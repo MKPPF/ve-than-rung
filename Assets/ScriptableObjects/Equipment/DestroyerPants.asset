@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 500107c4bb4689847b2b12a2649733fc, type: 3}
+  m_Name: DestroyerPants
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownGame.Equipment.EquipmentData
+  itemId: destroyer_pants
+  displayName: "Qu\u1EA7n H\u1EE7y Di\u1EC7t"
+  slot: 3
+  weaponType: 0
+  description: "C\xF4ng th\u1EE7 c\xE2n b\u1EB1ng."
+  icon: {fileID: 21300000, guid: 68095a7cf2b5d234cb8c3c947ffb8a88, type: 3}
+  price: 620
+  bonusDamage: 3
+  bonusArmor: 7
+  bonusMaxHealth: 35
+  bonusMoveSpeed: 0
+  bonusCriticalChance: 0
+  bonusCooldownRate: 0

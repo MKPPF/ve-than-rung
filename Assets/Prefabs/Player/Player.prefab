@@ -1,0 +1,706 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5587623954465138150
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8861711868839701508}
+  - component: {fileID: 6359592668283545005}
+  - component: {fileID: 8583513561506130800}
+  - component: {fileID: 16713760353434100}
+  - component: {fileID: 1514627178317981983}
+  - component: {fileID: 658503751443911909}
+  - component: {fileID: 8169804786614150728}
+  - component: {fileID: 7822979259318983675}
+  - component: {fileID: 5346836972569818765}
+  - component: {fileID: 4573760895196888154}
+  - component: {fileID: 8147183153947368920}
+  - component: {fileID: 5044598778725572074}
+  - component: {fileID: 6193740150072141858}
+  - component: {fileID: 1357008037333721571}
+  - component: {fileID: 4002432003477524120}
+  - component: {fileID: 3962474313832421665}
+  - component: {fileID: 2235438010770737264}
+  - component: {fileID: 4542244237548077952}
+  - component: {fileID: 5175304107836815848}
+  - component: {fileID: 9015989014726534237}
+  - component: {fileID: 3198483499803890518}
+  - component: {fileID: 9009539570861177073}
+  - component: {fileID: 8757917742574205773}
+  - component: {fileID: 3245456869653220979}
+  m_Layer: 8
+  m_Name: Player
+  m_TagString: Player
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8861711868839701508
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &6359592668283545005
+SpriteRenderer:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 10
+  m_MaskInteraction: 0
+  m_Sprite: {fileID: 21300000, guid: d97059fe55c72ed4284e6f9ef0aba2c2, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1.3650312, y: 1.6328125}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_SpriteSortPoint: 0
+  m_BlendShapeWeights: []
+--- !u!58 &8583513561506130800
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Radius: 0.48
+--- !u!50 &16713760353434100
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 1
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 1
+  m_SleepingMode: 1
+  m_CollisionDetection: 1
+  m_Constraints: 4
+--- !u!114 &1514627178317981983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
+  m_Actions: {fileID: -944628639613478452, guid: 5e716bb9195b9eb49a2ccb4c51691dc6,
+    type: 3}
+  m_NotificationBehavior: 3
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: Player
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
+--- !u!114 &658503751443911909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5b53e351fb2db04fa73d0e5158deda9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Player.PlayerMovement
+  moveSpeed: 3
+  smoothLocomotion: 1
+  acceleration: 60
+  deceleration: 90
+  moveActionName: Move
+  clickToMove: 1
+  clickStopDistance: 0.005
+  clickPathGridSize: 0.5
+  clickPathSearchPadding: 16
+  maxPathSearchNodes: 20000
+  clickPathTurnPenalty: 0.08
+  clickGoalSnapDistance: 1.5
+  contactOffset: 0.05
+  maxSlideIterations: 2
+  movementLayers:
+    serializedVersion: 2
+    m_Bits: 4294966783
+  impulseDamping: 18
+  gaitCyclesPerUnit: 0.4
+--- !u!114 &8169804786614150728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b39c4f2ffe11a2f4abe9dc0e47e4e28f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Player.PlayerCharacterAnimator
+  idleSprite: {fileID: 21300000, guid: d97059fe55c72ed4284e6f9ef0aba2c2, type: 3}
+  idleFrames: []
+  walkFrames:
+  - {fileID: 21300000, guid: 00f2e6842740c2a4a9c9c3d9bb8d7859, type: 3}
+  - {fileID: 21300000, guid: 0109d9c84a9cfa244810ab85803ffe22, type: 3}
+  - {fileID: 21300000, guid: 85b2e8a60f826f94db567093953cf8dd, type: 3}
+  - {fileID: 21300000, guid: f757099d8dd79e346b53cbce72a4b7ee, type: 3}
+  - {fileID: 21300000, guid: 13cc3cfb38f980a4a869d9cd0ad4087a, type: 3}
+  - {fileID: 21300000, guid: e14fc1d404ad5e24c8c8617a0e8e297b, type: 3}
+  - {fileID: 21300000, guid: b2c8346357fb8b447a3887573c601a7d, type: 3}
+  - {fileID: 21300000, guid: 9b5a0ffae5406bb4ab633f2a7988bfab, type: 3}
+  walkLeftFrames:
+  - {fileID: 21300000, guid: e5a2edf5d81d9324d9c675bbe44a0e17, type: 3}
+  - {fileID: 21300000, guid: 3c56e4e19eeadc44bb50c084261b853e, type: 3}
+  - {fileID: 21300000, guid: e27ef76fb7c45c54dab58abd9a240929, type: 3}
+  - {fileID: 21300000, guid: 051741c1b85506149a4ad43fa9850ab1, type: 3}
+  - {fileID: 21300000, guid: c178f7054488e4c4eb0a47d8affcafd7, type: 3}
+  - {fileID: 21300000, guid: 007ae5b5958445349b052757f6796e38, type: 3}
+  - {fileID: 21300000, guid: 7bdce9a17e7f8c04aba6ac4e95e31be0, type: 3}
+  - {fileID: 21300000, guid: ee06acd6d38096d409c7df7c8b9182a8, type: 3}
+  walkRightFrames:
+  - {fileID: 21300000, guid: e5a2edf5d81d9324d9c675bbe44a0e17, type: 3}
+  - {fileID: 21300000, guid: 3c56e4e19eeadc44bb50c084261b853e, type: 3}
+  - {fileID: 21300000, guid: e27ef76fb7c45c54dab58abd9a240929, type: 3}
+  - {fileID: 21300000, guid: 051741c1b85506149a4ad43fa9850ab1, type: 3}
+  - {fileID: 21300000, guid: c178f7054488e4c4eb0a47d8affcafd7, type: 3}
+  - {fileID: 21300000, guid: 007ae5b5958445349b052757f6796e38, type: 3}
+  - {fileID: 21300000, guid: 7bdce9a17e7f8c04aba6ac4e95e31be0, type: 3}
+  - {fileID: 21300000, guid: ee06acd6d38096d409c7df7c8b9182a8, type: 3}
+  walkUpFrames:
+  - {fileID: 21300000, guid: 2f72a1729178816429c2464081acc6e0, type: 3}
+  - {fileID: 21300000, guid: 4a39e52ba2290254f8bb9d8294e4aa8c, type: 3}
+  - {fileID: 21300000, guid: 3b76ef2e18c10754da543ee9f353cf59, type: 3}
+  - {fileID: 21300000, guid: 03fb5169261f3e54ba10d112d50bbe72, type: 3}
+  - {fileID: 21300000, guid: 916f7bf9f928a5c45ad1b61185ad4120, type: 3}
+  - {fileID: 21300000, guid: 714ce4d0eaf287d4fad429565ab86498, type: 3}
+  - {fileID: 21300000, guid: baf83052251a38c40bb006a2f148c1e6, type: 3}
+  - {fileID: 21300000, guid: a943d81e1c1a91d4891675edb77c4d5f, type: 3}
+  walkDownFrames:
+  - {fileID: 21300000, guid: 8661d75c480e44b4985b526cb36df3d7, type: 3}
+  - {fileID: 21300000, guid: b6ce5bf60b0b8de45af5a4ac372aea3c, type: 3}
+  - {fileID: 21300000, guid: 9e6dabb177693e342b1e0d790c52e056, type: 3}
+  - {fileID: 21300000, guid: cc66218baa396be4585cf7142ee04546, type: 3}
+  - {fileID: 21300000, guid: 721a2a7ae9bd4a649af04e24e566fa5b, type: 3}
+  - {fileID: 21300000, guid: d05a9f969d761244487c977add4d6de3, type: 3}
+  - {fileID: 21300000, guid: 8abdc88b6d4236d429bc24d333b34503, type: 3}
+  - {fileID: 21300000, guid: adf881454f5caa84f92da29cd133d2d5, type: 3}
+  attackFrames: []
+  skillCastFrames:
+  - {fileID: 21300000, guid: 9eae97fb4c1609c4182a42c868be9cb8, type: 3}
+  - {fileID: 21300000, guid: 362ce422e370862468827f705051671c, type: 3}
+  - {fileID: 21300000, guid: 012ed8da5b474c2429b562edd3f6cebe, type: 3}
+  hitFrames: []
+  deathFrames: []
+  walkStartSpeed: 0.08
+  walkStopSpeed: 0.04
+  smoothLocomotion: 1
+  stopSettleDuration: 0.1
+  attackDuration: 0.34
+  skillCastDuration: 0.48
+  hitDuration: 0.18
+  deathDuration: 0.62
+--- !u!114 &7822979259318983675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 885638d01a3f9334c8b857ac44272bfc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Player.PlayerStats
+  experimentalVitals: 1
+  maxHealth: 50000
+  baseDamage: 20
+  moveSpeed: 3
+  armor: 5
+  criticalChance: 0.1
+  criticalMultiplier: 1.75
+  maxMana: 25000
+  manaRegeneration: 400
+  cooldownRate: 1
+  gold: 0
+  level: 1
+  experience: 0
+  baseExperienceToLevel: 100
+  healthPerLevel: 10
+  damagePerLevel: 2
+  armorPerLevel: 0.75
+  availablePotentialPoints: 0
+  vitalityPoints: 0
+  powerPoints: 0
+  guardPoints: 0
+  hastePoints: 0
+--- !u!114 &5346836972569818765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d5daad66d98340459beb791189f5ded, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Equipment.EquipmentInventory
+  catalog:
+  - {fileID: 11400000, guid: 0018d2f780f1ff54589ec51ed2f752e8, type: 2}
+  - {fileID: 11400000, guid: f1bdc84d9c537554085f4f6ea643ea67, type: 2}
+  - {fileID: 11400000, guid: 83042c39317f15441ad5b95f7dad1a0a, type: 2}
+  - {fileID: 11400000, guid: 6bccf2b9ef7f35c468a5d815ce6502f1, type: 2}
+  - {fileID: 11400000, guid: f2c24918d41d89341a2debf9f5f037b7, type: 2}
+  - {fileID: 11400000, guid: 47cae72ecc62f19418fdddb8d804a06b, type: 2}
+  - {fileID: 11400000, guid: 0823feb88faf83c4191be038597ca180, type: 2}
+  - {fileID: 11400000, guid: 39fa5ec24a4991f4f8c8292f8b723942, type: 2}
+  - {fileID: 11400000, guid: af870a693cb8c5b4ab7cd605a437f6c5, type: 2}
+  - {fileID: 11400000, guid: 50a01102824c39d4daf9a7616105c678, type: 2}
+  - {fileID: 11400000, guid: 469ef56a1d1c24a43a03452e7806c980, type: 2}
+  - {fileID: 11400000, guid: ec9e675944706b5479691f199f801d2d, type: 2}
+  - {fileID: 11400000, guid: 7673d9871d5fce24d9f85f3a1f33643d, type: 2}
+  - {fileID: 11400000, guid: 54590c242b8de744e88553ff1b0c8128, type: 2}
+  - {fileID: 11400000, guid: ebf8c614e8fa48e4090c8cb5fe1b238e, type: 2}
+  - {fileID: 11400000, guid: 84b5ee94d753f0b4c9241f8e76de2112, type: 2}
+  - {fileID: 11400000, guid: c76521756183f2d40be9f5360aa811c2, type: 2}
+  - {fileID: 11400000, guid: 41f9cbfe9c673cb4cac39bc2aeef97cf, type: 2}
+  - {fileID: 11400000, guid: 2b69620f969afb04fa4fbc6adf5410f5, type: 2}
+  - {fileID: 11400000, guid: 69e51ec079faad340b98b51d7c85a3c0, type: 2}
+  - {fileID: 11400000, guid: f8355fd1daf267b48bfa891b7bd0b15a, type: 2}
+  - {fileID: 11400000, guid: 9f0f27769a313454b8c149d594c50e44, type: 2}
+  - {fileID: 11400000, guid: 70bc9efe64aa7ca4ebdb4ada49d06d99, type: 2}
+  - {fileID: 11400000, guid: ad289160125659f449e02f6e5425e9aa, type: 2}
+  - {fileID: 11400000, guid: a40762387e2163240b22b1bc5abcb7a3, type: 2}
+  - {fileID: 11400000, guid: aab63d5f2c0adba44a13acd5db3586c0, type: 2}
+  - {fileID: 11400000, guid: e43fcae14dfc23a4bb8f90fed23aff2f, type: 2}
+  - {fileID: 11400000, guid: 1f45fdecaebe1ee4bb99ee2aecd33fd3, type: 2}
+  - {fileID: 11400000, guid: 8dc62918ef20a1a4786d749df833af91, type: 2}
+  - {fileID: 11400000, guid: edb97613bcaa79c4eabf4f7078a1be00, type: 2}
+  - {fileID: 11400000, guid: 7a83c89e76e390e4c9b70fad1e0cef77, type: 2}
+  - {fileID: 11400000, guid: 19bad6ff75c6b9e4483b919977df553d, type: 2}
+  - {fileID: 11400000, guid: eca0744fe18a4bd4a788016cb07d3efb, type: 2}
+  - {fileID: 11400000, guid: f0d3a8518f4d4af0b9f61726bf2037bc, type: 2}
+  - {fileID: 11400000, guid: 904c8487185842e3a6277d16427930e4, type: 2}
+  - {fileID: 11400000, guid: ca70e5a8bdb947f79a899cae4926dbea, type: 2}
+  - {fileID: 11400000, guid: a597a88b3bb4408f860c6a30f9fda507, type: 2}
+  - {fileID: 11400000, guid: d91a95b795c64bfab40e4489f2ad7665, type: 2}
+  - {fileID: 11400000, guid: 65d7bb5e8c67412da44fc780974e592c, type: 2}
+  - {fileID: 11400000, guid: b9f480dd62ea4c34853b74c300f824b6, type: 2}
+--- !u!114 &4573760895196888154
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b2a6a2c1fb61624cad059d0a9b47cf5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Player.PlayerHealth
+  invulnerabilityDuration: 0.35
+  damagePopupPrefab: {fileID: 0}
+--- !u!114 &8147183153947368920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 530f0b6983219c6449292d3e89b607b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Player.PlayerPoisonStatus
+--- !u!114 &5044598778725572074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36981c4ba17289b4ea94af01e7f93767, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Player.PlayerCombat
+  attackRange: 1.35
+  attackArc: 95
+  attackCooldown: 0.4
+  knockback: 3
+  enemyLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  clickToShoot: 0
+  shotSpeed: 16
+  shotRange: 12
+  autoAttackEnabled: 1
+  autoTargetScanInterval: 0.08
+  autoSkillSearchRange: 7
+  autoCombatResumeDelay: 0.12
+  stationarySpeedThreshold: 0.08
+--- !u!114 &6193740150072141858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f8ac99001224f047b0e725bbc070a0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Player.PlayerInteraction
+  interactionRadius: 1.5
+  interactionLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  doubleClickWindow: 0.45
+  clickHitRadius: 0.25
+  worldDoubleClickEnabled: 1
+--- !u!114 &1357008037333721571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d30e2127cddbc42418835012ab62ea41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Skills.SkillInventory
+  slots:
+  - key: Q
+    skillId: Fireball
+    level: 1
+  - key: E
+    skillId: IceDash
+    level: 1
+  - key: R
+    skillId: SwordSpin
+    level: 1
+  - key: F
+    skillId: LightningStrike
+    level: 1
+--- !u!114 &4002432003477524120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec00345d79851a94c8c6f932d12f34bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Skills.SkillManager
+  skillDatabase:
+  - {fileID: 11400000, guid: 0db5e036d7330364b86928f33f184593, type: 2}
+  - {fileID: 11400000, guid: f2da104a59760fa42ad31bf034851817, type: 2}
+  - {fileID: 11400000, guid: 3f1b3c146b46b2b46979fa94dea2f708, type: 2}
+  - {fileID: 11400000, guid: 2b90971684d6f2445b5a9f3c5418cfd1, type: 2}
+  - {fileID: 11400000, guid: 3495e6c2d89903a4e85287c5ef84cbac, type: 2}
+  - {fileID: 11400000, guid: 8f14e178289fc7a43a27c8b6495679c2, type: 2}
+  - {fileID: 11400000, guid: d932f55453d99c74791dc02ea6bbdd96, type: 2}
+  - {fileID: 11400000, guid: f5a6be150ecf98f4fbef476e91f618df, type: 2}
+  - {fileID: 11400000, guid: 2078bd7101624ab468d93915dae56943, type: 2}
+--- !u!114 &3962474313832421665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fa3ae4b820834141b18d093b9c01f73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Skills.FireballSkill
+  data: {fileID: 11400000, guid: 0db5e036d7330364b86928f33f184593, type: 2}
+  projectileSpeed: 8
+  explosionRadius: 1.5
+  enemyLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  collisionLayers:
+    serializedVersion: 2
+    m_Bits: 0
+--- !u!114 &2235438010770737264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93791763a61d6164594c3ccec036f674, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Skills.IceDashSkill
+  data: {fileID: 11400000, guid: f2da104a59760fa42ad31bf034851817, type: 2}
+  dashDistance: 3.5
+  dashDuration: 0.2
+  hitRadius: 0.75
+  enemyLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &4542244237548077952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 621c65de9ebc60a4e94169e63e117935, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Skills.SwordSpinSkill
+  data: {fileID: 11400000, guid: 3f1b3c146b46b2b46979fa94dea2f708, type: 2}
+  effectSprite: {fileID: 21300000, guid: e77aeba6e4ff7064580f97068830817e, type: 3}
+  comboProfile: {fileID: 11400000, guid: 2b630ff629ceb964dbc94748ea656fa3, type: 2}
+  attackRadius: 2
+  duration: 1.2
+  damageInterval: 0.2
+  maximumHitsPerEnemy: 6
+  enemyLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &5175304107836815848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71517cb79bef0fd4282fa98baf9973a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Skills.LightningStrikeSkill
+  data: {fileID: 11400000, guid: 2b90971684d6f2445b5a9f3c5418cfd1, type: 2}
+  radius: 2
+  enemyLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  mainBoltSegments: 18
+  mainBoltCount: 3
+  mainBoltSpread: 0.6
+  branchBoltCount: 5
+  branchSegments: 8
+  zigzagStrength: 0.4
+  branchZigzag: 0.25
+  strikeHeight: 6
+  mainLineWidth: 0.22
+  branchLineWidth: 0.09
+  crackCount: 10
+  crackSegments: 7
+  crackMaxLength: 3.5
+  crackWidth: 0.12
+  crackJaggedness: 0.25
+  crackExpandDuration: 0.12
+  crackLingerDuration: 1.2
+  crackFadeDuration: 0.6
+  preStrikeDelay: 0.18
+  strikeDuration: 0.4
+  flickerInterval: 0.03
+--- !u!114 &9015989014726534237
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bd015782d0c959438e24141060efe1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Skills.HealingSkill
+  data: {fileID: 11400000, guid: 3495e6c2d89903a4e85287c5ef84cbac, type: 2}
+  healAmount: 35
+--- !u!114 &3198483499803890518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8703e843bbb7e2468067f543d1039cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Skills.ShieldSkill
+  data: {fileID: 11400000, guid: 8f14e178289fc7a43a27c8b6495679c2, type: 2}
+  damageReduction: 0.65
+  duration: 4
+--- !u!114 &9009539570861177073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e9bbfae3868698418e77eb861e95793, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Skills.ChainLightningSkill
+  data: {fileID: 11400000, guid: d932f55453d99c74791dc02ea6bbdd96, type: 2}
+  maximumTargets: 3
+  jumpRange: 4.25
+  damageFalloff: 0.75
+  enemyLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &8757917742574205773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48e38416e4f38564cb0f6a7118d8512d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Skills.MeteorShowerSkill
+  data: {fileID: 11400000, guid: f5a6be150ecf98f4fbef476e91f618df, type: 2}
+  meteorCount: 5
+  impactRadius: 0.95
+  spreadRadius: 1.55
+  warningDuration: 0.62
+  enemyLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &3245456869653220979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5587623954465138150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbdd858eddfa09641a45542d60031c13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Skills.VoidPulseSkill
+  data: {fileID: 11400000, guid: 2078bd7101624ab468d93915dae56943, type: 2}
+  pullStrength: 5.5
+  enemyLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295

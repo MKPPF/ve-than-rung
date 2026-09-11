@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cb108e827b92c042afe206dab509649, type: 3}
+  m_Name: IceDashPresentation
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Skills.SkillPresentationProfile
+  element: 1
+  shader: {fileID: 4800000, guid: 46ebf82520ed35d4eb1f61c60765c5da, type: 3}
+  primary: {r: 0.25, g: 0.8, b: 1, a: 1}
+  core: {r: 1, g: 1, b: 1, a: 1}
+  windup: 0.08
+  recovery: 0.17
+  paintedFrames:
+  - {fileID: 21300000, guid: 4569d1ad814bff94985059461f59bc4c, type: 2}
+  - {fileID: 21300000, guid: 2d443bf9dd5362641a345155f52c7e74, type: 2}
+  - {fileID: 21300000, guid: 42620d69a1c9cd94783cd31f3be0d3e2, type: 2}
+  - {fileID: 21300000, guid: 212840e22ed9273459d1ca631cdce720, type: 2}
+  - {fileID: 21300000, guid: 8a78eb74cd8647340a36c60e73d0302d, type: 2}
+  - {fileID: 21300000, guid: 0234b55a9da13ae45ab289ef286d0c59, type: 2}
+  paintedMaterial: {fileID: 2100000, guid: 9dfb9eb980c91d0439421fde7fb4a3cd, type: 2}
+  actorFrames:
+  - {fileID: 21300000, guid: 29d348d4ad124f64d83240105bf50a1a, type: 2}
+  - {fileID: 21300000, guid: 79b92c53a44aeca45bab8a1a342fd88d, type: 2}
+  - {fileID: 21300000, guid: b5cd583bcc95e31459048b98858122c6, type: 2}
+  - {fileID: 21300000, guid: 0baf734892d31314586ef3d23f164dc2, type: 2}
+  - {fileID: 21300000, guid: c4ab29d6b3d3eae4fa6e96704a13f3b9, type: 2}
+  - {fileID: 21300000, guid: 26d5d3f9a7b957643937f0b0ab26f03b, type: 2}
+  actorMaterial: {fileID: 2100000, guid: c357646b6b641554b9a91265a100e643, type: 2}
+  releasePose: 2

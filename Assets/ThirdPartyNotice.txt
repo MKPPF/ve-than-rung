@@ -1,0 +1,10 @@
+Asset is governed by the Asset Store EULA; however, the following components are governed by the licenses indicated below:
+
+LiberationSans
+LiberationSans - OFL
+Version 1.1 2007
+
+Unity Technologies PhysicsExamples2D - KinematicTopDownController adaptation
+Copyright © 2024 Unity Technologies ApS
+Unity Companion License for Unity-dependent projects
+See Assets/ThirdParty/UnityPhysicsExamples2D/LICENSE.md and NOTICE.md

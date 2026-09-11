@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 686ea926d83b3ec4390a29109191939f, type: 3}
+  m_Name: ChainLightning
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Skills.SkillData
+  skillId: 6
+  displayName: "S\xE9t Li\xEAn Ho\xE0n"
+  description: "S\xE9t nh\u1EA3y qua t\u1ED1i \u0111a ba m\u1EE5c ti\xEAu, gi\u1EA3m
+    25% s\xE1t th\u01B0\u01A1ng m\u1ED7i l\u1EA7n lan."
+  icon: {fileID: 21300000, guid: 0b256017d939d354f88a82dc545a82b7, type: 2}
+  damage: 62
+  manaCost: 28
+  cooldown: 4.2
+  range: 7
+  maxLevel: 5
+  effectColor: {r: 0.35, g: 0.78, b: 1, a: 1}
+  presentation: {fileID: 11400000, guid: 00cce2b8733cb624da8844f062dfe30c, type: 2}

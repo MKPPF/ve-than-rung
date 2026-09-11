@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 686ea926d83b3ec4390a29109191939f, type: 3}
+  m_Name: Fireball
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownGame.Skills.SkillData
+  skillId: 0
+  displayName: "C\u1EA7u L\u1EEDa"
+  description: "B\u1EAFn c\u1EA7u l\u1EEDa n\u1ED5 lan t\u1EA1i \u0111i\u1EC3m va
+    ch\u1EA1m."
+  icon: {fileID: 21300000, guid: f73e9e685d6f62a408e106466bd9e1ea, type: 2}
+  damage: 40
+  manaCost: 15
+  cooldown: 1.6
+  range: 6
+  maxLevel: 5
+  effectColor: {r: 1, g: 0.25, b: 0.1, a: 1}
+  presentation: {fileID: 11400000, guid: 33eae5f8417bdda4584b7b77aa25f35f, type: 2}

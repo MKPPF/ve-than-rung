@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 500107c4bb4689847b2b12a2649733fc, type: 3}
+  m_Name: LionPants
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownGame.Equipment.EquipmentData
+  itemId: lion_pants
+  displayName: "Qu\u1EA7n S\u01B0 T\u1EED"
+  slot: 3
+  weaponType: 0
+  description: "Nhanh v\xE0 b\u1EC1n b\u1EC9."
+  icon: {fileID: 21300000, guid: a1c5ffc3f478c0148b19b885aee07198, type: 3}
+  price: 520
+  bonusDamage: 0
+  bonusArmor: 5
+  bonusMaxHealth: 30
+  bonusMoveSpeed: 0
+  bonusCriticalChance: 0
+  bonusCooldownRate: 0

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 768dbfdc7ee210e4ca213925e4be7396, type: 3}
+  m_Name: CrystalScorpion
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Enemies.EnemyData
+  enemyId: crystalscorpion
+  displayName: "B\u1ECD C\u1EA1p Pha L\xEA"
+  archetype: 5
+  maxHealth: 210
+  damage: 18
+  armor: 14
+  moveSpeed: 2.5
+  detectionRange: 10
+  attackRange: 4.6
+  attackCooldown: 2.4
+  goldReward: 12
+  experienceReward: 48
+  itemDropChance: 0.15

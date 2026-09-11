@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 500107c4bb4689847b2b12a2649733fc, type: 3}
+  m_Name: DestroyerArmor
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownGame.Equipment.EquipmentData
+  itemId: destroyer_armor
+  displayName: "Gi\xE1p H\u1EE7y Di\u1EC7t"
+  slot: 2
+  weaponType: 0
+  description: "T\u0103ng s\xE1t th\u01B0\u01A1ng v\xE0 gi\xE1p."
+  icon: {fileID: 21300000, guid: 24f7dbf3138799e43b461429c30cf365, type: 3}
+  price: 750
+  bonusDamage: 8
+  bonusArmor: 14
+  bonusMaxHealth: 60
+  bonusMoveSpeed: 0
+  bonusCriticalChance: 0
+  bonusCooldownRate: 0

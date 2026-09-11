@@ -1,0 +1,1534 @@
+fileFormatVersion: 2
+guid: 99a716f928a66944891d473593a784fd
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8433493346251479381
+    second: ForestTreeClusterV2_0
+  - first:
+      213: -5176066576110756378
+    second: ForestTreeClusterV2_1
+  - first:
+      213: -2278815003432263312
+    second: ForestTreeClusterV2_2
+  - first:
+      213: -1844328558892096681
+    second: ForestTreeClusterV2_3
+  - first:
+      213: -1768986624110891118
+    second: ForestTreeClusterV2_4
+  - first:
+      213: -2308139995778168287
+    second: ForestTreeClusterV2_5
+  - first:
+      213: -4611117982200518877
+    second: ForestTreeClusterV2_6
+  - first:
+      213: 4803451001827759071
+    second: ForestTreeClusterV2_7
+  - first:
+      213: -5540125753759548484
+    second: ForestTreeClusterV2_8
+  - first:
+      213: 4551426252810186192
+    second: ForestTreeClusterV2_9
+  - first:
+      213: 988350501606529608
+    second: ForestTreeClusterV2_10
+  - first:
+      213: 189846217163127643
+    second: ForestTreeClusterV2_11
+  - first:
+      213: -3612882519931573774
+    second: ForestTreeClusterV2_12
+  - first:
+      213: -2527742755231315338
+    second: ForestTreeClusterV2_13
+  - first:
+      213: 4088335270270362652
+    second: ForestTreeClusterV2_14
+  - first:
+      213: -7650327408082340787
+    second: ForestTreeClusterV2_15
+  - first:
+      213: -8842940100539634489
+    second: ForestTreeClusterV2_16
+  - first:
+      213: 3397970493473088177
+    second: ForestTreeClusterV2_17
+  - first:
+      213: -8424213228289839359
+    second: ForestTreeClusterV2_18
+  - first:
+      213: -5751713250908068983
+    second: ForestTreeClusterV2_19
+  - first:
+      213: -2136249279171533970
+    second: ForestTreeClusterV2_20
+  - first:
+      213: 8560196014664836653
+    second: ForestTreeClusterV2_21
+  - first:
+      213: -132904950267125224
+    second: ForestTreeClusterV2_22
+  - first:
+      213: -8691469945420000853
+    second: ForestTreeClusterV2_23
+  - first:
+      213: -4792232856646648044
+    second: ForestTreeClusterV2_24
+  - first:
+      213: -5097726974813756396
+    second: ForestTreeClusterV2_25
+  - first:
+      213: -8152070152192113906
+    second: ForestTreeClusterV2_26
+  - first:
+      213: 8797974171860328162
+    second: ForestTreeClusterV2_27
+  - first:
+      213: -5640415420106105765
+    second: ForestTreeClusterV2_28
+  - first:
+      213: -4057050579349843482
+    second: ForestTreeClusterV2_29
+  - first:
+      213: 6998418175227090090
+    second: ForestTreeClusterV2_30
+  - first:
+      213: -1087977674443599546
+    second: ForestTreeClusterV2_31
+  - first:
+      213: -6779488864009695218
+    second: ForestTreeClusterV2_32
+  - first:
+      213: 1127587099611686427
+    second: ForestTreeClusterV2_33
+  - first:
+      213: 5870323929828833857
+    second: ForestTreeClusterV2_34
+  - first:
+      213: 4543028811700323938
+    second: ForestTreeClusterV2_35
+  - first:
+      213: 7053458975852147550
+    second: ForestTreeClusterV2_36
+  - first:
+      213: -617711803919535193
+    second: ForestTreeClusterV2_37
+  - first:
+      213: -7620460113907898000
+    second: ForestTreeClusterV2_38
+  - first:
+      213: -7444006288643636505
+    second: ForestTreeClusterV2_39
+  - first:
+      213: -5511422859154745378
+    second: ForestTreeClusterV2_40
+  - first:
+      213: -4292608721170800123
+    second: ForestTreeClusterV2_41
+  - first:
+      213: 3972060526733639780
+    second: ForestTreeClusterV2_42
+  - first:
+      213: 3018065280761767186
+    second: ForestTreeClusterV2_43
+  - first:
+      213: -8276909900280226553
+    second: ForestTreeClusterV2_44
+  - first:
+      213: -868012314151300356
+    second: ForestTreeClusterV2_45
+  - first:
+      213: 3895042132405101976
+    second: ForestTreeClusterV2_46
+  - first:
+      213: 737195888135164162
+    second: ForestTreeClusterV2_47
+  - first:
+      213: -90524450806842629
+    second: ForestTreeClusterV2_48
+  - first:
+      213: -7588323866903034414
+    second: ForestTreeClusterV2_49
+  - first:
+      213: 4170761438457827704
+    second: ForestTreeClusterV2_50
+  - first:
+      213: -3339081068208976861
+    second: ForestTreeClusterV2_51
+  - first:
+      213: -1948244690628201711
+    second: ForestTreeClusterV2_52
+  - first:
+      213: -5015486628466929
+    second: ForestTreeClusterV2_53
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 768
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_0
+      rect:
+        serializedVersion: 2
+        x: 524
+        y: 1321
+        width: 12
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba66f01fb7636fa80800000000000000
+      internalID: -8433493346251479381
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_1
+      rect:
+        serializedVersion: 2
+        x: 805
+        y: 1303
+        width: 28
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ed552d7fdaea28b0800000000000000
+      internalID: -5176066576110756378
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_2
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1173
+        height: 1305
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 071e69bf3d50060e0800000000000000
+      internalID: -2278815003432263312
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_3
+      rect:
+        serializedVersion: 2
+        x: 293
+        y: 1254
+        width: 46
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 753e02682f0a766e0800000000000000
+      internalID: -1844328558892096681
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_4
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 1283
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 29fe371b90c4377e0800000000000000
+      internalID: -1768986624110891118
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_5
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 1281
+        width: 60
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 12a45c327e6d7ffd0800000000000000
+      internalID: -2308139995778168287
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_6
+      rect:
+        serializedVersion: 2
+        x: 824
+        y: 1247
+        width: 17
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 327a58d30a40200c0800000000000000
+      internalID: -4611117982200518877
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_7
+      rect:
+        serializedVersion: 2
+        x: 830
+        y: 1215
+        width: 78
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fd310f38c3949a240800000000000000
+      internalID: 4803451001827759071
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_8
+      rect:
+        serializedVersion: 2
+        x: 840
+        y: 1261
+        width: 11
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cbb3b24daf48d13b0800000000000000
+      internalID: -5540125753759548484
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_9
+      rect:
+        serializedVersion: 2
+        x: 1125
+        y: 969
+        width: 7
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0dd632cff0ae92f30800000000000000
+      internalID: 4551426252810186192
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_10
+      rect:
+        serializedVersion: 2
+        x: 1131
+        y: 967
+        width: 8
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 84a16d17b8357bd00800000000000000
+      internalID: 988350501606529608
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_11
+      rect:
+        serializedVersion: 2
+        x: 1139
+        y: 966
+        width: 12
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b5bb5ffe02872a200800000000000000
+      internalID: 189846217163127643
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_12
+      rect:
+        serializedVersion: 2
+        x: 1125
+        y: 942
+        width: 7
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f9a2407d767cddc0800000000000000
+      internalID: -3612882519931573774
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_13
+      rect:
+        serializedVersion: 2
+        x: 1141
+        y: 916
+        width: 28
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67acede4b57abecd0800000000000000
+      internalID: -2527742755231315338
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_14
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 822
+        width: 48
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c146a23744facb830800000000000000
+      internalID: 4088335270270362652
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_15
+      rect:
+        serializedVersion: 2
+        x: 1073
+        y: 790
+        width: 65
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d4431d961c394d590800000000000000
+      internalID: -7650327408082340787
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_16
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 768
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7cc274994d0974580800000000000000
+      internalID: -8842940100539634489
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_17
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 774
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1b2e8bc1924082f20800000000000000
+      internalID: 3397970493473088177
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_18
+      rect:
+        serializedVersion: 2
+        x: 1116
+        y: 722
+        width: 16
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 10f23a7c3be271b80800000000000000
+      internalID: -8424213228289839359
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_19
+      rect:
+        serializedVersion: 2
+        x: 1139
+        y: 706
+        width: 10
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 983a7bda54fcd20b0800000000000000
+      internalID: -5751713250908068983
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_20
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 520
+        width: 30
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e63eb4359948a52e0800000000000000
+      internalID: -2136249279171533970
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_21
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 542
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d26efc5ebecebc670800000000000000
+      internalID: 8560196014664836653
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_22
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 496
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 812ef62e6a3d72ef0800000000000000
+      internalID: -132904950267125224
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_23
+      rect:
+        serializedVersion: 2
+        x: 1115
+        y: 237
+        width: 15
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba1d14f4222b16780800000000000000
+      internalID: -8691469945420000853
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_24
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 59
+        width: 11
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 41ffe927b919e7db0800000000000000
+      internalID: -4792232856646648044
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_25
+      rect:
+        serializedVersion: 2
+        x: 670
+        y: 15
+        width: 35
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 414ac48435c3149b0800000000000000
+      internalID: -5097726974813756396
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_26
+      rect:
+        serializedVersion: 2
+        x: 765
+        y: 63
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e03468a53670ede80800000000000000
+      internalID: -8152070152192113906
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_27
+      rect:
+        serializedVersion: 2
+        x: 775
+        y: 67
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2eedbc845eea81a70800000000000000
+      internalID: 8797974171860328162
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_28
+      rect:
+        serializedVersion: 2
+        x: 791
+        y: 77
+        width: 12
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b5c90f24f0839b1b0800000000000000
+      internalID: -5640415420106105765
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_29
+      rect:
+        serializedVersion: 2
+        x: 830
+        y: 69
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e15f064ef572b7c0800000000000000
+      internalID: -4057050579349843482
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_30
+      rect:
+        serializedVersion: 2
+        x: 832
+        y: 25
+        width: 68
+        height: 87
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aa45c0c40406f1160800000000000000
+      internalID: 6998418175227090090
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_31
+      rect:
+        serializedVersion: 2
+        x: 895
+        y: 66
+        width: 15
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 641db37c11ab6e0f0800000000000000
+      internalID: -1087977674443599546
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_32
+      rect:
+        serializedVersion: 2
+        x: 905
+        y: 73
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e005cf52cca6ae1a0800000000000000
+      internalID: -6779488864009695218
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_33
+      rect:
+        serializedVersion: 2
+        x: 911
+        y: 55
+        width: 27
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b16eaad2e7ef5af00800000000000000
+      internalID: 1127587099611686427
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_34
+      rect:
+        serializedVersion: 2
+        x: 322
+        y: 45
+        width: 11
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 14a3ce90384977150800000000000000
+      internalID: 5870323929828833857
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_35
+      rect:
+        serializedVersion: 2
+        x: 340
+        y: 43
+        width: 7
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 26643cd52a41c0f30800000000000000
+      internalID: 4543028811700323938
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_36
+      rect:
+        serializedVersion: 2
+        x: 759
+        y: 65
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e533575519be2e160800000000000000
+      internalID: 7053458975852147550
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_37
+      rect:
+        serializedVersion: 2
+        x: 761
+        y: 59
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a37fc913627d67f0800000000000000
+      internalID: -617711803919535193
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_38
+      rect:
+        serializedVersion: 2
+        x: 789
+        y: 35
+        width: 40
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 079ac7db6efae3690800000000000000
+      internalID: -7620460113907898000
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_39
+      rect:
+        serializedVersion: 2
+        x: 826
+        y: 63
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e24f9378b391b890800000000000000
+      internalID: -7444006288643636505
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_40
+      rect:
+        serializedVersion: 2
+        x: 986
+        y: 53
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed71d114c1e7383b0800000000000000
+      internalID: -5511422859154745378
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_41
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 43
+        width: 9
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 502eede7c179d64c0800000000000000
+      internalID: -4292608721170800123
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_42
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 33
+        width: 9
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4604f4211089f1730800000000000000
+      internalID: 3972060526733639780
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_43
+      rect:
+        serializedVersion: 2
+        x: 739
+        y: 18
+        width: 21
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 215aeb8e16252e920800000000000000
+      internalID: 3018065280761767186
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_44
+      rect:
+        serializedVersion: 2
+        x: 769
+        y: 45
+        width: 9
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 70d12e37c42822d80800000000000000
+      internalID: -8276909900280226553
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_45
+      rect:
+        serializedVersion: 2
+        x: 777
+        y: 39
+        width: 14
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf2d852366334f3f0800000000000000
+      internalID: -868012314151300356
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_46
+      rect:
+        serializedVersion: 2
+        x: 880
+        y: 13
+        width: 26
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 895af2fbe28fd0630800000000000000
+      internalID: 3895042132405101976
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_47
+      rect:
+        serializedVersion: 2
+        x: 308
+        y: 21
+        width: 17
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 201dc2221cb0b3a00800000000000000
+      internalID: 737195888135164162
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_48
+      rect:
+        serializedVersion: 2
+        x: 702
+        y: 17
+        width: 20
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bfabb2add746ebef0800000000000000
+      internalID: -90524450806842629
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_49
+      rect:
+        serializedVersion: 2
+        x: 791
+        y: 19
+        width: 18
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2d540a0d5abd0b690800000000000000
+      internalID: -7588323866903034414
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_50
+      rect:
+        serializedVersion: 2
+        x: 806
+        y: 29
+        width: 9
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8711d2e3e6581e930800000000000000
+      internalID: 4170761438457827704
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_51
+      rect:
+        serializedVersion: 2
+        x: 862
+        y: 15
+        width: 20
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 32c0c2da57339a1d0800000000000000
+      internalID: -3339081068208976861
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_52
+      rect:
+        serializedVersion: 2
+        x: 939
+        y: 15
+        width: 17
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 113b09fa6c176f4e0800000000000000
+      internalID: -1948244690628201711
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ForestTreeClusterV2_53
+      rect:
+        serializedVersion: 2
+        x: 870
+        y: 0
+        width: 63
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f0f6225017e2eeff0800000000000000
+      internalID: -5015486628466929
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      ForestTreeClusterV2_0: -8433493346251479381
+      ForestTreeClusterV2_1: -5176066576110756378
+      ForestTreeClusterV2_10: 988350501606529608
+      ForestTreeClusterV2_11: 189846217163127643
+      ForestTreeClusterV2_12: -3612882519931573774
+      ForestTreeClusterV2_13: -2527742755231315338
+      ForestTreeClusterV2_14: 4088335270270362652
+      ForestTreeClusterV2_15: -7650327408082340787
+      ForestTreeClusterV2_16: -8842940100539634489
+      ForestTreeClusterV2_17: 3397970493473088177
+      ForestTreeClusterV2_18: -8424213228289839359
+      ForestTreeClusterV2_19: -5751713250908068983
+      ForestTreeClusterV2_2: -2278815003432263312
+      ForestTreeClusterV2_20: -2136249279171533970
+      ForestTreeClusterV2_21: 8560196014664836653
+      ForestTreeClusterV2_22: -132904950267125224
+      ForestTreeClusterV2_23: -8691469945420000853
+      ForestTreeClusterV2_24: -4792232856646648044
+      ForestTreeClusterV2_25: -5097726974813756396
+      ForestTreeClusterV2_26: -8152070152192113906
+      ForestTreeClusterV2_27: 8797974171860328162
+      ForestTreeClusterV2_28: -5640415420106105765
+      ForestTreeClusterV2_29: -4057050579349843482
+      ForestTreeClusterV2_3: -1844328558892096681
+      ForestTreeClusterV2_30: 6998418175227090090
+      ForestTreeClusterV2_31: -1087977674443599546
+      ForestTreeClusterV2_32: -6779488864009695218
+      ForestTreeClusterV2_33: 1127587099611686427
+      ForestTreeClusterV2_34: 5870323929828833857
+      ForestTreeClusterV2_35: 4543028811700323938
+      ForestTreeClusterV2_36: 7053458975852147550
+      ForestTreeClusterV2_37: -617711803919535193
+      ForestTreeClusterV2_38: -7620460113907898000
+      ForestTreeClusterV2_39: -7444006288643636505
+      ForestTreeClusterV2_4: -1768986624110891118
+      ForestTreeClusterV2_40: -5511422859154745378
+      ForestTreeClusterV2_41: -4292608721170800123
+      ForestTreeClusterV2_42: 3972060526733639780
+      ForestTreeClusterV2_43: 3018065280761767186
+      ForestTreeClusterV2_44: -8276909900280226553
+      ForestTreeClusterV2_45: -868012314151300356
+      ForestTreeClusterV2_46: 3895042132405101976
+      ForestTreeClusterV2_47: 737195888135164162
+      ForestTreeClusterV2_48: -90524450806842629
+      ForestTreeClusterV2_49: -7588323866903034414
+      ForestTreeClusterV2_5: -2308139995778168287
+      ForestTreeClusterV2_50: 4170761438457827704
+      ForestTreeClusterV2_51: -3339081068208976861
+      ForestTreeClusterV2_52: -1948244690628201711
+      ForestTreeClusterV2_53: -5015486628466929
+      ForestTreeClusterV2_6: -4611117982200518877
+      ForestTreeClusterV2_7: 4803451001827759071
+      ForestTreeClusterV2_8: -5540125753759548484
+      ForestTreeClusterV2_9: 4551426252810186192
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

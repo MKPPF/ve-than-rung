@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 768dbfdc7ee210e4ca213925e4be7396, type: 3}
+  m_Name: Mage
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownGame.Enemies.EnemyData
+  enemyId: mage
+  displayName: Mage
+  archetype: 3
+  maxHealth: 120
+  damage: 16
+  armor: 3
+  moveSpeed: 1.8
+  detectionRange: 10
+  attackRange: 8
+  attackCooldown: 7
+  goldReward: 8
+  experienceReward: 32
+  itemDropChance: 0.15

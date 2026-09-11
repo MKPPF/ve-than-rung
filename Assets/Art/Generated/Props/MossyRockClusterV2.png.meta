@@ -1,0 +1,936 @@
+fileFormatVersion: 2
+guid: 1e28f0a2d4282a54ebd906e8e6793b7a
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 230827875482903310
+    second: MossyRockClusterV2_0
+  - first:
+      213: 4641675820398048287
+    second: MossyRockClusterV2_1
+  - first:
+      213: 5164051844632497387
+    second: MossyRockClusterV2_2
+  - first:
+      213: 3480829254673812119
+    second: MossyRockClusterV2_3
+  - first:
+      213: -7942130275357033562
+    second: MossyRockClusterV2_4
+  - first:
+      213: -2883553031286565725
+    second: MossyRockClusterV2_5
+  - first:
+      213: -2891356644975723865
+    second: MossyRockClusterV2_6
+  - first:
+      213: 4369260486165046609
+    second: MossyRockClusterV2_7
+  - first:
+      213: 8205035870741320392
+    second: MossyRockClusterV2_8
+  - first:
+      213: 8778327800692448653
+    second: MossyRockClusterV2_9
+  - first:
+      213: 4208797739784765437
+    second: MossyRockClusterV2_10
+  - first:
+      213: -3024870925690531192
+    second: MossyRockClusterV2_11
+  - first:
+      213: 1738605533956634863
+    second: MossyRockClusterV2_12
+  - first:
+      213: 7171161884316448972
+    second: MossyRockClusterV2_13
+  - first:
+      213: -104130403005680822
+    second: MossyRockClusterV2_14
+  - first:
+      213: -7212696336686995411
+    second: MossyRockClusterV2_15
+  - first:
+      213: -8362869218329376432
+    second: MossyRockClusterV2_16
+  - first:
+      213: 6846780953933591948
+    second: MossyRockClusterV2_17
+  - first:
+      213: -6817709216630466267
+    second: MossyRockClusterV2_18
+  - first:
+      213: -1490472372050830322
+    second: MossyRockClusterV2_19
+  - first:
+      213: -7778150891787653240
+    second: MossyRockClusterV2_20
+  - first:
+      213: -8128561447559609836
+    second: MossyRockClusterV2_21
+  - first:
+      213: 1134760979694022900
+    second: MossyRockClusterV2_22
+  - first:
+      213: 4545721807571125186
+    second: MossyRockClusterV2_23
+  - first:
+      213: -7419293063583362060
+    second: MossyRockClusterV2_24
+  - first:
+      213: 847782601812933824
+    second: MossyRockClusterV2_25
+  - first:
+      213: -7277369546710968070
+    second: MossyRockClusterV2_26
+  - first:
+      213: 8635582792679813317
+    second: MossyRockClusterV2_27
+  - first:
+      213: 8982504513004347269
+    second: MossyRockClusterV2_28
+  - first:
+      213: 6728842160672999113
+    second: MossyRockClusterV2_29
+  - first:
+      213: 8157261026891867908
+    second: MossyRockClusterV2_30
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 768
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: MossyRockClusterV2_0
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 25
+        width: 1187
+        height: 1094
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e03aa62dab0143300800000000000000
+      internalID: 230827875482903310
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_1
+      rect:
+        serializedVersion: 2
+        x: 667
+        y: 1100
+        width: 269
+        height: 116
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f147855e09b8a6040800000000000000
+      internalID: 4641675820398048287
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_2
+      rect:
+        serializedVersion: 2
+        x: 770
+        y: 1106
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bec4509dac56aa740800000000000000
+      internalID: 5164051844632497387
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_3
+      rect:
+        serializedVersion: 2
+        x: 808
+        y: 1066
+        width: 11
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79ace90d3c36e4030800000000000000
+      internalID: 3480829254673812119
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_4
+      rect:
+        serializedVersion: 2
+        x: 826
+        y: 1060
+        width: 9
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6abf7710892e7c190800000000000000
+      internalID: -7942130275357033562
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_5
+      rect:
+        serializedVersion: 2
+        x: 1107
+        y: 777
+        width: 17
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a4d927bbcf8bf7d0800000000000000
+      internalID: -2883553031286565725
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_6
+      rect:
+        serializedVersion: 2
+        x: 1107
+        y: 753
+        width: 9
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7aab1415376dfd7d0800000000000000
+      internalID: -2891356644975723865
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_7
+      rect:
+        serializedVersion: 2
+        x: 1115
+        y: 754
+        width: 9
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 155a409434bb2ac30800000000000000
+      internalID: 4369260486165046609
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_8
+      rect:
+        serializedVersion: 2
+        x: 1161
+        y: 616
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c2dfdcf6a42ed170800000000000000
+      internalID: 8205035870741320392
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_9
+      rect:
+        serializedVersion: 2
+        x: 1135
+        y: 572
+        width: 38
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d8d953a00a2e2d970800000000000000
+      internalID: 8778327800692448653
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_10
+      rect:
+        serializedVersion: 2
+        x: 1147
+        y: 570
+        width: 6
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dff7653ce37a86a30800000000000000
+      internalID: 4208797739784765437
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_11
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 516
+        width: 7
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8821fc66bef7506d0800000000000000
+      internalID: -3024870925690531192
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_12
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 464
+        width: 13
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fe873088584c02810800000000000000
+      internalID: 1738605533956634863
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_13
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 472
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc8b0854db5158360800000000000000
+      internalID: 7171161884316448972
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_14
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 411
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a43378e33fd0e8ef0800000000000000
+      internalID: -104130403005680822
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_15
+      rect:
+        serializedVersion: 2
+        x: 585
+        y: 144
+        width: 121
+        height: 141
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d28a20375ea57eb90800000000000000
+      internalID: -7212696336686995411
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_16
+      rect:
+        serializedVersion: 2
+        x: 687
+        y: 270
+        width: 11
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 059cd6a11ce11fb80800000000000000
+      internalID: -8362869218329376432
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_17
+      rect:
+        serializedVersion: 2
+        x: 705
+        y: 222
+        width: 52
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c853f167007a40f50800000000000000
+      internalID: 6846780953933591948
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_18
+      rect:
+        serializedVersion: 2
+        x: 742
+        y: 242
+        width: 49
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 52995d8d691a261a0800000000000000
+      internalID: -6817709216630466267
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_19
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 246
+        width: 9
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e0c50644647c05be0800000000000000
+      internalID: -1490472372050830322
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_20
+      rect:
+        serializedVersion: 2
+        x: 800
+        y: 240
+        width: 23
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 88feb9d69f47e0490800000000000000
+      internalID: -7778150891787653240
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_21
+      rect:
+        serializedVersion: 2
+        x: 802
+        y: 231
+        width: 7
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 412464f2e6c813f80800000000000000
+      internalID: -8128561447559609836
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_22
+      rect:
+        serializedVersion: 2
+        x: 804
+        y: 206
+        width: 101
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f0f2ab491b7fbf00800000000000000
+      internalID: 1134760979694022900
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_23
+      rect:
+        serializedVersion: 2
+        x: 930
+        y: 240
+        width: 20
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c3060456e5a51f30800000000000000
+      internalID: 4545721807571125186
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_24
+      rect:
+        serializedVersion: 2
+        x: 786
+        y: 222
+        width: 9
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f3189c8440690990800000000000000
+      internalID: -7419293063583362060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_25
+      rect:
+        serializedVersion: 2
+        x: 794
+        y: 230
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0ccf0dbd8cde3cb00800000000000000
+      internalID: 847782601812933824
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_26
+      rect:
+        serializedVersion: 2
+        x: 794
+        y: 212
+        width: 11
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: af81c0554f6910b90800000000000000
+      internalID: -7277369546710968070
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_27
+      rect:
+        serializedVersion: 2
+        x: 940
+        y: 226
+        width: 10
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c0f722fbc0c7d770800000000000000
+      internalID: 8635582792679813317
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_28
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 194
+        width: 35
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 58f97f2634448ac70800000000000000
+      internalID: 8982504513004347269
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_29
+      rect:
+        serializedVersion: 2
+        x: 930
+        y: 216
+        width: 14
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c606905b46a16d50800000000000000
+      internalID: 6728842160672999113
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MossyRockClusterV2_30
+      rect:
+        serializedVersion: 2
+        x: 850
+        y: 192
+        width: 19
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 40727085fa9643170800000000000000
+      internalID: 8157261026891867908
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      MossyRockClusterV2_0: 230827875482903310
+      MossyRockClusterV2_1: 4641675820398048287
+      MossyRockClusterV2_10: 4208797739784765437
+      MossyRockClusterV2_11: -3024870925690531192
+      MossyRockClusterV2_12: 1738605533956634863
+      MossyRockClusterV2_13: 7171161884316448972
+      MossyRockClusterV2_14: -104130403005680822
+      MossyRockClusterV2_15: -7212696336686995411
+      MossyRockClusterV2_16: -8362869218329376432
+      MossyRockClusterV2_17: 6846780953933591948
+      MossyRockClusterV2_18: -6817709216630466267
+      MossyRockClusterV2_19: -1490472372050830322
+      MossyRockClusterV2_2: 5164051844632497387
+      MossyRockClusterV2_20: -7778150891787653240
+      MossyRockClusterV2_21: -8128561447559609836
+      MossyRockClusterV2_22: 1134760979694022900
+      MossyRockClusterV2_23: 4545721807571125186
+      MossyRockClusterV2_24: -7419293063583362060
+      MossyRockClusterV2_25: 847782601812933824
+      MossyRockClusterV2_26: -7277369546710968070
+      MossyRockClusterV2_27: 8635582792679813317
+      MossyRockClusterV2_28: 8982504513004347269
+      MossyRockClusterV2_29: 6728842160672999113
+      MossyRockClusterV2_3: 3480829254673812119
+      MossyRockClusterV2_30: 8157261026891867908
+      MossyRockClusterV2_4: -7942130275357033562
+      MossyRockClusterV2_5: -2883553031286565725
+      MossyRockClusterV2_6: -2891356644975723865
+      MossyRockClusterV2_7: 4369260486165046609
+      MossyRockClusterV2_8: 8205035870741320392
+      MossyRockClusterV2_9: 8778327800692448653
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

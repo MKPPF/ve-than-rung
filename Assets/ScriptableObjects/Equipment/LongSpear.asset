@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 500107c4bb4689847b2b12a2649733fc, type: 3}
+  m_Name: LongSpear
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownGame.Equipment.EquipmentData
+  itemId: long_spear
+  displayName: "Th\u01B0\u01A1ng D\xE0i"
+  slot: 0
+  weaponType: 5
+  description: "V\u0169 kh\xED linh ho\u1EA1t, c\xE2n b\u1EB1ng t\u1ED1c \u0111\u1ED9
+    v\xE0 s\xE1t th\u01B0\u01A1ng."
+  icon: {fileID: 21300000, guid: dc92c7a364d747c4d8129a86ddb3fc54, type: 3}
+  price: 420
+  bonusDamage: 11
+  bonusArmor: 1
+  bonusMaxHealth: 0
+  bonusMoveSpeed: 0
+  bonusCriticalChance: 0.03
+  bonusCooldownRate: 0.04

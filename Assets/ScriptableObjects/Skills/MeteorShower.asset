@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 686ea926d83b3ec4390a29109191939f, type: 3}
+  m_Name: MeteorShower
+  m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Skills.SkillData
+  skillId: 7
+  displayName: "M\u01B0a Thi\xEAn Th\u1EA1ch"
+  description: "\u0110\xE1nh d\u1EA5u m\u1ED9t v\xF9ng r\u1ED3i d\u1ED9i nhi\u1EC1u
+    thi\xEAn th\u1EA1ch ch\u1ED3ng s\xE1t th\u01B0\u01A1ng."
+  icon: {fileID: 21300000, guid: 46bbd4b5852325b4286ba84c6ad4fbdf, type: 2}
+  damage: 72
+  manaCost: 36
+  cooldown: 6.5
+  range: 8
+  maxLevel: 5
+  effectColor: {r: 1, g: 0.24, b: 0.04, a: 1}
+  presentation: {fileID: 11400000, guid: 03fd9e47715afee42b7a0a45a2229c0d, type: 2}

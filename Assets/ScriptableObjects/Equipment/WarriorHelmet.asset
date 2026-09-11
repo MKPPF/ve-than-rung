@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 500107c4bb4689847b2b12a2649733fc, type: 3}
+  m_Name: WarriorHelmet
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownGame.Equipment.EquipmentData
+  itemId: warrior_helmet
+  displayName: "M\u0169 Chi\u1EBFn Binh"
+  slot: 1
+  weaponType: 0
+  description: "C\xE2n b\u1EB1ng ph\xF2ng th\u1EE7."
+  icon: {fileID: 21300000, guid: 0218fee9164ce634f832eeb85a1e5390, type: 3}
+  price: 280
+  bonusDamage: 0
+  bonusArmor: 4
+  bonusMaxHealth: 15
+  bonusMoveSpeed: 0
+  bonusCriticalChance: 0
+  bonusCooldownRate: 0

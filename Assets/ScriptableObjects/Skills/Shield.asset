@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 686ea926d83b3ec4390a29109191939f, type: 3}
+  m_Name: Shield
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownGame.Skills.SkillData
+  skillId: 5
+  displayName: "H\u1ED9 Thu\u1EABn"
+  description: "Gi\u1EA3m s\xE1t th\u01B0\u01A1ng nh\u1EADn v\xE0o trong th\u1EDDi
+    gian ng\u1EAFn."
+  icon: {fileID: 21300000, guid: 25b0349422ddba044980d207feb61c91, type: 2}
+  damage: 0
+  manaCost: 20
+  cooldown: 8
+  range: 0
+  maxLevel: 5
+  effectColor: {r: 0.45, g: 0.55, b: 1, a: 1}
+  presentation: {fileID: 11400000, guid: 105a9f9a73265ae48a733340a32b8a1e, type: 2}

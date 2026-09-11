@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: f7f306633254f9c47b441e4beeedf280
+  - enabled: 1
+    path: Assets/Scenes/Lobby.unity
+    guid: 50680d1b59a756d44914bf73ebc37f62
+  - enabled: 1
+    path: Assets/Scenes/Map01.unity
+    guid: dcc4823266c630342b34396c075de139
+  - enabled: 1
+    path: Assets/Scenes/Map02.unity
+    guid: 16fd16deb4407524bbeebe26f3ac4ef4
+  - enabled: 1
+    path: Assets/Scenes/Map03.unity
+    guid: 463ca49753a9b974dafe4ea0e2b3aafb
+  - enabled: 1
+    path: Assets/Scenes/BossMap01.unity
+    guid: db8fa13cc39c43a4884e5f458c245b4c
+  - enabled: 1
+    path: Assets/Scenes/CaveMap01.unity
+    guid: fb84610d3221e9845b583077bfa957fe
+  - enabled: 1
+    path: Assets/Scenes/RiftMap01.unity
+    guid: 10c3a8e4a0389b1468443f6e97985c6c
+  m_configObjects:
+    com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f,
+      type: 2}
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 5e716bb9195b9eb49a2ccb4c51691dc6,
+      type: 3}

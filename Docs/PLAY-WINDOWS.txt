@@ -1,0 +1,19 @@
+VE THAN RUNG - WINDOWS DEMO
+
+Giai nen TOAN BO thu muc VeThanRung, sau do mo VeThanRung.exe.
+Khong chay EXE trong ZIP. Khong tach EXE khoi VeThanRung_Data,
+UnityPlayer.dll, MonoBleedingEdge va cac file di kem.
+
+Windows 64-bit, DirectX 11. Khong can cai Unity hay dang nhap GitHub.
+Game choi don; khong can cap quyen truy cap mang cho choi offline.
+Khong tat phan mem bao mat. Day la ban demo chua can bang hoan chinh.
+
+WASD / mui ten / chuot trai: di chuyen. Chuot phai / J: danh.
+Q E R F: ky nang. E uu tien tuong tac khi o gan doi tuong.
+I: hanh trang. P: tiem nang. K: ky nang. Esc: tam dung / dong bang.
+Mo Huong dan trong menu game de xem noi dung tieng Viet day du.
+
+Save luu rieng tren may. Choi moi thay the save sau khi xac nhan.
+Dung menu Tam dung > Luu va ve man hinh chinh truoc khi roi game.
+
+Tai nguyen ben thu ba: xem thu muc Licenses di kem.
