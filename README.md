@@ -1,5 +1,9 @@
 # Vệ Thần Rừng — game hành động 2D
 
+Kho bài tập nhóm (private): https://github.com/MKPPF/ve-than-rung
+Để cùng phát triển: nhận lời mời, clone mã nguồn, làm trên nhánh riêng và gửi
+Pull Request theo CONTRIBUTING.md. Bản Windows chỉ dùng chơi thử, không sửa dự án.
+
 Game top-down bằng Unity: khám phá vùng săn, chiến đấu, học kỹ năng, thu thập
 và cường hóa trang bị. Đây là bản demo đồ án đang phát triển, không phải release
 đã cân bằng hoàn chỉnh.
