@@ -1,12 +1,30 @@
 # Vệ Thần Rừng — game hành động 2D
 
 Kho bài tập nhóm (private): https://github.com/MKPPF/ve-than-rung
+Người tải phải đăng nhập GitHub bằng tài khoản đã được mời và đã chấp nhận lời
+mời. Chỉ gửi đường link là chưa đủ; người chưa có quyền có thể thấy trang 404.
 Để cùng phát triển: nhận lời mời, clone mã nguồn, làm trên nhánh riêng và gửi
 Pull Request theo CONTRIBUTING.md. Bản Windows chỉ dùng chơi thử, không sửa dự án.
 
 Game top-down bằng Unity: khám phá vùng săn, chiến đấu, học kỹ năng, thu thập
 và cường hóa trang bị. Đây là bản demo đồ án đang phát triển, không phải release
 đã cân bằng hoàn chỉnh.
+
+## Tải về để tiếp tục phát triển
+
+Nên **clone bằng Git**, không dùng ZIP, để giữ lịch sử và gửi thay đổi lại nhóm:
+
+```powershell
+git clone https://github.com/MKPPF/ve-than-rung.git
+cd ve-than-rung
+```
+
+Cài Unity **6000.5.6f1**, thêm thư mục vừa clone vào Unity Hub và chờ import xong.
+Mở **Top Down Game → Open Main Menu**, Play để chạy; chọn **Validate Project**
+để kiểm tra nội dung. Mã nguồn C# ở `Assets/Scripts`, công cụ sinh content ở
+`Assets/Editor`. Tạo nhánh riêng trước khi sửa; xem [CONTRIBUTING.md](CONTRIBUTING.md)
+cho quy trình cập nhật, commit và Pull Request. Không cần có bản EXE hay GitHub
+Release để tiếp tục phát triển.
 
 ## Chỉ muốn chơi, không cài Unity
 
@@ -35,6 +53,10 @@ Trên trang kho, chọn **Code → Download ZIP**, giải nén rồi vào Unity 
 project from disk và chọn thư mục có `Assets`, `Packages`, `ProjectSettings`.
 Hoặc chọn **Code → HTTPS**, sao chép URL và chạy `git clone` với URL đó.
 
+Nếu dùng Git để cập nhật bản đã clone, lưu/commit thay đổi của mình trước, rồi
+chạy `git pull --ff-only` trên nhánh `main`. Không chép đè thư mục dự án đang sửa
+bằng ZIP mới; ZIP không giữ quy trình cập nhật và lịch sử Git.
+
 Kho hiện không dùng Git LFS: file ảnh thật được lưu trong Git, không phải pointer.
 Không chép `Library`, `Temp` hoặc `UserSettings` từ máy người khác. Lần import đầu
 có thể mất nhiều phút; chờ Unity hoàn tất biên dịch.
@@ -42,6 +64,23 @@ có thể mất nhiều phút; chờ Unity hoàn tất biên dịch.
 Chọn **Top Down Game → Open Main Menu**, rồi nhấn Play. Các scene/prefab đã được
 đưa vào kho, không cần dựng lại chỉ để chơi. Không cần chạy MCP/AI để chơi hoặc
 build game; các package hỗ trợ Editor hiện vẫn giữ theo cấu hình dự án gốc.
+
+### Nếu máy khác chưa mở được
+
+- Trang GitHub báo 404 hoặc clone báo `Repository not found`: kiểm tra tài khoản
+  và lời mời vào kho private; không chia sẻ mật khẩu hay token.
+- Unity báo thiếu Editor: cài đúng phiên bản trong `ProjectVersion.txt`, không
+  chọn nâng/hạ phiên bản dự án chỉ để bỏ qua thông báo.
+- Package Manager báo không tìm thấy Git: cài Git, đóng rồi mở lại Unity Hub và
+  Unity để cập nhật PATH. Lần đầu cần truy cập GitHub và kho package Unity.
+- Unity mở scene trống: dùng **Top Down Game → Open Main Menu**.
+- Có lỗi đỏ: đợi import hoàn tất, mở Console, gửi lỗi đầu tiên cùng phiên bản
+  Unity cho nhóm. Không xóa `.meta` hoặc chạy builder chỉ để che lỗi import.
+- Git báo `dubious ownership`: thường gặp khi chép cả `.git` từ tài khoản khác.
+  Ưu tiên clone bằng chính tài khoản Windows của mình vào thư mục mới; không
+  tắt kiểm tra quyền sở hữu cho tất cả thư mục bằng `safe.directory=*`.
+
+Kết quả và giới hạn kiểm tra bản tải mới: [DOWNLOAD_READINESS.md](DOWNLOAD_READINESS.md).
 
 ## Điều khiển
 
