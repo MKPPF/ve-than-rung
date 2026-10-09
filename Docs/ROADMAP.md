@@ -160,7 +160,7 @@ Không nên triển khai đồng thời hai hạng mục cùng sửa
 V11: đồng bộ animation với chuyển động hiển thị, giữ hướng khi dừng, tăng/giảm
 tốc ngắn; giữ di chuyển bốn hướng và bộ hình đang dùng. Đã quay trước/sau,
 56/56 EditMode, 54/54 PlayMode và validator đạt; cần người chơi đánh giá
-cảm giác thực tế. Xem PLAYER_WALK_V11_VERIFICATION.md.
+cảm giác thực tế. Xem Docs/Verification/PLAYER_WALK_V11_VERIFICATION.md.
 
 ### [ ] G1 — Dodge roll có i-frame
 
@@ -371,14 +371,14 @@ cảm giác thực tế. Xem PLAYER_WALK_V11_VERIFICATION.md.
 ### [-] MAP2 — Rừng Cổ Lá Đồng (08/09/2026)
 
 Clarity V2: bổ sung chỉnh độ nét độ sáng giới hạn riêng trên nền phục hồi Map02;
-giữ camera/bố cục/gameplay. Trạng thái ở `MAP02_CLARITY_V2_VERIFICATION.md`.
+giữ camera/bố cục/gameplay. Trạng thái ở `Docs/Verification/MAP02_CLARITY_V2_VERIFICATION.md`.
 Đã dựng hai lượt + validator, 73/73 EditMode và 69/69 PlayMode đạt; đã xem
 ảnh so sánh và runtime. Đây là tăng nét nhẹ, không bổ sung chi tiết tranh gốc.
 
 Living V6: người dùng không thích nét đỏ/đen chồng lên quái trong V5. Bỏ
 viền đen và cạnh nối tâm của báo chém, nét mảnh dưới actor; thêm cá bơi ở
 hồ và sông qua habitat builder, không collider/reward/save. Kiểm tra đang
-thực hiện; xem `MAP02_LIVING_V6_VERIFICATION.md`.
+thực hiện; xem `Docs/Verification/MAP02_LIVING_V6_VERIFICATION.md`.
 
 Living V6 đã dựng hai lượt cuối + validator đạt; toàn bộ 70/70 EditMode,
 69/69 PlayMode đạt. Sau căn thêm vùng cá tránh đá nổi, 7/7 Map02 đạt. Đã
@@ -389,7 +389,7 @@ lịch sử đã được thay bằng nét mảnh dưới actor trong V6.
 Color V5 theo yêu cầu khắc phục màu nhạt: shader riêng trên tranh Map02 giảm
 vàng xám, tăng tương phản có chọn lọc và giữ màu hồ; cảnh báo có viền tối.
 Không vẽ lại bitmap hay sửa chỉ số/kỹ năng. Kiểm thử/so ảnh đang được ghi ở
-`MAP02_COLOR_V5_VERIFICATION.md`; phần lịch sử V4/V3 bên dưới được giữ lại.
+`Docs/Verification/MAP02_COLOR_V5_VERIFICATION.md`; phần lịch sử V4/V3 bên dưới được giữ lại.
 
 Color V5 đã dựng hai lượt + validator đạt, 70/70 EditMode và 69/69 PlayMode
 trong Editor đạt. Đã so ảnh cùng góc trước/sau và xem cảnh báo trong combat.
@@ -400,7 +400,7 @@ lượt V5. MAP2 tổng thể giữ `[-]` cho cảm nhận người dùng/loadou
 V4 theo phản hồi người dùng: không chấp nhận bản V3 quá đơn giản. Thay bằng
 Tàn Tích Suối Ngọc: tranh cảnh hoàn chỉnh, collider theo tranh, navigation
 tránh vật cản và hai bộ kỹ năng/di chuyển mới cho Goblin/cung thủ. Chi tiết
-và kiểm thử đang được ghi tại `MAP02_V4_VERIFICATION.md`. Các ghi chú V3
+và kiểm thử đang được ghi tại `Docs/Verification/MAP02_V4_VERIFICATION.md`. Các ghi chú V3
 bên dưới là lịch sử, không phải mô tả bản hiện tại.
 
 V4: tranh/collider và kỹ năng đã dựng hai lượt + validator; 6/6 PlayMode riêng
@@ -419,7 +419,7 @@ lượt, validator, EditMode/PlayMode, đường đi và ảnh ở camera gamepl
 kiểm tra. Toàn bộ PlayMode đạt 64/65; bài click-bắn cũ vẫn lỗi input giả lập
 trong batch kể cả chạy riêng trước khi Map02 được load. Giữ `[-]` đến khi
 đóng lỗi hồi quy và kiểm tra cảm giác giao chiến thủ công theo loadout.
-Chi tiết, ảnh, nguồn art imagegen và giới hạn: `MAP02_V3_VERIFICATION.md`.
+Chi tiết, ảnh, nguồn art imagegen và giới hạn: `Docs/Verification/MAP02_V3_VERIFICATION.md`.
 
 ### [ ] U1 — AudioManager và audio event
 
@@ -500,38 +500,38 @@ Chi tiết, ảnh, nguồn art imagegen và giới hạn: `MAP02_V3_VERIFICATION
 
 10/09/2026 — Sửa lỗi font sau build: bake tiếng Việt vào atlas chính static,
 giữ GUID, bổ sung guard và test glyph; không dựa vào fallback động để kiểm tra
-tiếng Việt. Kết quả ở `VIETNAMESE_FONT_VERIFICATION.md`.
+tiếng Việt. Kết quả ở `Docs/Verification/VIETNAMESE_FONT_VERIFICATION.md`.
 
 10/09/2026 — Đợt chuẩn bị đồ án: bổ sung hướng dẫn mở từ MainMenu/Pause,
 xác nhận ghi đè save, tiếng Việt cho thao tác menu/màn thua và quyền sở hữu pause
 khi mở hướng dẫn. Bỏ gold grant thử nghiệm nhưng giữ save cũ. Đây là đợt runtime
 UI, không thay builder/content. Không đánh dấu U4/U5/T3 hoàn tất: chưa có tutorial
 lần đầu, settings hiển thị đầy đủ, balance chính thức hay kiểm tra toàn bộ release.
-Kết quả thực tế được ghi ở `GRADUATION_GAME_VERIFICATION.md`.
+Kết quả thực tế được ghi ở `Docs/Verification/GRADUATION_GAME_VERIFICATION.md`.
 
 Wildlife Detail V2: chi tiết cá và tư thế chim tự nhiên hơn, giữ vùng hoạt động.
 Validator, 73/73 EditMode và 69/69 PlayMode đạt; đã xem ảnh cá/chim bản cuối.
-Xem `WILDLIFE_DETAIL_V2_VERIFICATION.md`.
+Xem `Docs/Verification/WILDLIFE_DETAIL_V2_VERIFICATION.md`.
 
 Truyền tống V10: sửa cột sáng thẳng đứng và hạt sáng không hội tụ, giữ thời
-gian/logic cổng. Trạng thái kiểm thử ở `TELEPORT_STRAIGHT_V10_VERIFICATION.md`.
+gian/logic cổng. Trạng thái kiểm thử ở `Docs/Verification/TELEPORT_STRAIGHT_V10_VERIFICATION.md`.
 
 Sân giữa Lobby: ba lữ khách đi–nghỉ và hai cụm hàng/đèn, giữ đường đến ba trạm.
 Đã dựng hai lượt + validator, 73/73 EditMode và 69/69 PlayMode đạt; có ảnh
-và video chuyển động. Chi tiết ở `LOBBY_VISITORS_V1_VERIFICATION.md`.
+và video chuyển động. Chi tiết ở `Docs/Verification/LOBBY_VISITORS_V1_VERIFICATION.md`.
 
 Tiềm năng/Kỹ năng V2: nâng giao diện khung đồng, biểu tượng chiêu và thao tác
 chuột cho danh sách/bốn ô/nâng cấp, giữ progression. Validator và 73/73 EditMode,
 69/69 PlayMode đạt; ảnh 1080p/720p/4:3 đã chụp, kiểm tra lớp hiển thị. Xem
-`PROGRESSION_UI_V2_VERIFICATION.md`.
+`Docs/Verification/PROGRESSION_UI_V2_VERIFICATION.md`.
 
 Vườn dưới Lobby: bổ sung bướm màu và chim trang trí qua builder, không đổi
-nền/đường đi/save. Đang kiểm tra ở `LOWER_GARDEN_WILDLIFE_VERIFICATION.md`.
+nền/đường đi/save. Đang kiểm tra ở `Docs/Verification/LOWER_GARDEN_WILDLIFE_VERIFICATION.md`.
 
 10/09/2026 — Restored V1: thay toàn bộ tranh Lobby và Map02 bằng hai ảnh
 Real-ESRGAN đã duyệt; giữ bố cục/gameplay/save, đồng bộ ảnh hiệu ứng nước.
 Đã dựng hai lượt + validator, 73/73 EditMode và 69/69 PlayMode đạt; đã xem
-ảnh runtime Lobby/Map02. Xem `SCENERY_RESTORED_V1_VERIFICATION.md`.
+ảnh runtime Lobby/Map02. Xem `Docs/Verification/SCENERY_RESTORED_V1_VERIFICATION.md`.
 
 Đợt 05/09/2026: hành trang và cửa hàng — bố cục vừa màn hình, cuộn catalog,
 giá/khả năng mua rõ ràng, chỉ số cường hóa, khóa input và Esc. Các màn hình
@@ -540,30 +540,30 @@ Settings/Tutorial và phần accessibility toàn game vẫn ngoài phạm vi đ�
 Đợt phong cảnh sảnh 05/09/2026: đã kiểm tra Trạm nghỉ Tán Rừng, tranh nền riêng,
 HUD sảnh gọn, giới hạn camera, đường biên và ba trạm tương tác. Không thay gameplay
 các map chiến đấu; 49/49 EditMode, 51/51 PlayMode và validator đạt.
-Chi tiết/giới hạn: LOBBY_V3_VERIFICATION.md. Chưa đánh dấu toàn bộ U5 hoàn thành.
+Chi tiết/giới hạn: Docs/Verification/LOBBY_V3_VERIFICATION.md. Chưa đánh dấu toàn bộ U5 hoàn thành.
 
 08/09/2026: căn truyền tống trận theo bệ đá V7, ánh ngọc lam nhẹ, chỉ sáng
 nửa viền ngoài phía trước để không đè cột. Hai lượt builder, validator,
 64/64 EditMode và 62/62 PlayMode đạt; sau tinh chỉnh ảnh chạy lại 2/2 test
-Lobby/truyền tống đạt. Xem TELEPORT_ALIGNED_V8_VERIFICATION.md.
+Lobby/truyền tống đạt. Xem Docs/Verification/TELEPORT_ALIGNED_V8_VERIFICATION.md.
 
 Tiếp 08/09/2026 — V9: bật vòng ngoài đầy đủ. Sau chọn vùng, camera lùi ra,
 tia sáng/hạt sáng bay lên trong 3 giây rồi mới chuyển map. Khóa chọn lặp,
 pause dừng tiến độ, ngắt quá trình trả camera/input. Hai lượt builder và
 validator đạt; 64/64 EditMode, 62/62 PlayMode. Ảnh/giới hạn và danh sách
-file: TELEPORT_CINEMATIC_V9_VERIFICATION.md. Không thêm âm thanh mới.
+file: Docs/Verification/TELEPORT_CINEMATIC_V9_VERIFICATION.md. Không thêm âm thanh mới.
 
 V4 không khí sảnh: đã kiểm tra nước chảy, thác/bọt, lửa và tàn lửa. Không thêm
 asset bên ngoài; lớp hiệu ứng procedural lấy tranh nền hiện có làm nguồn.
 Mở rộng V4: 4 cá bơi trong ao, 6 bướm tại ba cụm hoa và 7 lá rơi thưa.
 Không thêm va chạm, thưởng, nhiệm vụ hoặc thay đổi save.
 56/56 EditMode, 54/54 PlayMode và validator đạt. Hai lượt builder hoàn tất;
-video và giới hạn xem LOBBY_LIVING_V4_VERIFICATION.md.
+video và giới hạn xem Docs/Verification/LOBBY_LIVING_V4_VERIFICATION.md.
 
 Truyền tống trận (06/09): giữ nền V3, không áp dụng vườn bàn ghế V5.
 Đã bỏ cổng đứng Lobby; bước vào vòng đá kích hoạt rune và chuyển Map01 sau
 1,15 giây, ra ngoài hủy, pause dừng tiến độ. 56/56 EditMode (gồm validator)
-và 55/55 PlayMode đạt. Xem TELEPORT_CIRCLE_VERIFICATION.md.
+và 55/55 PlayMode đạt. Xem Docs/Verification/TELEPORT_CIRCLE_VERIFICATION.md.
 
 **Phụ thuộc:** U2, U4.
 

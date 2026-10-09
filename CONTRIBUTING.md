@@ -70,5 +70,5 @@ Không đăng nhập bằng tài khoản của chủ kho.
 5. Báo lại phiên bản Windows/Unity, commit đang dùng và lỗi đầu tiên nếu có.
 
 Không cần dựng lại content khi chỉ tải về chơi. Khi kiểm tra lần đầu trên máy
-khác, xem thêm [DOWNLOAD_READINESS.md](DOWNLOAD_READINESS.md) để phân biệt kết quả
+khác, xem thêm [DOWNLOAD_READINESS.md](Docs/DOWNLOAD_READINESS.md) để phân biệt kết quả
 đã xác minh với phần còn cần thử trên thiết bị khác.

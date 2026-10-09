@@ -46,7 +46,7 @@ tài khoản hoặc máy của thành viên khác.
 thất bại tại dòng 73: sau khi mô phỏng nhấn chuột trái, không tìm thấy `PlayerShot`
 (`Expected: not null; But was: null`). Chạy riêng bài này vẫn thất bại (0/1).
 
-- Lỗi tương tự đã được ghi trong `MAP02_V3_VERIFICATION.md`, liên quan input
+- Lỗi tương tự đã được ghi trong `Docs/Verification/MAP02_V3_VERIFICATION.md`, liên quan input
   giả lập khi chạy batch. Lần kiểm tra này xác nhận tái hiện, chưa khẳng định
   nguyên nhân gốc chỉ từ kết quả assert.
 - Builder đặt `clickToShoot=false`, prefab Player có `clickToShoot: 0`; tính năng

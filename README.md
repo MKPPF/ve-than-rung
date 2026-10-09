@@ -80,7 +80,7 @@ build game; các package hỗ trợ Editor hiện vẫn giữ theo cấu hình d
   Ưu tiên clone bằng chính tài khoản Windows của mình vào thư mục mới; không
   tắt kiểm tra quyền sở hữu cho tất cả thư mục bằng `safe.directory=*`.
 
-Kết quả và giới hạn kiểm tra bản tải mới: [DOWNLOAD_READINESS.md](DOWNLOAD_READINESS.md).
+Kết quả và giới hạn kiểm tra bản tải mới: [DOWNLOAD_READINESS.md](Docs/DOWNLOAD_READINESS.md).
 
 ## Điều khiển
 
@@ -140,4 +140,9 @@ Chỉ package một bản đã build xong và chơi thử. Script không build h
 - Chưa chỉ định giấy phép mã nguồn mở cho toàn dự án. Công khai kho không tự động
   cấp quyền tái phân phối mọi tài nguyên. Xem `THIRD_PARTY_NOTICES.md`.
 
-Hướng dẫn kiến trúc: `AGENTS.md` và `Assets/Scripts/README.md`.
+## Tài liệu dự án
+
+- [Phát triển cùng nhóm](CONTRIBUTING.md).
+- [Mục lục tài liệu](Docs/README.md): lộ trình, thiết kế và báo cáo kiểm tra.
+- [Hướng dẫn kiến trúc và quy ước](AGENTS.md).
+- [Mã nguồn gameplay](Assets/Scripts/README.md).

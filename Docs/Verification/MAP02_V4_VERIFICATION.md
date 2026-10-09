@@ -3,7 +3,7 @@
 Update after Color V5: the pending entrance-width builder change below has now
 been generated twice and validated. Strengthened navigation checks pass; full
 interactive Editor runs pass 70/70 EditMode and 69/69 PlayMode. See
-`MAP02_COLOR_V5_VERIFICATION.md`. The pending notes below describe the earlier
+`Docs/Verification/MAP02_COLOR_V5_VERIFICATION.md`. The pending notes below describe the earlier
 V4 handoff and are retained as history.
 
 ## User feedback and scope

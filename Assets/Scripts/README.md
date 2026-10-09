@@ -22,7 +22,7 @@ Toàn bộ gameplay của dự án được viết bằng C# và nằm trong th�
 
 - Sửa mất chữ sau build: builder tạo sẵn toàn bộ dấu tiếng Việt trong font chính
   dạng static. `Prepare Vietnamese Font` có thể tạo lại riêng font; build guard
-  ngăn đóng gói nếu thiếu ký tự. Xem `VIETNAMESE_FONT_VERIFICATION.md`.
+  ngăn đóng gói nếu thiếu ký tự. Xem `Docs/Verification/VIETNAMESE_FONT_VERIFICATION.md`.
 
 - Menu chính có hướng dẫn tiếng Việt; menu tạm dừng mở lại cùng bảng hướng dẫn.
 - Chơi mới khi đã có save phải xác nhận; Hủy/Esc giữ nguyên tiến trình.
@@ -71,39 +71,39 @@ Toàn bộ gameplay của dự án được viết bằng C# và nằm trong th�
 Wildlife Detail V2: cá Lobby/Map02 thêm mang, mắt đôi, vây ngực, mảng màu và
 vảy sáng; chim Lobby có chân/mỏ/lông rõ hơn, gập cánh lúc đậu và xòe lúc bay.
 Giữ số lượng, vùng bơi và save. Đây là hình nhiều lớp theo phong cách wildlife
-hiện có, không phải bộ sprite vẽ tay mới. Xem `WILDLIFE_DETAIL_V2_VERIFICATION.md`.
+hiện có, không phải bộ sprite vẽ tay mới. Xem `Docs/Verification/WILDLIFE_DETAIL_V2_VERIFICATION.md`.
 
 Truyền tống V10: tia sáng song song thẳng đứng, không thu vào tâm ở phía trên;
 hạt sáng bay theo đường thẳng thay xoắn vào trong. Giữ màu, vòng sáng và thời
-gian chuyển map. Kiểm thử: `TELEPORT_STRAIGHT_V10_VERIFICATION.md`.
+gian chuyển map. Kiểm thử: `Docs/Verification/TELEPORT_STRAIGHT_V10_VERIFICATION.md`.
 
 Sân Lobby V1: thêm ba lữ khách áo xanh lá/đỏ đất/tím đi theo vòng ngắn, tăng
 giảm tốc và nghỉ lệch nhịp, nhường người chơi ở phía trước. Dùng lại hình bước
 chân hiện có, không phải NPC vẽ mới. Không chiến đấu/tương tác/save/collider.
 Hai cụm thùng hàng–đèn trang trí mép sân có footprint nhỏ. Xem
-`LOBBY_VISITORS_V1_VERIFICATION.md` cho kiểm thử và giới hạn.
+`Docs/Verification/LOBBY_VISITORS_V1_VERIFICATION.md` cho kiểm thử và giới hạn.
 
 Tiềm năng/Kỹ năng V2: bảng tối viền đồng giống Hành trang, tự thu vừa màn hình.
 Tiềm năng có bốn thẻ chỉ số; Kỹ năng có danh sách hình, hình lớn và icon ở bốn
 ô Q/E/R/F, chọn/trang bị/tháo/nâng cấp bằng chuột hoặc phím cũ. P/K/Esc đóng;
 pause/input qua GameplayState, giữ chi phí và save API. Không tự mở khóa chiêu.
-Xem `PROGRESSION_UI_V2_VERIFICATION.md` cho ảnh và kiểm thử.
+Xem `Docs/Verification/PROGRESSION_UI_V2_VERIFICATION.md` cho ảnh và kiểm thử.
 
 Map02 Clarity V2: tăng tương phản chi tiết độ sáng có giới hạn, chỉ trên tranh
 Map02, không đổi ảnh/camera/quái/save. Không phải thêm độ phân giải hoặc vẽ lại.
-Kiểm thử và ảnh so sánh: `MAP02_CLARITY_V2_VERIFICATION.md`.
+Kiểm thử và ảnh so sánh: `Docs/Verification/MAP02_CLARITY_V2_VERIFICATION.md`.
 
 Vườn dưới Lobby: `LobbyGardenWildlife` bổ sung 6 bướm xanh/tím/hồng và 3 chim
 nhỏ bay–đậu giữa các vị trí do builder khai báo. Giữ cá và bướm vàng cũ;
 không collider/thưởng/save, dừng khi pause. Trạng thái kiểm tra ở
-`LOWER_GARDEN_WILDLIFE_VERIFICATION.md`.
+`Docs/Verification/LOWER_GARDEN_WILDLIFE_VERIFICATION.md`.
 
 Restored V1 (10/09/2026): Lobby và Map02 chuyển sang tranh phục hồi Real-ESRGAN
 đã được người dùng duyệt, lần lượt 6476×3884 và 6144×4096. Builder giữ nguyên
 pixel với cap 8192, không nén/mipmap/CPU copy; nước Lobby lấy cùng ảnh mới.
 Giữ world bounds, collider, camera, tương tác, quái và cá. Map02 giữ màu V5,
 bỏ sharpen phụ. Tranh gốc vẫn được lưu; các tên V7/V4 dưới đây là lịch sử bố cục.
-Xem `SCENERY_RESTORED_V1_VERIFICATION.md` cho trạng thái kiểm thử thực tế.
+Xem `Docs/Verification/SCENERY_RESTORED_V1_VERIFICATION.md` cho trạng thái kiểm thử thực tế.
 
 Sảnh dùng cảnh Trạm nghỉ Tán Rừng, dựng bởi builder từ
 `Art/Generated/Lobby/WoodlandWaystationV7_GardenPond.png`. Sân đá là vùng đi lại;
@@ -166,20 +166,20 @@ chu kỳ. `ForestNavigation` chia sẻ lưới tránh vật cản, `ForestPathAg
 góc đường riêng cho từng quái. Giữ 8 Goblin + 4 cung thủ đặt sẵn, mục tiêu
 quần thể 16, cấp 8–20 và 12 điểm hồi sinh có kiểm tra. Không có sprite bước
 chân bốn hướng mới; animator hiện tại vẫn sở hữu hình và hướng nhân vật.
-Kết quả kiểm thử/nguồn tranh/giới hạn xem `MAP02_V4_VERIFICATION.md`.
+Kết quả kiểm thử/nguồn tranh/giới hạn xem `Docs/Verification/MAP02_V4_VERIFICATION.md`.
 
 Map02 Color V5: material `Map02ColorV5` chỉnh riêng màu tranh nền (giảm vàng
 ở cây/đất, bóng rừng sâu hơn, bảo vệ màu hồ). Không đổi bitmap/camera/UI hay
 màu quái. Viền báo đòn đỏ cam có lớp tối bên ngoài, giữ đúng phạm vi và thời
 gian chiêu. Độ nét tăng nhẹ qua shader, không phải ảnh độ phân giải cao mới.
-Ảnh so sánh và kết quả kiểm tra: `MAP02_COLOR_V5_VERIFICATION.md`.
+Ảnh so sánh và kết quả kiểm tra: `Docs/Verification/MAP02_COLOR_V5_VERIFICATION.md`.
 
 Living V6 theo phản hồi ảnh chụp: bỏ viền đen dày V5 và cạnh tam giác nối
 tâm vùng chém. Cung/vòng báo đòn mảnh màu hổ phách nằm dưới actor, không
 đổi sát thương hay thời gian né. `ForestFishSchool` thêm 8 cá hồ + 12 cá
 sông trong 8 vùng nước do builder khai báo, tránh cầu/đá/bờ. Cá có thân,
 vây, quẫy đuôi và gợn nước, dừng khi pause, không collider/loot/save. Không
-thay tranh hoặc màu V5. Kiểm thử: `MAP02_LIVING_V6_VERIFICATION.md`.
+thay tranh hoặc màu V5. Kiểm thử: `Docs/Verification/MAP02_LIVING_V6_VERIFICATION.md`.
 
 Người chơi bắt đầu ở Lobby, mua/trang bị vật phẩm, đi qua các map chiến đấu,
 tiêu diệt quái để nhận vàng và XP, mở rương hồi phục/lấy thưởng, học hoặc nâng

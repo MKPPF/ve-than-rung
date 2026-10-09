@@ -135,10 +135,19 @@ asset mới phải đặt đúng tên/path hoặc cập nhật hằng số tươ
 `Assets/Screenshots/**` là ảnh chụp kết quả trong lúc phát triển để verify bằng
 mắt. Đặt tên theo dạng `TênTínhNăng_TrạngThái.png` để dễ theo dõi lịch sử.
 
+## Tài liệu dự án
+
+- Mục lục ở `Docs/README.md`, lộ trình ở `Docs/ROADMAP.md`.
+- Báo cáo kiểm tra đặt trong `Docs/Verification/`; ghi chú thiết kế đặt trong
+  `Docs/Design/`. Cập nhật mục lục khi thêm tài liệu.
+- Các prompt cũ đã gộp vào `Docs/Prompts/REQUESTS.md`; không tạo thêm file
+  prompt hoặc báo cáo ở thư mục chính.
+- `AGENTS.md` là nguồn hướng dẫn chung; `CLAUDE.md` chỉ dẫn tới file này.
+
 ## Khi bắt đầu một phiên làm việc mới với AI
 
 1. Đọc `Assets/Scripts/README.md`, file này và hạng mục tương ứng trong
-   `PROMPT_ROADMAP.md`.
+   `Docs/ROADMAP.md`.
 2. Xác định tính năng nằm ở namespace/thư mục nào.
 3. Nếu liên quan content (quái/skill/trang bị/map) → sửa builder trước, rồi mới
    viết logic runtime nếu cần.
