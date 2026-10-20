@@ -14,7 +14,7 @@ namespace TopDownGame.Items
     /// </summary>
     [RequireComponent(typeof(CircleCollider2D))]
     [RequireComponent(typeof(SpriteRenderer))]
-    public sealed class EnemyLootPickup : MonoBehaviour
+    public sealed class EnemyLootPickup : MonoBehaviour, IInteractable
     {
         [SerializeField, Min(0f)] private float attractionRadius = 2.2f;
         [SerializeField, Min(0f)] private float attractionSpeed = 5.5f;
@@ -33,6 +33,15 @@ namespace TopDownGame.Items
         public int Gold => gold;
         public EquipmentData Equipment => equipment;
         public bool IsCollected => collected;
+        public bool CanInteract => !collected && !PlayerAutomationState.AutoPickupEnabled;
+        public string InteractionPrompt => "E / Nhấp đúp: Nhặt chiến lợi phẩm";
+
+        public void Interact(PlayerInteraction collector)
+        {
+            if (CanInteract && collector != null &&
+                Vector2.Distance(groundPosition, collector.transform.position) <= 1.5f)
+                Collect(collector.gameObject);
+        }
 
         public static EnemyLootPickup Spawn(Vector3 position, int experience,
             int gold, EquipmentData equipment)
@@ -85,7 +94,8 @@ namespace TopDownGame.Items
 
             float bob = Mathf.Sin(Time.time * bobSpeed) * bobHeight;
             Vector3 displayPosition = groundPosition + Vector3.up * bob;
-            if (player != null)
+            if (player != null && PlayerAutomationState.AutoPickupEnabled &&
+                PlayerAutomationState.CanCollect(player.gameObject))
             {
                 float distance = Vector2.Distance(groundPosition, player.position);
                 if (distance <= collectDistance)
@@ -107,7 +117,7 @@ namespace TopDownGame.Items
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.CompareTag("Player"))
+            if (PlayerAutomationState.AutoPickupEnabled && other.CompareTag("Player"))
             {
                 Collect(other.gameObject);
             }
@@ -115,7 +125,7 @@ namespace TopDownGame.Items
 
         public void Collect(GameObject collector)
         {
-            if (collected || collector == null || !collector.CompareTag("Player"))
+            if (collected || !PlayerAutomationState.CanCollect(collector))
             {
                 return;
             }

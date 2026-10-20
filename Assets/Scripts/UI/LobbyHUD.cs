@@ -18,6 +18,7 @@ namespace TopDownGame.UI
 
         private IEnumerator Start()
         {
+            PlayerAutomationUI.Ensure(gameObject);
             GameObject player = GameObject.FindWithTag("Player");
             stats = player != null ? player.GetComponent<PlayerStats>() : null;
             interaction = player != null ? player.GetComponent<PlayerInteraction>() : null;

@@ -48,6 +48,7 @@ namespace TopDownGame.UI
 
         private void Start()
         {
+            PlayerAutomationUI.Ensure(gameObject);
             if (GetComponent<PotentialUpgradeUI>() == null)
             {
                 gameObject.AddComponent<PotentialUpgradeUI>();
@@ -196,8 +197,8 @@ namespace TopDownGame.UI
             hasDisplayedAutoAttackState = true;
             controlsText.text =
                 "WASD / Chuột trái: Di chuyển   Chuột phải / J: Đánh   " +
-                "T: Auto khi dừng " + (enabled ? "BẬT" : "TẮT") +
-                "   Q E R F: Skills";
+                "T: Tự đánh khi dừng " + (enabled ? "BẬT" : "TẮT") +
+                "   Q E R F: Kỹ năng";
             controlsText.color = enabled
                 ? new Color(0.5f, 1f, 0.65f)
                 : new Color(0.8f, 0.9f, 1f);

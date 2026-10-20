@@ -79,6 +79,30 @@ Chèn đoạn này trước prompt của từng hạng mục:
 
 ## 3. Thứ tự triển khai đề xuất
 
+### [-] AI1 — Nhận diện cử chỉ tay để di chuyển và dùng kỹ năng (20/10/2026)
+
+Theo yêu cầu đồ án AI: thu dữ liệu HaGRID/webcam, tự train MLP phân loại năm
+tư thế tay, chạy suy luận webcam và gửi input cho Unity. Tay di chuyển dùng
+tư thế xòe làm điều kiện bật cần điều khiển; tay còn lại gọi bốn slot hiện có.
+Hướng dẫn và tiêu chí nghiệm thu: `Design/HAND_GESTURE_CONTROL.md`.
+Đã thu 14.589 mẫu HaGRID, thực thi notebook và train MLP; test tĩnh 99,12%,
+77/77 EditMode, 78/78 PlayMode và validator đạt. Báo cáo:
+`Verification/HAND_GESTURE_CONTROL_VERIFICATION.md`. Giữ `[-]` đến khi đánh giá
+webcam/người mới và playtest thao tác thực tế đạt.
+
+Bổ sung nút bật/tắt tự đánh/tự nhặt để kiểm tra điều khiển thủ công và cử chỉ
+độc lập. 77/77 EditMode, 82/82 PlayMode, validator và kiểm tra HUD Map01/Lobby đạt;
+xem `Verification/AUTOMATION_CONTROLS_VERIFICATION.md`.
+
+Điều khiển tay V2 sửa chọn nhầm tay/chưa đặt tâm và focus cửa sổ camera;
+thêm nút TAY [F8], ACK, tự chọn tay/tự hiệu chỉnh và ngón trỏ chỉ bốn hướng.
+Đã xác nhận bốn hướng qua UDP trên player thật; vẫn cần nghiệm thu hai tay
+ngoài đời. Xem `Verification/HAND_GESTURE_V2_FIX_VERIFICATION.md`.
+
+V2.1 sửa gate dùng chiêu trong notebook: dấu đầu/đổi dấu giữ 0,35 giây tự gửi,
+ngón trỏ tay cast cho phép lặp cùng chiêu; chờ ACK trước khi đếm dấu đầu.
+16/16 Python test đạt; vẫn cần người dùng nghiệm thu webcam thực tế.
+
 | Milestone | Mục tiêu | Hạng mục | Điều kiện hoàn tất |
 |---|---|---|---|
 | M0 | Baseline đáng tin cậy | R0, R1, R2 | Compile sạch, có validator và smoke test |

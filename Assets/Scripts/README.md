@@ -35,6 +35,29 @@ Toàn bộ gameplay của dự án được viết bằng C# và nằm trong th�
 - Chưa cân bằng lại cấu hình thử nghiệm 50.000 HP / 25.000 mana của player.
   Không coi toàn bộ roadmap mở rộng là yêu cầu bắt buộc cho một đồ án cơ bản.
 
+## Điều khiển cử chỉ tay (AI1, đang kiểm tra)
+
+Tool Python ở `Tools/HandGestures`: tải tọa độ HaGRID, thu webcam, train MLP và
+chạy suy luận. Unity nhận UDP localhost khi bật nút TAY [F8] trên HUD. Camera
+V2 tự chọn tay di chuyển; ngón trỏ chỉ bốn hướng hoặc xòe tay dịch khỏi tâm
+(tự hiệu chỉnh sau 0,6 giây). Tay còn lại dùng Q/E/R/F; H trong camera đổi vai.
+ACK từ Unity hiển thị đã kết nối/mất focus/menu/chưa vào game trên camera/HUD.
+Không cần sửa scene/prefab hay chạy builder để gắn bridge.
+Xem `Docs/Design/HAND_GESTURE_CONTROL.md` để cài đặt, train và hiệu chỉnh camera.
+
+## Bật/tắt tự đánh và tự nhặt
+
+- HUD tại Lobby và map chiến đấu có hai nút dưới nhóm hành trang/kỹ năng:
+  **TỰ ĐÁNH [T]: BẬT/TẮT** và **TỰ NHẶT: BẬT/TẮT**.
+- Tắt tự đánh ngăn các lượt đánh/kỹ năng tự động tiếp theo; vẫn dùng J/chuột
+  phải, Q/E/R/F và cử chỉ tay bình thường. Phím T đồng bộ với nút trên HUD.
+- Tắt tự nhặt ngừng hút và tự nhận chiến lợi phẩm/vật phẩm, kể cả khi chạm
+  vào đồ. Đứng gần và nhấn E hoặc nhấp đúp để nhặt thủ công.
+- Hai lựa chọn giữ qua chuyển map trong phiên chơi; bắt đầu phiên Play/game
+  mới trở về mặc định bật. Không ghi thêm vào save tiến trình.
+- Nút được tạo bằng runtime UI như các launcher hiện có; không cần chạy lại
+  builder cho scene đã tạo. Kiểm tra: `Docs/Verification/AUTOMATION_CONTROLS_VERIFICATION.md`.
+
 ## Chạy kiểm thử
 
 - Mở `Window > General > Test Runner` để chạy EditMode và PlayMode test.

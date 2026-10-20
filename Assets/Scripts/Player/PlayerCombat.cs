@@ -49,6 +49,8 @@ namespace TopDownGame.Player
 
         private void Awake()
         {
+            if (PlayerAutomationState.AutoAttackOverride.HasValue)
+                autoAttackEnabled = PlayerAutomationState.AutoAttackOverride.Value;
             stats = GetComponent<PlayerStats>();
             movement = GetComponent<PlayerMovement>();
             characterAnimator = GetComponent<PlayerCharacterAnimator>();
@@ -78,7 +80,7 @@ namespace TopDownGame.Player
                 Keyboard.current.tKey.wasPressedThisFrame;
             if (toggleAutoAttack)
             {
-                autoAttackEnabled = !autoAttackEnabled;
+                SetAutoAttackEnabled(!autoAttackEnabled, true);
             }
 
             if (coolingDown || Time.time < nextShotTime)
@@ -121,7 +123,8 @@ namespace TopDownGame.Player
                     out float targetDistance))
                 {
                     AimDirection = targetDirection;
-                    if (skillManager != null && skillManager.TryAutoCast(
+                    if (!TopDownGame.Core.GestureInputState.IsActive &&
+                        skillManager != null && skillManager.TryAutoCast(
                         target.transform.position, targetDistance))
                     {
                         return;
@@ -141,9 +144,10 @@ namespace TopDownGame.Player
                 movement.CurrentVelocity.magnitude <= stationarySpeedThreshold);
         }
 
-        public void SetAutoAttackEnabled(bool enabled)
+        public void SetAutoAttackEnabled(bool enabled, bool rememberForSession = false)
         {
             autoAttackEnabled = enabled;
+            if (rememberForSession) PlayerAutomationState.SetAutoAttackEnabled(enabled);
             nextAutoTargetScanTime = 0f;
         }
 
@@ -188,6 +192,11 @@ namespace TopDownGame.Player
 
         private void UpdateAimDirection()
         {
+            if (TopDownGame.Core.GestureInputState.IsActive)
+            {
+                SetAimDirection(TopDownGame.Core.GestureInputState.Aim);
+                return;
+            }
             if (mainCamera == null)
             {
                 mainCamera = Camera.main;
@@ -275,7 +284,7 @@ namespace TopDownGame.Player
             float impactTime = Time.time + impactDelay;
             while (Time.time < impactTime)
             {
-                if (automatic && movement != null && movement.WantsToMove)
+                if (automatic && (!autoAttackEnabled || (movement != null && movement.WantsToMove)))
                 {
                     coolingDown = false;
                     lastMovementTime = Time.time;
@@ -314,7 +323,7 @@ namespace TopDownGame.Player
                 adjustedCooldown - impactDelay);
             while (Time.time < cooldownEnd)
             {
-                if (automatic && movement != null && movement.WantsToMove)
+                if (automatic && (!autoAttackEnabled || (movement != null && movement.WantsToMove)))
                 {
                     lastMovementTime = Time.time;
                     coolingDown = false;

@@ -233,6 +233,8 @@ namespace TopDownGame.Player
                     return true;
                 }
 
+                if (GestureInputState.Movement.sqrMagnitude > 0.001f) return true;
+
                 Vector2 rawInput = moveAction != null
                     ? moveAction.ReadValue<Vector2>()
                     : Vector2.zero;
@@ -334,6 +336,12 @@ namespace TopDownGame.Player
             if (rawInput.sqrMagnitude <= 0.001f)
             {
                 rawInput = ReadKeyboardDirection();
+            }
+            if (GestureInputState.IsActive)
+            {
+                CancelClickMovement();
+                if (rawInput.sqrMagnitude <= 0.001f)
+                    rawInput = GestureInputState.Movement;
             }
             moveDirection = ResolveCardinalInput(rawInput);
 

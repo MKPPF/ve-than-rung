@@ -20,6 +20,7 @@
 /Tools/*
 !/Tools/UnityRequest.cjs
 !/Tools/Package-Windows.ps1
+!/Tools/HandGestures/
 
 # IDE, credentials, local configuration and logs anywhere in tracked folders.
 **/.vs/

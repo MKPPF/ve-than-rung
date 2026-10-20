@@ -11,6 +11,7 @@
 
 ## Thiết kế và yêu cầu
 
+- [AI1 — Thu dữ liệu, train và điều khiển bằng cử chỉ tay](Design/HAND_GESTURE_CONTROL.md).
 - [Các yêu cầu phát triển đã gộp](Prompts/REQUESTS.md).
 - [Painted skills V4](Design/SPELLS_PAINTED_V4.md).
 - [Spell V2 — rebuild](Design/SPELL_V2_ARCHITECTURE.md).
@@ -22,6 +23,10 @@
 
 Các báo cáo giữ kết quả tại thời điểm thực hiện, gồm cả giới hạn và lỗi còn mở.
 Kết quả của bản cũ không tự xác nhận bản hiện tại đã đạt mọi điều kiện phát hành.
+
+- [AI1 — Kiểm tra notebook, model và bridge cử chỉ tay](Verification/HAND_GESTURE_CONTROL_VERIFICATION.md).
+- [AI1 — Sửa chọn tay, điều khiển nền và di chuyển bốn hướng V2](Verification/HAND_GESTURE_V2_FIX_VERIFICATION.md).
+- [Nút bật/tắt tự đánh và tự nhặt](Verification/AUTOMATION_CONTROLS_VERIFICATION.md).
 
 - [Editor startup recovery — 2026-09-06](Verification/EDITOR_STARTUP_VERIFICATION.md).
 - [Kiểm tra game để trình diễn đồ án — 10/09/2026](Verification/GRADUATION_GAME_VERIFICATION.md).

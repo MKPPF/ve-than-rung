@@ -156,6 +156,22 @@ namespace TopDownGame.Skills
             return false;
         }
 
+        /// <summary>
+        /// A gesture selects an equipped slot without synthesizing keyboard E,
+        /// so nearby interactions do not swallow the second gesture skill.
+        /// The regular cast pipeline still owns mana, cooldown and alive checks.
+        /// </summary>
+        public bool TryCastFromGesture(int slotIndex, Vector2 direction)
+        {
+            SkillData data = GetSkillData(slotIndex);
+            if (data == null || direction.sqrMagnitude <= 0.001f ||
+                TopDownGame.Core.GameplayState.ModalClosedThisFrame) return false;
+            combat?.SetAimDirection(direction);
+            Vector2 target = (Vector2)transform.position + direction.normalized *
+                EffectiveRange(data, inventory.Slots[slotIndex].level);
+            return TryCastSlot(slotIndex, true, target);
+        }
+
         public float GetCooldownRemaining(int slotIndex)
         {
             if (inventory == null || slotIndex < 0 || slotIndex >= inventory.Slots.Count ||
