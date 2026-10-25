@@ -15,6 +15,9 @@ namespace TopDownGame.Core
         [Header("Optional Authored Map Bounds")]
         [SerializeField] private bool constrainToBounds;
         [SerializeField] private Rect worldBounds = new Rect(-13f, -7.8f, 26f, 15.6f);
+        [Header("Impact Feedback")]
+        [SerializeField, Range(0f, 0.3f)] private float maximumShakeAmplitude = 0.16f;
+        [SerializeField, Range(0.05f, 0.5f)] private float maximumShakeDuration = 0.3f;
 
         private Vector3 velocity;
         private Camera attachedCamera;
@@ -23,12 +26,20 @@ namespace TopDownGame.Core
         private Vector3 cinematicFocus;
         private float cinematicZoom = 1f;
         private float cinematicBlend;
+        private Vector3 unshakenPosition;
+        private float shakeStartedAt, shakeEndsAt, shakeAmplitude;
+        public static CameraFollow2D Active { get; private set; }
+        public Vector3 UnshakenPosition => unshakenPosition;
+        public Vector2 ShakeOffset { get; private set; }
+        public float MaximumShakeAmplitude => maximumShakeAmplitude;
+        public bool IsShaking => shakeAmplitude > 0f && Time.unscaledTime < shakeEndsAt;
         public bool IsCinematic => cinematicOwner != null;
 
         public bool BeginCinematicFocus(Object owner, Vector3 focus, float zoomMultiplier)
         {
             if (owner == null || (cinematicOwner != null && cinematicOwner != owner)) return false;
             cinematicOwner = owner;
+            ClearShake();
             cinematicFocus = focus;
             cinematicZoom = Mathf.Max(1f, zoomMultiplier);
             cinematicBlend = 0f;
@@ -54,7 +65,60 @@ namespace TopDownGame.Core
         private void Awake()
         {
             attachedCamera = GetComponent<Camera>();
+            unshakenPosition = transform.position;
             if (attachedCamera != null) authoredOrthographicSize = attachedCamera.orthographicSize;
+        }
+
+        private void OnEnable()
+        {
+            if (GetComponent<Camera>() != null && CompareTag("MainCamera")) Active = this;
+        }
+
+        private void OnDisable()
+        {
+            ClearShake();
+            if (Active == this) Active = null;
+        }
+
+        public bool IsPointVisible(Vector2 position)
+        {
+            if (attachedCamera == null) return false;
+            Vector3 point = attachedCamera.WorldToViewportPoint(position);
+            return point.z > 0f && point.x >= 0f && point.x <= 1f && point.y >= 0f && point.y <= 1f;
+        }
+
+        public void RequestShake(float strength, float duration)
+        {
+            if (!isActiveAndEnabled || !FeedbackPreferences.CameraShakeEnabled || GameplayState.IsPaused || IsCinematic ||
+                strength <= 0f || duration <= 0f) return;
+            float now = Time.unscaledTime;
+            if (now >= shakeEndsAt)
+            {
+                shakeStartedAt = now;
+                shakeAmplitude = 0f;
+            }
+            shakeAmplitude = Mathf.Min(maximumShakeAmplitude, Mathf.Max(shakeAmplitude,strength));
+            shakeEndsAt = Mathf.Min(shakeStartedAt + maximumShakeDuration, Mathf.Max(shakeEndsAt,now + duration));
+        }
+
+        public void ClearShake()
+        {
+            shakeStartedAt = shakeEndsAt = shakeAmplitude = 0f;
+            ShakeOffset = Vector2.zero;
+            transform.position = unshakenPosition;
+        }
+
+        private Vector3 SampleShake()
+        {
+            if (!FeedbackPreferences.CameraShakeEnabled || GameplayState.IsPaused || IsCinematic || Time.unscaledTime >= shakeEndsAt)
+            {
+                ClearShake();
+                return Vector3.zero;
+            }
+            float age = Time.unscaledTime - shakeStartedAt;
+            float envelope = Mathf.Clamp01((shakeEndsAt - Time.unscaledTime) / Mathf.Max(0.001f,shakeEndsAt - shakeStartedAt));
+            Vector2 sample = new Vector2(Mathf.Sin(age * 97f),Mathf.Sin(age * 123f + 0.7f));
+            return Vector2.ClampMagnitude(sample,1f) * shakeAmplitude * envelope;
         }
 
         private void Start()
@@ -69,6 +133,7 @@ namespace TopDownGame.Core
         {
             if (!ResolveTarget())
             {
+                ClearShake();
                 return;
             }
 
@@ -81,8 +146,11 @@ namespace TopDownGame.Core
             }
             Vector3 nextPosition = smoothTime <= 0f
                 ? desiredPosition
-                : Vector3.SmoothDamp(transform.position, desiredPosition, ref velocity, smoothTime);
-            transform.position = Constrained(PixelSnapped(nextPosition));
+                : Vector3.SmoothDamp(unshakenPosition, desiredPosition, ref velocity, smoothTime);
+            unshakenPosition = Constrained(PixelSnapped(nextPosition));
+            Vector3 shake = SampleShake();
+            transform.position = Constrained(PixelSnapped(unshakenPosition + shake));
+            ShakeOffset = transform.position - unshakenPosition;
         }
 
         public void SetTarget(Transform newTarget, bool snapImmediately = true)
@@ -125,7 +193,8 @@ namespace TopDownGame.Core
             }
 
             velocity = Vector3.zero;
-            transform.position = Constrained(PixelSnapped(target.position + offset));
+            unshakenPosition = Constrained(PixelSnapped(target.position + offset));
+            ClearShake();
         }
 
         private Vector3 Constrained(Vector3 position)

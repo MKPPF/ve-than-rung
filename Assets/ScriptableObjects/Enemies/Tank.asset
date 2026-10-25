@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tank
   m_EditorClassIdentifier: Assembly-CSharp::TopDownGame.Enemies.EnemyData
   enemyId: tank
-  displayName: Tank
+  displayName: "H\u1ED9 V\u1EC7"
   archetype: 4
   maxHealth: 360
   damage: 25

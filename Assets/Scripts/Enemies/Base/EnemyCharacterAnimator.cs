@@ -364,6 +364,14 @@ namespace TopDownGame.Enemies
             }
         }
 
+        /// <summary>Clears a cancelled attack pose without reviving a dying character or changing its facing.</summary>
+        public void CancelAction()
+        {
+            attackStart = attackImpact = attackActiveEnd = attackEnd = 0f;
+            skillStart = skillImpact = skillActiveEnd = skillEnd = 0f;
+            hopStart = hopTakeoff = hopLand = hopEnd = 0f;
+        }
+
         public void PlayDeath()
         {
             if (dying) return;

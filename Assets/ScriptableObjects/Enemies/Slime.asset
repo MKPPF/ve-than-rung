@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Slime
   m_EditorClassIdentifier: Assembly-CSharp::TopDownGame.Enemies.EnemyData
   enemyId: slime
-  displayName: Slime
+  displayName: "Slime \u0110\u1ED9c"
   archetype: 0
   maxHealth: 90
   damage: 8

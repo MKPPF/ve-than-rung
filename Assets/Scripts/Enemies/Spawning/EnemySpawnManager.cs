@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace TopDownGame.Enemies.Spawning
 {
+    /// <summary>Reuses a bounded enemy pool and authored safe anchors so hunting stays populated without spawning in view or across maze walls.</summary>
     [DisallowMultipleComponent]
     public sealed class EnemySpawnManager : MonoBehaviour
     {
@@ -15,6 +16,7 @@ namespace TopDownGame.Enemies.Spawning
         [SerializeField, Min(0)] private int reservePoolSize = 8;
         [SerializeField, Min(0.05f)] private float evaluationInterval = 0.35f;
         [SerializeField] private bool expandSpawnAnchors = true;
+        [SerializeField] private Vector2[] additionalSpawnPoints = System.Array.Empty<Vector2>();
 
         [Header("Safe Respawn")]
         [SerializeField, Min(2f)] private float minimumPlayerDistance = 7f;
@@ -187,6 +189,10 @@ namespace TopDownGame.Enemies.Spawning
                 : Mathf.Max(1, sceneEnemies.Length);
             TargetAliveCount = Mathf.Clamp(Mathf.Max(configuredTarget,
                 ActiveCount), 1, Mathf.Max(1, poolHardLimit - reservePoolSize));
+            // Extra authored anchors leave free positions for replenishment even
+            // when every initial enemy holds its original post.
+            if (additionalSpawnPoints != null)
+                foreach (Vector2 point in additionalSpawnPoints) AddSpawnPoint(point);
             if (expandSpawnAnchors) ExpandSpawnPoints(TargetAliveCount + reservePoolSize);
             int reserve = mapData != null && mapData.IsBossMap ? 0 : reservePoolSize;
             PrewarmPool(Mathf.Min(poolHardLimit, TargetAliveCount + reserve));

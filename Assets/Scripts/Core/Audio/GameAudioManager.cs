@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
+using TopDownGame.Core;
 
 namespace TopDownGame.Audio
 {
+    /// <summary>Bounds audio voices and owns loop transitions so scene changes and live volume controls share one gain path.</summary>
     [DisallowMultipleComponent]
     public sealed class GameAudioManager : MonoBehaviour
     {
@@ -28,14 +30,25 @@ namespace TopDownGame.Audio
             public AudioSource Source;
             public AudioCue Cue;
             public float EndTime;
+            public AudioBus Bus;
+            public float FadeGain = 1f;
+            public bool Counted;
+        }
+
+        private sealed class LoopChannel
+        {
+            public Voice Current;
+            public Voice Outgoing;
+            public Coroutine Transition;
         }
 
         private static GameAudioManager instance;
         private readonly List<Voice> voices = new List<Voice>(MaximumSources);
         private readonly Dictionary<ulong, int> cueVoiceCounts =
             new Dictionary<ulong, int>();
-        private AudioSource musicSource;
-        private AudioSource ambientSource;
+        private readonly LoopChannel musicChannel = new LoopChannel();
+        private readonly LoopChannel ambientChannel = new LoopChannel();
+        private readonly HashSet<ulong> missingClipWarnings = new HashSet<ulong>();
 
         public static GameAudioManager Instance => instance;
         public float MasterVolume { get; private set; } = 1f;
@@ -67,10 +80,10 @@ namespace TopDownGame.Audio
             }
             instance = this;
             DontDestroyOnLoad(gameObject);
-            MasterVolume = PlayerPrefs.GetFloat(MasterKey, 1f);
-            MusicVolume = PlayerPrefs.GetFloat(MusicKey, 0.75f);
-            AmbientVolume = PlayerPrefs.GetFloat(AmbientKey, 0.7f);
-            SfxVolume = PlayerPrefs.GetFloat(SfxKey, 0.85f);
+            MasterVolume = Mathf.Clamp01(PlayerPrefs.GetFloat(GamePreferences.Key(MasterKey), 1f));
+            MusicVolume = Mathf.Clamp01(PlayerPrefs.GetFloat(GamePreferences.Key(MusicKey), 0.75f));
+            AmbientVolume = Mathf.Clamp01(PlayerPrefs.GetFloat(GamePreferences.Key(AmbientKey), 0.7f));
+            SfxVolume = Mathf.Clamp01(PlayerPrefs.GetFloat(GamePreferences.Key(SfxKey), 0.85f));
             LoadMixerRouting();
             for (int i = 0; i < PrewarmSources; i++) CreateVoice();
             SceneManager.sceneLoaded -= OnSceneLoaded;
@@ -99,13 +112,16 @@ namespace TopDownGame.Audio
         {
             if (cue == null) return null;
             AudioClip clip = cue.RandomClip;
-            if (clip == null) return null;
+            if (clip == null) { WarnMissingClip(cue); return null; }
             ulong cueId = EntityId.ToULong(cue.GetEntityId());
             if (cueVoiceCounts.TryGetValue(cueId, out int count) &&
                 count >= cue.MaxConcurrent) return null;
             Voice voice = AcquireVoice();
             if (voice == null) return null;
             voice.Cue = cue;
+            voice.Bus = cue.Bus;
+            voice.FadeGain = 1f;
+            voice.Counted = true;
             voice.Source.transform.position = position;
             voice.Source.clip = clip;
             voice.Source.pitch = cue.RandomPitch;
@@ -115,7 +131,7 @@ namespace TopDownGame.Audio
             voice.Source.minDistance = cue.MinimumDistance;
             voice.Source.maxDistance = cue.MaximumDistance;
             voice.Source.outputAudioMixerGroup = GroupFor(cue.Bus);
-            voice.Source.volume = cue.Volume * VolumeFor(cue.Bus) * MasterVolume;
+            ApplyVolume(voice);
             voice.EndTime = Time.unscaledTime + clip.length /
                 Mathf.Max(0.1f, Mathf.Abs(voice.Source.pitch));
             cueVoiceCounts[cueId] = count + 1;
@@ -125,12 +141,12 @@ namespace TopDownGame.Audio
 
         public void CrossfadeMusic(AudioCue cue, float duration = 1.5f)
         {
-            StartCoroutine(CrossfadeLoop(cue, duration, true));
+            BeginLoop(musicChannel, AudioBus.Music, cue, duration);
         }
 
         public void CrossfadeAmbient(AudioCue cue, float duration = 1.5f)
         {
-            StartCoroutine(CrossfadeLoop(cue, duration, false));
+            BeginLoop(ambientChannel, AudioBus.Ambient, cue, duration);
         }
 
         public void SetMasterVolume(float value) => SetVolume(MasterKey,
@@ -142,38 +158,71 @@ namespace TopDownGame.Audio
         public void SetSfxVolume(float value) => SetVolume(SfxKey,
             value, v => SfxVolume = v);
 
-        private IEnumerator CrossfadeLoop(AudioCue cue, float duration, bool music)
+        private void BeginLoop(LoopChannel channel, AudioBus bus, AudioCue cue, float duration)
         {
             AudioClip clip = cue != null ? cue.RandomClip : null;
-            if (clip == null) yield break;
+            if (clip == null) { if (cue != null) WarnMissingClip(cue); return; }
+            // Requests for the active theme retain playback position, including
+            // requests received before its fade has finished.
+            if (channel.Current != null && channel.Current.Cue == cue &&
+                channel.Current.Source.gameObject.activeSelf) return;
+            if (channel.Transition != null) StopCoroutine(channel.Transition);
+            channel.Transition = null;
+            Release(channel.Outgoing);
+            channel.Outgoing = null;
             Voice voice = AcquireVoice();
-            if (voice == null) yield break;
+            if (voice == null)
+            {
+                if (channel.Current != null)
+                {
+                    channel.Current.FadeGain = 1f;
+                    ApplyVolume(channel.Current);
+                }
+                return;
+            }
             AudioSource next = voice.Source;
             next.clip = clip;
+            next.pitch = 1f;
             next.loop = true;
             next.spatialBlend = 0f;
-            next.outputAudioMixerGroup = GroupFor(music ? AudioBus.Music : AudioBus.Ambient);
+            next.outputAudioMixerGroup = GroupFor(bus);
             next.volume = 0f;
             voice.Cue = cue;
+            voice.Bus = bus;
+            voice.FadeGain = 0f;
+            voice.Counted = false;
             voice.EndTime = float.PositiveInfinity;
             next.Play();
-            AudioSource previous = music ? musicSource : ambientSource;
-            float target = cue.Volume * VolumeFor(music ? AudioBus.Music : AudioBus.Ambient) *
-                MasterVolume;
-            float start = previous != null ? previous.volume : 0f;
+            channel.Outgoing = channel.Current;
+            channel.Current = voice;
+            channel.Transition = StartCoroutine(CrossfadeLoop(channel, duration));
+        }
+
+        private IEnumerator CrossfadeLoop(LoopChannel channel, float duration)
+        {
+            Voice next = channel.Current;
+            Voice previous = channel.Outgoing;
+            float start = previous != null ? previous.FadeGain : 0f;
             float elapsed = 0f;
             duration = Mathf.Max(0.05f, duration);
             while (elapsed < duration)
             {
                 elapsed += Time.unscaledDeltaTime;
                 float t = Mathf.Clamp01(elapsed / duration);
-                next.volume = Mathf.Lerp(0f, target, t);
-                if (previous != null) previous.volume = Mathf.Lerp(start, 0f, t);
+                next.FadeGain = t;
+                ApplyVolume(next);
+                if (previous != null)
+                {
+                    previous.FadeGain = Mathf.Lerp(start, 0f, t);
+                    ApplyVolume(previous);
+                }
                 yield return null;
             }
-            if (previous != null) Release(FindVoice(previous));
-            if (music) musicSource = next;
-            else ambientSource = next;
+            next.FadeGain = 1f;
+            ApplyVolume(next);
+            Release(previous);
+            channel.Outgoing = null;
+            channel.Transition = null;
         }
 
         private Voice AcquireVoice()
@@ -186,7 +235,10 @@ namespace TopDownGame.Audio
                     return voices[i];
                 }
             }
-            return voices.Count < MaximumSources ? CreateVoice() : null;
+            if (voices.Count >= MaximumSources) return null;
+            Voice created = CreateVoice();
+            created.Source.gameObject.SetActive(true);
+            return created;
         }
 
         private Voice CreateVoice()
@@ -204,7 +256,7 @@ namespace TopDownGame.Audio
         private void Release(Voice voice)
         {
             if (voice == null || voice.Source == null) return;
-            if (voice.Cue != null)
+            if (voice.Counted && voice.Cue != null)
             {
                 ulong id = EntityId.ToULong(voice.Cue.GetEntityId());
                 if (cueVoiceCounts.TryGetValue(id, out int count))
@@ -216,13 +268,8 @@ namespace TopDownGame.Audio
             voice.Source.gameObject.SetActive(false);
             voice.Cue = null;
             voice.EndTime = 0f;
-        }
-
-        private Voice FindVoice(AudioSource source)
-        {
-            for (int i = 0; i < voices.Count; i++)
-                if (voices[i].Source == source) return voices[i];
-            return null;
+            voice.Counted = false;
+            voice.FadeGain = 1f;
         }
 
         private AudioMixerGroup GroupFor(AudioBus bus)
@@ -264,9 +311,9 @@ namespace TopDownGame.Audio
                 "Cave", System.StringComparison.OrdinalIgnoreCase)
                     ? "Audio/Cues/Ambient_Cave"
                     : "Audio/Cues/Ambient_Forest");
-            if (music != null && music.RandomClip != null)
+            if (music != null)
                 CrossfadeMusic(music, 1.6f);
-            if (ambient != null && ambient.RandomClip != null)
+            if (ambient != null)
                 CrossfadeAmbient(ambient, 1.6f);
         }
 
@@ -286,7 +333,7 @@ namespace TopDownGame.Audio
         {
             float clamped = Mathf.Clamp01(value);
             setter(clamped);
-            PlayerPrefs.SetFloat(key, clamped);
+            PlayerPrefs.SetFloat(GamePreferences.Key(key), clamped);
             PlayerPrefs.Save();
             RefreshPlayingVolumes();
         }
@@ -297,9 +344,20 @@ namespace TopDownGame.Audio
             {
                 Voice voice = voices[i];
                 if (voice.Source.gameObject.activeSelf && voice.Cue != null)
-                    voice.Source.volume = voice.Cue.Volume *
-                        VolumeFor(voice.Cue.Bus) * MasterVolume;
+                    ApplyVolume(voice);
             }
+        }
+
+        private void ApplyVolume(Voice voice)
+        {
+            voice.Source.volume = voice.Cue.Volume * VolumeFor(voice.Bus) *
+                MasterVolume * voice.FadeGain;
+        }
+
+        private void WarnMissingClip(AudioCue cue)
+        {
+            if (missingClipWarnings.Add(EntityId.ToULong(cue.GetEntityId())))
+                Debug.LogWarning("Audio cue '" + cue.name + "' has no playable clip; see Assets/Audio/README_MISSING_AUDIO.md.", cue);
         }
     }
 }

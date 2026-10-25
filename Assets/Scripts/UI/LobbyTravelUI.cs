@@ -12,10 +12,11 @@ namespace TopDownGame.UI
     {
         private LobbyPortal portal;
         private GameObject surface;
-        private static readonly string[] Labels = { "Rừng Khởi Hành", "Đường Rừng", "Rừng Sâu", "Vệ Thần Rừng", "Hang Pha Lê", "Tàn Tích Nhật Thực" };
+        private readonly MenuModalFocus focus = new MenuModalFocus();
 
         public void Open(LobbyPortal owner)
         {
+            if (surface != null || owner == null || GameplayState.IsBlockedByOther(this)) return;
             portal=owner;
             surface=new GameObject("TravelDestinationCanvas",typeof(Canvas),typeof(CanvasScaler),typeof(GraphicRaycaster));
             surface.transform.SetParent(transform,false);
@@ -33,23 +34,28 @@ namespace TopDownGame.UI
             var panelRect=(RectTransform)panel;panelRect.anchorMin=panelRect.anchorMax=panelRect.pivot=Vector2.one*0.5f;panelRect.anchoredPosition=Vector2.zero;
             FantasyEquipmentUI.Text(panel,"Eyebrow","TRUYỀN TỐNG TRẬN",30,22,590,28,16,FantasyEquipmentUI.Gold);
             FantasyEquipmentUI.Text(panel,"Title","Bạn muốn đến đâu?",30,54,590,42,28);
-            FantasyEquipmentUI.Text(panel,"Hint","Chọn vùng đã mở khóa để bắt đầu hành trình.",30,99,590,32,17,FantasyEquipmentUI.Muted);
+            FantasyEquipmentUI.Text(panel,"Hint","Đi qua cửa ra ở vùng trước để khám phá và mở vùng mới.",30,99,590,40,17,FantasyEquipmentUI.Muted);
             for(int i=0;i<LobbyPortal.Destinations.Length;i++)
             {
                 string scene=LobbyPortal.Destinations[i];
                 bool available=portal.IsDestinationAvailable(scene);
+                MapData data = portal.GetDestinationData(scene);
+                string label = data != null ? data.DisplayName : scene;
+                string levels = data != null ? "Cấp đề nghị " + data.RecommendedMinLevel + "–" + data.RecommendedMaxLevel : "";
                 var button=FantasyEquipmentUI.Button(panel,"Travel_"+scene,
-                    Labels[i]+(available ? "  →" : "  •  Chưa mở"),30+(i%2)*300,155+(i/2)*103,285,85,
+                    label + "\n" + levels + (available ? "\nĐÃ MỞ" : "\nCHƯA MỞ"),30+(i%2)*300,155+(i/2)*103,285,85,
                     ()=>portal.ChooseDestination(scene),available);
                 button.interactable=available;
             }
-            FantasyEquipmentUI.Button(panel,"Cancel","Ở lại sảnh  •  Esc",30,490,590,54,()=>portal.CancelChoice());
+            Button cancel = FantasyEquipmentUI.Button(panel,"Cancel","Ở lại sảnh  •  Esc",30,490,590,54,()=>portal.CancelChoice());
+            focus.Capture(surface.transform);
             GameplayState.EnterModal(this);
+            cancel.Select();
         }
 
         private void Update()
         {
-            if(portal!=null && Keyboard.current!=null && Keyboard.current.escapeKey.wasPressedThisFrame)
+            if(portal!=null && !GameplayState.IsBlockedByOther(this) && Keyboard.current!=null && Keyboard.current.escapeKey.wasPressedThisFrame)
                 portal.CancelChoice();
         }
 
@@ -57,11 +63,19 @@ namespace TopDownGame.UI
         {
             GameplayState.ExitModal(this);
             if(surface!=null) {surface.SetActive(false); Destroy(surface);}
+            focus.Release();
             Destroy(this);
+        }
+        private void OnDisable()
+        {
+            GameplayState.ExitModal(this);
+            focus.Release();
+            if (surface != null) surface.SetActive(false);
         }
         private void OnDestroy()
         {
             GameplayState.ExitModal(this);
+            focus.Release();
             if(surface!=null) Destroy(surface);
         }
     }

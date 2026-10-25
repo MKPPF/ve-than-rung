@@ -9,6 +9,7 @@ namespace TopDownGame.Maps
     public sealed class LobbyPortal : MonoBehaviour, IInteractable
     {
         [SerializeField] private string destinationScene = "Map01";
+        [SerializeField] private MapData[] destinationMaps;
         [SerializeField, Min(0.2f)] private float chargeDuration = 1.15f;
         [Header("Departure ceremony")]
         [SerializeField, Min(0.5f)] private float departureDuration = 3f;
@@ -23,6 +24,14 @@ namespace TopDownGame.Maps
         private TopDownGame.UI.LobbyTravelUI travelUI;
         public bool IsChoosing => travelUI != null;
         public static readonly string[] Destinations = { "Map01", "Map02", "Map03", "BossMap01", "CaveMap01", "RiftMap01" };
+
+        public MapData GetDestinationData(string scene)
+        {
+            if (destinationMaps == null) return null;
+            foreach (MapData data in destinationMaps)
+                if (data != null && data.MapId == scene) return data;
+            return null;
+        }
 
         public bool CanInteract => !transporting;
         public string InteractionPrompt => transporting ? "Đang truyền tống..." :
@@ -110,7 +119,11 @@ namespace TopDownGame.Maps
 
         private void UpdateDeparture()
         {
-            if (loadRequested) return;
+            if (loadRequested)
+            {
+                if (!SceneTransition.IsLoading) CancelDeparture();
+                return;
+            }
             var health = occupant != null ? occupant.GetComponent<PlayerHealth>() : null;
             if (occupant == null || !occupant.gameObject.activeInHierarchy ||
                 (health != null && !health.IsAlive) || !activationArea.OverlapPoint(PhysicalPosition(occupant)))
@@ -123,7 +136,7 @@ namespace TopDownGame.Maps
             if (departureTime < departureDuration) return;
             // Save capture and the actual scene load happen only after the entire ceremony.
             loadRequested = true;
-            SceneTransition.LoadScene(selectedScene, occupant);
+            if (!SceneTransition.TryLoadScene(selectedScene, occupant, this)) CancelDeparture();
         }
 
         private void CancelDeparture()

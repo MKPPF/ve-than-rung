@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BossMap01
   m_EditorClassIdentifier: Assembly-CSharp::TopDownGame.Maps.MapData
   mapId: BossMap01
-  displayName: Forest Guardian's Grove
+  displayName: "L\xE3nh \u0110\u1ECBa V\u1EC7 Th\u1EA7n"
   nextScene: CaveMap01
   isBossMap: 1
   opensSkillSelection: 0

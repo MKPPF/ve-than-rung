@@ -81,6 +81,18 @@ namespace TopDownGame.UI
 
         private void BuildBar()
         {
+            // The hunting pool clones initialized scene enemies, including their
+            // generated children. Rebind that bar so it has one owner and its
+            // label follows this clone's profile rather than the seed's snapshot.
+            Transform existingBar = transform.Find("EnemyHealthBar");
+            if (existingBar != null)
+            {
+                canvas = existingBar.GetComponent<Canvas>();
+                slider = existingBar.GetComponent<Slider>();
+                levelLabel = existingBar.GetComponentInChildren<TMP_Text>(true);
+                if (canvas != null && slider != null && levelLabel != null) return;
+            }
+
             GameObject barObject = new GameObject("EnemyHealthBar", typeof(RectTransform),
                 typeof(Canvas), typeof(CanvasScaler));
             barObject.transform.SetParent(transform, false);
@@ -126,10 +138,12 @@ namespace TopDownGame.UI
             labelRect.anchorMax = new Vector2(0.5f, 1f);
             labelRect.pivot = new Vector2(0.5f, 0f);
             labelRect.anchoredPosition = new Vector2(0f, 5f);
-            labelRect.sizeDelta = new Vector2(220f, 28f);
+            labelRect.sizeDelta = new Vector2(340f, 28f);
             levelLabel = labelObject.AddComponent<TextMeshProUGUI>();
             levelLabel.alignment = TextAlignmentOptions.Center;
             levelLabel.fontSize = 17f;
+            levelLabel.textWrappingMode = TextWrappingModes.NoWrap;
+            levelLabel.overflowMode = TextOverflowModes.Ellipsis;
             levelLabel.color = Color.white;
             levelLabel.outlineWidth = 0.16f;
             levelLabel.outlineColor = Color.black;
@@ -141,8 +155,8 @@ namespace TopDownGame.UI
             if (levelLabel == null || health == null) return;
             EnemyRuntimeProfile profile = health.Profile;
             levelLabel.text = profile != null
-                ? "Lv. " + profile.Level + "  " + profile.DisplayName
-                : "Lv. 1  Enemy";
+                ? "Cấp " + profile.Level + "  " + profile.DisplayName
+                : "Cấp 1  Địch";
             levelLabel.color = profile != null && profile.IsElite
                 ? new Color(1f, 0.68f, 0.18f)
                 : Color.white;

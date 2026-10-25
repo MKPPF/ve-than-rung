@@ -29,18 +29,22 @@ namespace TopDownGame.Enemies
         private Vector3 endScale;
         private float duration;
         private float elapsed;
+        private EnemyBase warningOwner;
+        private EnemyHealth warningHealth;
+        private bool cancelWithOwner;
+        private bool holdUntilCancelled;
 
         public static GameObject TelegraphCircle(Vector2 position, float radius,
-            float duration, Color color)
+            float duration, Color color, EnemyBase owner = null, bool holdUntilCancelled = false)
         {
             return Create("Enemy Area Warning", position,
                 new Vector3(radius * 2f, radius * 2f, 1f),
                 RuntimeSpriteFactory.RingSprite, color, duration,
-                EffectMode.Telegraph, 12);
+                EffectMode.Telegraph, 12, owner, holdUntilCancelled);
         }
 
         public static GameObject TelegraphLine(Vector2 origin, Vector2 direction,
-            float length, float width, float duration, Color color)
+            float length, float width, float duration, Color color, EnemyBase owner = null, bool holdUntilCancelled = false)
         {
             direction = direction.sqrMagnitude > 0.001f
                 ? direction.normalized
@@ -48,10 +52,19 @@ namespace TopDownGame.Enemies
             GameObject effect = Create("Enemy Line Warning",
                 origin + direction * (length * 0.5f),
                 new Vector3(length, width, 1f), RuntimeSpriteFactory.WhiteSprite,
-                color, duration, EffectMode.Telegraph, 12);
+                color, duration, EffectMode.Telegraph, 12, owner, holdUntilCancelled);
             effect.transform.rotation = Quaternion.Euler(0f, 0f,
                 Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
             return effect;
+        }
+
+        /// <summary>Only cancels still-pending warnings; already released impacts and other owners' pooled effects keep their lifetime.</summary>
+        public static void CancelWarnings(EnemyBase owner)
+        {
+            if (owner == null) return;
+            foreach (EnemyCombatVfx effect in Pool)
+                if (effect != null && effect.cancelWithOwner && effect.warningOwner == owner)
+                    effect.gameObject.SetActive(false);
         }
 
         public static void TelegraphCone(Vector2 origin, Vector2 direction,
@@ -301,7 +314,7 @@ namespace TopDownGame.Enemies
 
         private static GameObject Create(string name, Vector2 position,
             Vector3 scale, Sprite sprite, Color color, float duration,
-            EffectMode mode, int sortingOrder)
+            EffectMode mode, int sortingOrder, EnemyBase warningOwner = null, bool holdUntilCancelled = false)
         {
             EnemyCombatVfx vfx = Acquire();
             GameObject effect = vfx.gameObject;
@@ -320,6 +333,10 @@ namespace TopDownGame.Enemies
             vfx.endScale = mode == EffectMode.Burst ? scale * 3f : scale;
             vfx.duration = Mathf.Max(0.05f, duration);
             vfx.elapsed = 0f;
+            vfx.warningOwner = warningOwner;
+            vfx.warningHealth = warningOwner != null ? warningOwner.GetComponent<EnemyHealth>() : null;
+            vfx.cancelWithOwner = warningOwner != null;
+            vfx.holdUntilCancelled = holdUntilCancelled && warningOwner != null;
             effect.SetActive(true);
             return effect;
         }
@@ -338,6 +355,14 @@ namespace TopDownGame.Enemies
 
             if (Pool.Count >= PoolLimit)
             {
+                // Recycle released impacts before a warning that still promises a pending hit.
+                for (int i = 0; i < Pool.Count; i++)
+                {
+                    EnemyCombatVfx candidate = Pool[recycleCursor++ % Pool.Count];
+                    if (candidate.holdUntilCancelled) continue;
+                    candidate.gameObject.SetActive(false);
+                    return candidate;
+                }
                 EnemyCombatVfx recycled = Pool[recycleCursor++ % Pool.Count];
                 recycled.gameObject.SetActive(false);
                 return recycled;
@@ -354,6 +379,12 @@ namespace TopDownGame.Enemies
 
         private void Update()
         {
+            if (cancelWithOwner && (warningOwner == null || !warningOwner.isActiveAndEnabled ||
+                warningHealth == null || !warningHealth.IsAlive))
+            {
+                gameObject.SetActive(false);
+                return;
+            }
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / duration);
             Color color = baseColor;
@@ -363,7 +394,9 @@ namespace TopDownGame.Enemies
                 case EffectMode.Telegraph:
                     float pulse = 0.72f + Mathf.Sin(elapsed * 18f) * 0.16f;
                     color.a = baseColor.a * pulse * Mathf.Lerp(0.55f, 1f, t);
-                    transform.localScale = startScale * Mathf.Lerp(0.9f, 1f, t);
+                    // Pulse opacity, not the danger boundary: the outer edge
+                    // must describe the eventual hit area throughout the windup.
+                    transform.localScale = startScale;
                     break;
 
                 case EffectMode.Burst:
@@ -389,7 +422,7 @@ namespace TopDownGame.Enemies
             }
 
             visual.color = color;
-            if (t >= 1f)
+            if (t >= 1f && !holdUntilCancelled)
             {
                 gameObject.SetActive(false);
             }

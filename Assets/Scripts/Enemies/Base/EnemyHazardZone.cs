@@ -157,8 +157,7 @@ namespace TopDownGame.Enemies
                 (Vector2)transform.position;
             target.TakeDamage(new DamageInfo(damagePerPulse, source,
                 player.transform.position, direction, 0.4f));
-            source?.GetComponent<EnemyRuntimeProfile>()?.ApplyLifeSteal(
-                damagePerPulse);
+            if (source != null) source.GetComponent<EnemyRuntimeProfile>()?.ApplyLifeSteal(damagePerPulse);
         }
     }
 }

@@ -73,6 +73,7 @@ namespace TopDownGame.Skills
 
         private void DamageImpact(Vector2 point, float damage)
         {
+            TopDownGame.Core.CombatFeedback.WorldImpact(point,0.075f);
             var hitTargets = new HashSet<ulong>();
             foreach (Collider2D hit in Physics2D.OverlapCircleAll(point,
                 impactRadius, enemyLayers))

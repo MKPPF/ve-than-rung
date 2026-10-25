@@ -16,7 +16,7 @@ namespace TopDownGame.Skills
 
         public bool Begin(SkillBase skill,int level,Vector2 point,Vector2 direction)
         {
-            if(IsCasting || !isActiveAndEnabled || skill==null) return false;
+            if(IsCasting || !isActiveAndEnabled || skill==null || GetComponent<PlayerDodge>()?.IsDodging == true) return false;
             StartCoroutine(Execute(skill,level,point,direction));
             return true;
         }

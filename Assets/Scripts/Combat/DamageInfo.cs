@@ -5,7 +5,7 @@ namespace TopDownGame.Combat
     public readonly struct DamageInfo
     {
         public DamageInfo(float amount, GameObject source, Vector2 hitPoint, Vector2 direction,
-            float knockback = 0f, bool isCritical = false, bool ignoreArmor = false)
+            float knockback = 0f, bool isCritical = false, bool ignoreArmor = false, bool isPeriodic = false)
         {
             Amount = Mathf.Max(0f, amount);
             Source = source;
@@ -14,6 +14,7 @@ namespace TopDownGame.Combat
             Knockback = Mathf.Max(0f, knockback);
             IsCritical = isCritical;
             IgnoreArmor = ignoreArmor;
+            IsPeriodic = isPeriodic;
         }
 
         public float Amount { get; }
@@ -23,5 +24,6 @@ namespace TopDownGame.Combat
         public float Knockback { get; }
         public bool IsCritical { get; }
         public bool IgnoreArmor { get; }
+        public bool IsPeriodic { get; }
     }
 }

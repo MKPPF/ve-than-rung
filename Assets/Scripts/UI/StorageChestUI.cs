@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using TMPro;
+using TopDownGame.Core;
 using TopDownGame.Equipment;
 using TopDownGame.Player;
 using TopDownGame.Save;
@@ -9,314 +10,146 @@ using UnityEngine.UI;
 
 namespace TopDownGame.UI
 {
+    /// <summary>Keeps storage transfers readable and pauses combat for the entire transaction.</summary>
     public sealed class StorageChestUI : MonoBehaviour
     {
         private GameObject panel;
-        private Transform playerItemsRoot;
-        private Transform chestItemsRoot;
+        private Transform playerItemsRoot, chestItemsRoot;
         private TMP_Text statusText;
         private EquipmentInventory inventory;
-        private PlayerMovement movement;
-
+        private Button closeButton;
+        private readonly MenuModalFocus focus = new MenuModalFocus();
         public bool IsOpen => panel != null && panel.activeSelf;
 
         private void Update()
         {
-            if (IsOpen && Keyboard.current != null &&
-                Keyboard.current.escapeKey.wasPressedThisFrame)
-            {
-                Close();
-            }
+            if (IsOpen && Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) Close();
         }
 
         public void Open(PlayerInteraction player)
         {
-            if (player == null)
-            {
-                return;
-            }
-
-            BuildPanel();
+            if (player == null || IsOpen || GameplayState.IsBlockedByOther(this)) return;
             inventory = player.GetComponent<EquipmentInventory>();
-            movement = player.GetComponent<PlayerMovement>();
-            if (panel == null || inventory == null)
-            {
-                return;
-            }
-
-            if (movement != null)
-            {
-                movement.enabled = false;
-            }
-
+            if (inventory == null) return;
+            BuildPanel();
+            if (panel == null) return;
             panel.SetActive(true);
             panel.transform.SetAsLastSibling();
-            statusText.text = "Chọn đồ bên trái để cất, bên phải để lấy.";
+            GameplayState.EnterModal(this);
+            focus.Capture(panel.transform);
+            statusText.text = "Chọn đồ bên trái để cất, bên phải để lấy. Cất món đang mặc sẽ tháo trang bị đó.";
             Refresh();
+            closeButton.Select();
         }
 
         public void Close()
         {
-            panel?.SetActive(false);
-            if (movement != null)
-            {
-                movement.enabled = true;
-            }
+            if (panel != null) panel.SetActive(false);
+            GameplayState.ExitModal(this);
+            focus.Release();
         }
 
         private void Refresh()
         {
-            ClearChildren(playerItemsRoot);
-            ClearChildren(chestItemsRoot);
+            FantasyEquipmentUI.Clear(playerItemsRoot);
+            FantasyEquipmentUI.Clear(chestItemsRoot);
             GameProgressManager progress = GameProgressManager.Instance;
-            if (progress == null || inventory == null)
-            {
-                return;
-            }
-
-            List<EquipmentData> owned = new List<EquipmentData>(inventory.OwnedItems());
+            if (progress == null || inventory == null) return;
+            var owned = new List<EquipmentData>(inventory.OwnedItems());
             foreach (EquipmentData item in owned)
             {
                 EquipmentData captured = item;
-                CreateTransferCard(playerItemsRoot, item, "CẤT VÀO RƯƠNG", () =>
+                bool equipped = inventory.GetEquipped(item.Slot) == item;
+                CreateTransferCard(playerItemsRoot, item, equipped ? "THÁO VÀ CẤT VÀO RƯƠNG" : "CẤT VÀO RƯƠNG", () =>
                 {
                     inventory.UnequipIfMatching(captured.ItemId);
-                    if (progress.MoveItemToChest(captured.ItemId))
-                    {
-                        progress.CaptureActivePlayer();
-                        statusText.text = "Đã cất " + captured.DisplayName + ".";
-                        Refresh();
-                    }
+                    if (!progress.MoveItemToChest(captured.ItemId)) return;
+                    progress.CaptureActivePlayer();
+                    statusText.text = "Đã cất " + captured.DisplayName + ".";
+                    Refresh();
                 });
             }
-
             foreach (string itemId in progress.ChestItems)
             {
                 EquipmentData item = inventory.FindById(itemId);
                 if (item == null) continue;
                 EquipmentData captured = item;
-                CreateTransferCard(chestItemsRoot, item, "LẤY RA", () =>
+                CreateTransferCard(chestItemsRoot, item, "LẤY RA HÀNH TRANG", () =>
                 {
-                    if (progress.MoveItemFromChest(captured.ItemId))
-                    {
-                        progress.CaptureActivePlayer();
-                        statusText.text = "Đã lấy " + captured.DisplayName + ".";
-                        Refresh();
-                    }
+                    if (!progress.MoveItemFromChest(captured.ItemId)) return;
+                    progress.CaptureActivePlayer();
+                    statusText.text = "Đã lấy " + captured.DisplayName + ".";
+                    Refresh();
                 });
             }
-
-            if (owned.Count == 0)
-            {
-                CreateEmptyMessage(playerItemsRoot, "Hành trang trống");
-            }
-
-            if (progress.ChestItems.Count == 0)
-            {
-                CreateEmptyMessage(chestItemsRoot, "Rương đang trống");
-            }
+            if (owned.Count == 0) CreateEmptyMessage(playerItemsRoot, "Hành trang trống");
+            if (progress.ChestItems.Count == 0) CreateEmptyMessage(chestItemsRoot, "Rương đang trống");
         }
 
         private void BuildPanel()
         {
-            if (panel != null)
-            {
-                return;
-            }
-
+            if (panel != null) return;
             Canvas canvas = GetComponentInParent<Canvas>();
-            if (canvas == null)
-            {
-                return;
-            }
-
+            if (canvas == null) return;
             panel = new GameObject("StorageChestPanel", typeof(RectTransform), typeof(Image));
             panel.transform.SetParent(canvas.transform, false);
-            Stretch(panel.GetComponent<RectTransform>());
-            panel.GetComponent<Image>().color = new Color(0.015f, 0.025f, 0.045f, 1f);
-
-            TMP_Text title = CreateText(panel.transform, "Title", "RƯƠNG ĐỒ", 44f);
-            Place(title.rectTransform, new Vector2(0f, -28f),
-                new Vector2(900f, 60f), new Vector2(0.5f, 1f));
-            title.color = new Color(1f, 0.78f, 0.25f);
-
-            Button close = CreateButton(panel.transform, "Close", "ĐÓNG [ESC]",
-                new Vector2(-35f, -30f), new Vector2(210f, 54f));
-            RectTransform closeRect = close.GetComponent<RectTransform>();
-            closeRect.anchorMin = closeRect.anchorMax = Vector2.one;
-            closeRect.pivot = Vector2.one;
-            close.onClick.AddListener(Close);
-
-            playerItemsRoot = CreateSide(panel.transform, "PlayerItems", "HÀNH TRANG",
-                new Vector2(0.04f, 0.12f), new Vector2(0.49f, 0.88f));
-            chestItemsRoot = CreateSide(panel.transform, "ChestItems", "TRONG RƯƠNG",
-                new Vector2(0.51f, 0.12f), new Vector2(0.96f, 0.88f));
-
-            statusText = CreateText(panel.transform, "Status", string.Empty, 21f);
-            Place(statusText.rectTransform, new Vector2(0f, 28f),
-                new Vector2(1600f, 45f), new Vector2(0.5f, 0f));
-            statusText.color = new Color(0.65f, 0.9f, 1f);
-        }
-
-        private static Transform CreateSide(Transform parent, string name, string title,
-            Vector2 anchorMin, Vector2 anchorMax)
-        {
-            GameObject side = new GameObject(name, typeof(RectTransform), typeof(Image));
-            side.transform.SetParent(parent, false);
-            RectTransform sideRect = side.GetComponent<RectTransform>();
-            sideRect.anchorMin = anchorMin;
-            sideRect.anchorMax = anchorMax;
-            sideRect.offsetMin = Vector2.zero;
-            sideRect.offsetMax = Vector2.zero;
-            side.GetComponent<Image>().color = new Color(0.035f, 0.055f, 0.085f, 1f);
-
-            TMP_Text heading = CreateText(side.transform, "Heading", title, 28f);
-            Place(heading.rectTransform, new Vector2(0f, -18f),
-                new Vector2(700f, 46f), new Vector2(0.5f, 1f));
-
-            GameObject viewport = new GameObject("Viewport", typeof(RectTransform),
-                typeof(Image), typeof(RectMask2D), typeof(ScrollRect));
-            viewport.transform.SetParent(side.transform, false);
-            RectTransform viewportRect = viewport.GetComponent<RectTransform>();
-            viewportRect.anchorMin = new Vector2(0.03f, 0.04f);
-            viewportRect.anchorMax = new Vector2(0.97f, 0.91f);
-            viewportRect.offsetMin = Vector2.zero;
-            viewportRect.offsetMax = Vector2.zero;
-            viewport.GetComponent<Image>().color = new Color(0.02f, 0.03f, 0.05f, 1f);
-
-            GameObject content = new GameObject("Content", typeof(RectTransform),
-                typeof(GridLayoutGroup), typeof(ContentSizeFitter));
-            content.transform.SetParent(viewport.transform, false);
-            RectTransform contentRect = content.GetComponent<RectTransform>();
-            contentRect.anchorMin = new Vector2(0f, 1f);
-            contentRect.anchorMax = new Vector2(1f, 1f);
-            contentRect.pivot = new Vector2(0.5f, 1f);
-            contentRect.sizeDelta = Vector2.zero;
-            GridLayoutGroup grid = content.GetComponent<GridLayoutGroup>();
-            grid.cellSize = new Vector2(330f, 280f);
-            grid.spacing = new Vector2(20f, 20f);
-            grid.padding = new RectOffset(22, 22, 22, 22);
-            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            grid.constraintCount = 2;
-            content.GetComponent<ContentSizeFitter>().verticalFit =
-                ContentSizeFitter.FitMode.PreferredSize;
-            ScrollRect scroll = viewport.GetComponent<ScrollRect>();
-            scroll.viewport = viewportRect;
-            scroll.content = contentRect;
-            scroll.horizontal = false;
-            return content.transform;
-        }
-
-        private static void CreateTransferCard(Transform parent, EquipmentData item,
-            string actionLabel, UnityEngine.Events.UnityAction action)
-        {
-            Button button = CreateButton(parent, item.ItemId, string.Empty,
-                Vector2.zero, new Vector2(330f, 280f));
-            button.GetComponent<Image>().color = Color.Lerp(
-                new Color(0.045f, 0.065f, 0.1f, 1f), item.RarityColor, 0.16f);
-            button.onClick.AddListener(action);
-
-            TMP_Text name = CreateText(button.transform, "Name", item.DisplayName, 21f);
-            Place(name.rectTransform, new Vector2(0f, -9f),
-                new Vector2(300f, 34f), new Vector2(0.5f, 1f));
-            name.color = item.RarityColor;
-
-            TMP_Text rarity = CreateText(button.transform, "Rarity",
-                item.RarityLabel.ToUpperInvariant() + "  •  SỨC MẠNH " +
-                item.PowerScore, 13f);
-            Place(rarity.rectTransform, new Vector2(0f, -40f),
-                new Vector2(300f, 24f), new Vector2(0.5f, 1f));
-            rarity.color = item.RarityColor;
-
-            GameObject iconObject = new GameObject("Icon", typeof(RectTransform), typeof(Image));
-            iconObject.transform.SetParent(button.transform, false);
-            RectTransform iconRect = iconObject.GetComponent<RectTransform>();
-            iconRect.sizeDelta = new Vector2(145f, 145f);
-            iconRect.anchoredPosition = new Vector2(0f, 10f);
-            Image icon = iconObject.GetComponent<Image>();
-            icon.sprite = item.Icon;
-            icon.preserveAspect = true;
-            icon.raycastTarget = false;
-
-            TMP_Text label = CreateText(button.transform, "Action", actionLabel, 17f);
-            Place(label.rectTransform, new Vector2(0f, 12f),
-                new Vector2(300f, 34f), new Vector2(0.5f, 0f));
-            label.fontStyle = FontStyles.Bold;
-            label.color = new Color(0.65f, 0.9f, 1f);
-
-            TMP_Text stats = CreateText(button.transform, "Stats",
-                item.BuildStatSummary(), 14f);
-            Place(stats.rectTransform, new Vector2(0f, 45f),
-                new Vector2(305f, 38f), new Vector2(0.5f, 0f));
-            stats.textWrappingMode = TextWrappingModes.Normal;
-            stats.color = new Color(0.82f, 0.88f, 0.96f);
-        }
-
-        private static void CreateEmptyMessage(Transform parent, string message)
-        {
-            TMP_Text empty = CreateText(parent, "Empty", message, 21f);
-            empty.rectTransform.sizeDelta = new Vector2(330f, 100f);
-            empty.color = new Color(0.5f, 0.58f, 0.68f);
-        }
-
-        private static TMP_Text CreateText(Transform parent, string name,
-            string value, float size)
-        {
-            GameObject gameObject = new GameObject(name, typeof(RectTransform));
-            gameObject.transform.SetParent(parent, false);
-            TMP_Text text = gameObject.AddComponent<TextMeshProUGUI>();
-            text.text = value;
-            text.fontSize = size;
-            text.alignment = TextAlignmentOptions.Center;
-            text.color = Color.white;
-            text.raycastTarget = false;
-            return text;
-        }
-
-        private static Button CreateButton(Transform parent, string name, string label,
-            Vector2 position, Vector2 size)
-        {
-            GameObject gameObject = new GameObject(name, typeof(RectTransform),
-                typeof(Image), typeof(Button));
-            gameObject.transform.SetParent(parent, false);
-            RectTransform rect = gameObject.GetComponent<RectTransform>();
-            rect.sizeDelta = size;
-            rect.anchoredPosition = position;
-            gameObject.GetComponent<Image>().color = new Color(0.2f, 0.34f, 0.5f, 1f);
-            Button button = gameObject.GetComponent<Button>();
-            if (!string.IsNullOrEmpty(label))
-            {
-                TMP_Text text = CreateText(gameObject.transform, "Label", label, 18f);
-                Stretch(text.rectTransform, 4f);
-                text.fontStyle = FontStyles.Bold;
-            }
-            return button;
-        }
-
-        private static void Place(RectTransform rect, Vector2 position, Vector2 size,
-            Vector2 anchor)
-        {
-            rect.anchorMin = rect.anchorMax = anchor;
-            rect.pivot = anchor;
-            rect.anchoredPosition = position;
-            rect.sizeDelta = size;
-        }
-
-        private static void Stretch(RectTransform rect, float inset = 0f)
-        {
+            RectTransform rect = panel.GetComponent<RectTransform>();
             rect.anchorMin = Vector2.zero;
             rect.anchorMax = Vector2.one;
-            rect.offsetMin = new Vector2(inset, inset);
-            rect.offsetMax = new Vector2(-inset, -inset);
+            rect.offsetMin = rect.offsetMax = Vector2.zero;
+            Transform surface = EquipmentPanelLayout.CreateSurface(panel);
+            Transform frame = FantasyEquipmentUI.Window(surface, "KHO TRANG BỊ", "CẤT GIỮ VÀ CHUẨN BỊ CHUYẾN ĐI", Close);
+            closeButton = frame.Find("Close").GetComponent<Button>();
+            frame.Find("KeyHints").GetComponent<TMP_Text>().text = "CHUỘT  Cất / Lấy đồ     •     CUỘN  Xem danh sách     •     ESC  Đóng";
+            playerItemsRoot = CreateSide(frame, "PlayerItems", "HÀNH TRANG", 30);
+            chestItemsRoot = CreateSide(frame, "ChestItems", "TRONG RƯƠNG", 872);
+            statusText = FantasyEquipmentUI.Text(frame, "Status", "", 32, 803, 1648, 50, 22, FantasyEquipmentUI.Gold);
         }
 
-        private static void ClearChildren(Transform root)
+        private static Transform CreateSide(Transform parent, string name, string title, float x)
         {
-            if (root == null) return;
-            for (int i = root.childCount - 1; i >= 0; i--)
+            Transform side = FantasyEquipmentUI.Frame(parent, name, x, 128, 810, 660, FantasyEquipmentUI.Panel);
+            FantasyEquipmentUI.Text(side, "Heading", title, 24, 16, 762, 40, 25, FantasyEquipmentUI.Gold);
+            FantasyEquipmentUI.Grid(side, "Viewport", 22, 76, 766, 560, new Vector2(360, 250), 2, out Transform content);
+            return content;
+        }
+
+        private void CreateTransferCard(Transform parent, EquipmentData item, string actionLabel, UnityEngine.Events.UnityAction action)
+        {
+            Transform frame = FantasyEquipmentUI.Frame(parent, item.ItemId, 0, 0, 360, 250,
+                Color.Lerp(FantasyEquipmentUI.Ink, item.RarityColor, 0.08f));
+            Button button = frame.gameObject.AddComponent<Button>();
+            button.targetGraphic = frame.Find("Inset").GetComponent<Image>();
+            frame.GetComponent<Image>().raycastTarget = true;
+            EquipmentPanelLayout.StyleButton(button);
+            // Rebuilding a scrolled grid cannot leave keyboard focus on a destroyed card.
+            button.navigation = new Navigation { mode = Navigation.Mode.None };
+            button.onClick.AddListener(() =>
             {
-                Destroy(root.GetChild(i).gameObject);
-            }
+                if (!IsOpen || GameplayState.IsBlockedByOther(this)) return;
+                action.Invoke();
+                closeButton.Select();
+            });
+            int enhancement = inventory.GetEnhancementLevel(item);
+            FantasyEquipmentUI.Text(frame, "Name", item.DisplayName + (enhancement > 0 ? "  +" + enhancement : ""), 16, 12, 328, 34, 23, item.RarityColor);
+            FantasyEquipmentUI.Text(frame, "Rarity", item.RarityLabel + "  •  Sức mạnh " + inventory.EffectivePowerScore(item),
+                16, 48, 328, 26, 17, FantasyEquipmentUI.Muted);
+            FantasyEquipmentUI.Icon(frame, "Icon", item.Icon, 18, 90, 86, 86);
+            FantasyEquipmentUI.Text(frame, "Stats", item.BuildDetailedStatSummary(EquipmentInventory.EnhancementMultiplier(enhancement)), 118, 84, 226, 104, 17,
+                null, TextAlignmentOptions.TopLeft);
+            FantasyEquipmentUI.Line(frame, 16, 197, 328);
+            FantasyEquipmentUI.Text(frame, "Action", actionLabel, 16, 208, 328, 28, 19,
+                FantasyEquipmentUI.Green, TextAlignmentOptions.Center);
+        }
+
+        private static void CreateEmptyMessage(Transform parent, string message) =>
+            FantasyEquipmentUI.Text(parent, "Empty", message, 0, 0, 360, 100, 23, FantasyEquipmentUI.Muted, TextAlignmentOptions.Center);
+
+        private void OnDisable() => Close();
+        private void OnDestroy()
+        {
+            Close();
+            if (panel != null) Destroy(panel);
         }
     }
 }

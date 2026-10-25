@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 
 namespace TopDownGame.Save
 {
+    /// <summary>Keeps the live campaign separate from unreadable preferences until the player explicitly resolves recovery.</summary>
     public sealed class GameProgressManager : MonoBehaviour
     {
         private const string SaveKey = "TopDownGame.Progress.v1";
@@ -68,7 +69,10 @@ namespace TopDownGame.Save
         [SerializeField] private string safeRespawnScene;
         [SerializeField] private Vector3 safeRespawnPosition;
         [SerializeField] private bool hasSafeRespawn;
+        [SerializeField] private bool tutorialInitialized;
+        [SerializeField] private bool tutorialCompleted;
         private bool playerProgressApplied;
+        private ProgressLoadStatus loadStatus;
 
         public string CurrentMap => currentMap;
         public float CurrentHealth => currentHealth;
@@ -84,7 +88,12 @@ namespace TopDownGame.Save
         public string EquippedPantsId => equippedPantsId;
         public string EquippedNecklaceId => equippedNecklaceId;
         public IReadOnlyList<string> ChestItems => chestItems;
-        public bool HasSavedGame => PlayerPrefs.HasKey(ActiveSaveKey);
+        public ProgressLoadStatus LoadStatus => loadStatus;
+        public bool NeedsSaveRecovery => loadStatus == ProgressLoadStatus.RecoveryAvailable || loadStatus == ProgressLoadStatus.Unreadable;
+        public bool HasStoredProgress => PlayerPrefs.HasKey(ActiveSaveKey) || PlayerPrefs.HasKey(BackupSaveKey);
+        public bool HasSavedGame => !NeedsSaveRecovery && PlayerPrefs.HasKey(ActiveSaveKey);
+        public bool TutorialCompleted => tutorialCompleted;
+        public bool ShouldShowTutorial => HasSavedGame && tutorialInitialized && !tutorialCompleted;
         public int PlayerLevel => playerLevel;
         public int PotentialPoints => potentialPoints;
         public int HunterEssence => hunterEssence;
@@ -113,18 +122,13 @@ namespace TopDownGame.Save
             Instance = this;
             DontDestroyOnLoad(gameObject);
             NormalizeCollections();
-            bool loadedProgress = LoadProgress();
-            bool migratedPotential = loadedProgress && !potentialInitialized;
+            LoadProgress();
             if (!potentialInitialized)
             {
-                // Save v1 files created before Potential existed receive every
-                // point their current level should have earned exactly once.
-                potentialPoints = loadedProgress ? Mathf.Max(0, playerLevel - 1) : 0;
+                // A fresh or unresolved campaign has no points to migrate. Valid
+                // legacy progression is migrated by ProgressSnapshot before application.
+                potentialPoints = 0;
                 potentialInitialized = true;
-            }
-            if (migratedPotential)
-            {
-                SaveProgress();
             }
             // Opening the menu must not create a save or overwrite existing gold.
             // A fresh game is persisted only after the player chooses New Game.
@@ -166,6 +170,7 @@ namespace TopDownGame.Save
 
         public void BeginNewGame()
         {
+            ArchiveUnreadablePrimary();
             currentMap = "Lobby";
             currentHealth = PlayerStats.ExperimentalMaxHealth;
             maxHealth = PlayerStats.ExperimentalMaxHealth;
@@ -201,14 +206,47 @@ namespace TopDownGame.Save
             safeRespawnScene = string.Empty;
             safeRespawnPosition = Vector3.zero;
             hasSafeRespawn = false;
+            tutorialInitialized = true;
+            tutorialCompleted = false;
+            playerProgressApplied = false;
+            NormalizeCollections();
+            string json = JsonUtility.ToJson(CreateSnapshot());
+            // A new campaign owns its own backup; an older campaign must not
+            // reappear after the player has explicitly chosen to start over.
+            PlayerPrefs.SetString(BackupSaveKey, json);
+            PlayerPrefs.SetString(ActiveSaveKey, json);
+            PlayerPrefs.Save();
+            loadStatus = ProgressLoadStatus.Ready;
+        }
+
+        public void CompleteTutorial()
+        {
+            if (!HasSavedGame || tutorialCompleted) return;
+            tutorialInitialized = true;
+            tutorialCompleted = true;
+            // Do not capture a partially initialized player or modify their loadout.
             SaveProgress();
         }
 
         public void CapturePlayer(PlayerStats stats, PlayerHealth health, SkillInventory inventory)
         {
-            if (stats == null || health == null)
+            if (UpdatePlayerSnapshot(stats, health, inventory)) SaveProgress();
+        }
+
+        /// <summary>Keeps earned progress on defeat and saves recovered vitals without reviving the current, defeated avatar.</summary>
+        public void CaptureDefeatedPlayer(PlayerStats stats, PlayerHealth health, SkillInventory inventory)
+        {
+            if (health == null || health.IsAlive || !UpdatePlayerSnapshot(stats, health, inventory)) return;
+            currentHealth = stats.MaxHealth;
+            currentMana = stats.MaxMana;
+            SaveProgress();
+        }
+
+        private bool UpdatePlayerSnapshot(PlayerStats stats, PlayerHealth health, SkillInventory inventory)
+        {
+            if (NeedsSaveRecovery || stats == null || health == null)
             {
-                return;
+                return false;
             }
 
             currentMap = SceneManager.GetActiveScene().name;
@@ -244,7 +282,7 @@ namespace TopDownGame.Save
                 }
             }
 
-            SaveProgress();
+            return true;
         }
 
         public void CaptureActivePlayer()
@@ -269,37 +307,118 @@ namespace TopDownGame.Save
 
         public void SaveProgress()
         {
+            if (NeedsSaveRecovery) return;
+            bool primaryExists = PlayerPrefs.HasKey(ActiveSaveKey);
+            string previous = PlayerPrefs.GetString(ActiveSaveKey, string.Empty);
+            if ((primaryExists && !ProgressSnapshot.TryDeserialize(previous, out _)) ||
+                (!primaryExists && PlayerPrefs.HasKey(BackupSaveKey)))
+            {
+                RefreshRecoveryStatus();
+                return;
+            }
             NormalizeCollections();
-            PlayerPrefs.SetString(ActiveSaveKey, JsonUtility.ToJson(this));
+            string json = JsonUtility.ToJson(CreateSnapshot());
+            if (primaryExists && previous != json) PlayerPrefs.SetString(BackupSaveKey, previous);
+            else if (!ProgressSnapshot.TryDeserialize(PlayerPrefs.GetString(BackupSaveKey, string.Empty), out _))
+                PlayerPrefs.SetString(BackupSaveKey, json);
+            PlayerPrefs.SetString(ActiveSaveKey, json);
             PlayerPrefs.Save();
+            if (loadStatus != ProgressLoadStatus.Recovered) loadStatus = ProgressLoadStatus.Ready;
         }
 
         public bool LoadProgress()
         {
-            if (!PlayerPrefs.HasKey(ActiveSaveKey))
+            if (!PlayerPrefs.HasKey(ActiveSaveKey) ||
+                !ProgressSnapshot.TryDeserialize(PlayerPrefs.GetString(ActiveSaveKey, string.Empty), out ProgressSnapshot snapshot))
             {
+                RefreshRecoveryStatus();
                 return false;
             }
 
-            string json = PlayerPrefs.GetString(ActiveSaveKey, string.Empty);
-            if (string.IsNullOrWhiteSpace(json))
-            {
-                PlayerPrefs.DeleteKey(ActiveSaveKey);
-                return false;
-            }
+            ApplySnapshot(snapshot);
+            loadStatus = ProgressLoadStatus.Ready;
+            if (snapshot.needsMigration) SaveProgress();
+            return true;
+        }
 
-            try
+        public bool TryGetBackupSummary(out int level, out int savedGold) => TryGetBackupSummary(out level, out savedGold, out _);
+
+        public bool TryGetBackupSummary(out int level, out int savedGold, out string revision)
+        {
+            revision = PlayerPrefs.GetString(BackupSaveKey, string.Empty);
+            bool valid = ProgressSnapshot.TryDeserialize(revision, out ProgressSnapshot backup);
+            level = valid ? backup.playerLevel : 0;
+            savedGold = valid ? backup.gold : 0;
+            return valid;
+        }
+
+        public bool TryRestoreBackup(string expectedRevision = null)
+        {
+            if (!NeedsSaveRecovery) return false;
+            // Recheck both records at confirmation time. A newly valid primary
+            // takes precedence over an older backup shown by a stale dialog.
+            if (ProgressSnapshot.TryDeserialize(PlayerPrefs.GetString(ActiveSaveKey, string.Empty), out _))
             {
-                JsonUtility.FromJsonOverwrite(json, this);
-                NormalizeCollections();
-                return true;
-            }
-            catch (Exception exception)
-            {
-                Debug.LogWarning("Could not load saved progress: " + exception.Message);
-                PlayerPrefs.DeleteKey(ActiveSaveKey);
+                LoadProgress();
                 return false;
             }
+            string revision = PlayerPrefs.GetString(BackupSaveKey, string.Empty);
+            if ((expectedRevision != null && !string.Equals(revision, expectedRevision, StringComparison.Ordinal)) ||
+                !ProgressSnapshot.TryDeserialize(revision, out ProgressSnapshot backup))
+            {
+                RefreshRecoveryStatus();
+                return false;
+            }
+            ArchiveUnreadablePrimary();
+            PlayerPrefs.SetString(ActiveSaveKey, JsonUtility.ToJson(backup));
+            PlayerPrefs.Save();
+            ApplySnapshot(backup);
+            playerProgressApplied = false;
+            loadStatus = ProgressLoadStatus.Recovered;
+            return true;
+        }
+
+        private void RefreshRecoveryStatus()
+        {
+            loadStatus = !HasStoredProgress ? ProgressLoadStatus.Missing
+                : TryGetBackupSummary(out _, out _) ? ProgressLoadStatus.RecoveryAvailable : ProgressLoadStatus.Unreadable;
+        }
+
+        private void ArchiveUnreadablePrimary()
+        {
+            if (!PlayerPrefs.HasKey(ActiveSaveKey)) return;
+            string original = PlayerPrefs.GetString(ActiveSaveKey, string.Empty);
+            if (!ProgressSnapshot.TryDeserialize(original, out _)) PlayerPrefs.SetString(UnreadableSaveKey, original);
+        }
+
+        private ProgressSnapshot CreateSnapshot() => new ProgressSnapshot
+        {
+            currentMap = currentMap, currentHealth = currentHealth, maxHealth = maxHealth, currentMana = currentMana,
+            gold = gold, baseDamage = baseDamage, armor = armor, cooldownRate = cooldownRate,
+            playerLevel = playerLevel, experience = experience, potentialPoints = potentialPoints,
+            vitalityPoints = vitalityPoints, powerPoints = powerPoints, guardPoints = guardPoints, hastePoints = hastePoints,
+            potentialInitialized = potentialInitialized, hunterEssence = hunterEssence, equipmentEnhancements = equipmentEnhancements,
+            items = items, ownedSkills = ownedSkills, equippedSkills = equippedSkills, defeatedBosses = defeatedBosses,
+            equippedWeaponId = equippedWeaponId, equippedHelmetId = equippedHelmetId, equippedArmorId = equippedArmorId,
+            equippedPantsId = equippedPantsId, equippedNecklaceId = equippedNecklaceId, chestItems = chestItems,
+            chestInitialized = chestInitialized, unlockedRegions = unlockedRegions, safeRespawnScene = safeRespawnScene,
+            safeRespawnPosition = safeRespawnPosition, hasSafeRespawn = hasSafeRespawn,
+            tutorialInitialized = tutorialInitialized, tutorialCompleted = tutorialCompleted
+        };
+
+        private void ApplySnapshot(ProgressSnapshot snapshot)
+        {
+            currentMap = snapshot.currentMap; currentHealth = snapshot.currentHealth; maxHealth = snapshot.maxHealth; currentMana = snapshot.currentMana;
+            gold = snapshot.gold; baseDamage = snapshot.baseDamage; armor = snapshot.armor; cooldownRate = snapshot.cooldownRate;
+            playerLevel = snapshot.playerLevel; experience = snapshot.experience; potentialPoints = snapshot.potentialPoints;
+            vitalityPoints = snapshot.vitalityPoints; powerPoints = snapshot.powerPoints; guardPoints = snapshot.guardPoints; hastePoints = snapshot.hastePoints;
+            potentialInitialized = snapshot.potentialInitialized; hunterEssence = snapshot.hunterEssence; equipmentEnhancements = snapshot.equipmentEnhancements;
+            items = snapshot.items; ownedSkills = snapshot.ownedSkills; equippedSkills = snapshot.equippedSkills; defeatedBosses = snapshot.defeatedBosses;
+            equippedWeaponId = snapshot.equippedWeaponId; equippedHelmetId = snapshot.equippedHelmetId; equippedArmorId = snapshot.equippedArmorId;
+            equippedPantsId = snapshot.equippedPantsId; equippedNecklaceId = snapshot.equippedNecklaceId; chestItems = snapshot.chestItems;
+            chestInitialized = snapshot.chestInitialized; unlockedRegions = snapshot.unlockedRegions; safeRespawnScene = snapshot.safeRespawnScene;
+            safeRespawnPosition = snapshot.safeRespawnPosition; hasSafeRespawn = snapshot.hasSafeRespawn;
+            tutorialInitialized = snapshot.tutorialInitialized; tutorialCompleted = snapshot.tutorialCompleted;
         }
 
         public void PrepareRetry()
@@ -312,7 +431,7 @@ namespace TopDownGame.Save
 
         public void ApplyToPlayer(PlayerStats stats, PlayerHealth health, SkillInventory inventory)
         {
-            if (stats == null || health == null)
+            if (NeedsSaveRecovery || stats == null || health == null)
             {
                 return;
             }
@@ -591,6 +710,8 @@ namespace TopDownGame.Save
         }
 
         private static string ActiveSaveKey => IsAutomatedTestRun ? TestSaveKey : SaveKey;
+        private static string BackupSaveKey => ActiveSaveKey + ".Backup";
+        private static string UnreadableSaveKey => ActiveSaveKey + ".Unreadable";
 
         private static bool IsAutomatedTestRun
         {

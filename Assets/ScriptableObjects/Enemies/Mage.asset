@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Mage
   m_EditorClassIdentifier: Assembly-CSharp::TopDownGame.Enemies.EnemyData
   enemyId: mage
-  displayName: Mage
+  displayName: "Ph\xE1p S\u01B0"
   archetype: 3
   maxHealth: 120
   damage: 16

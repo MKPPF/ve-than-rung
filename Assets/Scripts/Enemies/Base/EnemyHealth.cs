@@ -105,6 +105,7 @@ namespace TopDownGame.Enemies
                 damageInfo.IsCritical, damagePopupPrefab);
 
             GetComponent<EnemyCharacterAnimator>()?.PlayHit(damageInfo.Direction);
+            TopDownGame.Core.CombatFeedback.EnemyHit(damageInfo, transform.position);
             EnemyMovement movement = GetComponent<EnemyMovement>();
             if (movement != null && damageInfo.Knockback > 0f)
             {

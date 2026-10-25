@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Archer
   m_EditorClassIdentifier: Assembly-CSharp::TopDownGame.Enemies.EnemyData
   enemyId: archer
-  displayName: Archer
+  displayName: "Cung Th\u1EE7"
   archetype: 2
   maxHealth: 100
   damage: 10

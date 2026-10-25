@@ -1,7 +1,7 @@
 // Local MCP-for-Unity framed transport, as implemented by StdioBridgeHost.
 // Usage: node Tools/UnityRequest.cjs command '{"parameter":"value"}'
 const net = require('node:net');
-const socket = net.createConnection({ host: '127.0.0.1', port: 6400 });
+const socket = net.createConnection({ host: '127.0.0.1', port: Number(process.env.UNITY_MCP_PORT || 6400) });
 let bytes = Buffer.alloc(0), welcomed = false, finished = false;
 const deadline = setTimeout(() => fail(new Error('Unity request timed out')), 25000);
 function fail(error) {

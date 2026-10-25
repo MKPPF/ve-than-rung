@@ -35,16 +35,21 @@ namespace TopDownGame.Core
         private float lastPacketTime = float.NegativeInfinity;
         private float nextReplyTime;
         private bool? previousRunInBackground;
+        private GameObject statusDisplay;
 
         public bool ControlEnabled => controlEnabled;
         public bool HasRecentPacket => controlEnabled && Time.realtimeSinceStartup - lastPacketTime < 1f;
+        public bool HasStatusDisplay => statusDisplay != null && statusDisplay.activeInHierarchy;
+
+        /// <summary>Lets a scene HUD replace the fallback message without adding another overlay over gameplay hints.</summary>
+        public void RegisterStatusDisplay(GameObject display) => statusDisplay = display;
         public string StatusText
         {
             get
             {
                 if (!string.IsNullOrEmpty(status)) return status;
-                if (!controlEnabled) return "Bật TAY rồi chạy camera ở mục 8 notebook.";
-                if (!HasRecentPacket) return "Chờ camera gửi dữ liệu (cổng " + port + ").";
+                if (!controlEnabled) return "Điều khiển cử chỉ đang tắt.";
+                if (!HasRecentPacket) return "Chờ camera. Chạy mục 8 trong notebook cử chỉ.";
                 string reason = GetBlockReason();
                 if (reason == "focus") return "Đã nối camera. Click Game View để điều khiển.";
                 if (reason == "player") return "Đã nối camera. Vào game để điều khiển.";
@@ -111,7 +116,7 @@ namespace TopDownGame.Core
             {
                 socket?.Close();
                 socket = null;
-                status = "Không mở được cổng điều khiển tay. Hãy đóng phiên game khác và nhấn F8 để thử lại.";
+                status = "Cổng cử chỉ đang bận. Đóng phiên game khác, rồi nhấn F8.";
                 Debug.LogWarning(status);
             }
         }
@@ -218,6 +223,7 @@ namespace TopDownGame.Core
 
         private void OnGUI()
         {
+            if (HasStatusDisplay) return;
             if (!controlEnabled && string.IsNullOrEmpty(status)) return;
             GUI.Box(new Rect(10, Screen.height - 44, Mathf.Min(Screen.width - 20, 900), 34),
                 "Điều khiển tay: " + StatusText + " | F8 để tắt");

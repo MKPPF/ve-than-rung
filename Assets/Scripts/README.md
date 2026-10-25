@@ -16,7 +16,7 @@ Toàn bộ gameplay của dự án được viết bằng C# và nằm trong th�
 - Trong game: WASD/phím mũi tên hoặc chuột trái để di chuyển,
   chuột phải/J đánh cận chiến. Đã khôi phục tự đánh mặc định và tương tác nhấp đúp.
   Click bắn thử nghiệm đã tắt trong builder; không thay đổi bộ bước đi V11.
-  Q/E/R/F dùng kỹ năng, E tương tác, I mở hành trang và Esc tạm dừng.
+  Space/nút dưới gamepad để né đòn; Q/E/R/F dùng kỹ năng, E tương tác, I mở hành trang và Esc tạm dừng.
 
 ## Chuẩn bị trình diễn đồ án (10/09/2026)
 
@@ -34,6 +34,224 @@ Toàn bộ gameplay của dự án được viết bằng C# và nằm trong th�
   không sửa tay scene và không cần chạy builder vì không đổi content/builder.
 - Chưa cân bằng lại cấu hình thử nghiệm 50.000 HP / 25.000 mana của player.
   Không coi toàn bộ roadmap mở rộng là yêu cầu bắt buộc cho một đồ án cơ bản.
+
+## Rà soát giao diện và luồng chơi (22/10/2026)
+
+- `HudUtilityLayout` giữ launcher ở canvas root, chuẩn hóa nút 300×54 và cỡ
+  chữ 24; tăng local scale khi CanvasScaler nhỏ hơn 0,7. Controller cũ tiếp tục
+  sở hữu callback và bộ đếm. Lobby không còn thu launcher xuống 76%.
+- Tab / View vào hoặc rời nhóm nút HUD. Navigate/Submit dùng action của UI module;
+  `GameplayState.ConsumeNavigationInput` chặn world input đúng frame đã dùng cho
+  HUD, không tạo PauseOwner và không đổi timeScale. Bảng modal vẫn khóa nền và
+  trả focus như cũ. Tự đánh/tự nhặt/cử chỉ giữ trạng thái riêng.
+- Thẻ Lobby, hướng dẫn tương tác và né được tăng cỡ chữ. Minimap có tên vùng
+  hai dòng, tên Lobby tiếng Việt và bốn chú giải marker; graphics không nhận click.
+  Trạng thái camera cử chỉ nằm trong HUD; overlay dự phòng chỉ hiện khi thiếu HUD.
+- Kiểm chứng và giới hạn của đợt này: `Docs/Verification/HUD_UTILITY_VERIFICATION.md`.
+
+- Menu chính, Pause và màn thua dùng khung tối viền đồng, tự vừa màn hình.
+- Cài đặt dùng chung từ menu/Pause: bốn âm lượng tiếng Việt, phần trăm,
+  chế độ màn hình và độ phân giải. Đổi hiển thị cần xác nhận trong 15 giây;
+  đóng hoặc hết hạn sẽ hoàn tác. Editor không đổi kích thước cửa sổ Game.
+- Menu con khóa navigation nền và trả focus khi đóng; đóng từ Pause không resume.
+- Kho dùng GameplayState, có cuộn và chỉ rõ thao tác tháo/cất đồ đang mặc.
+- Nhận kỹ năng thưởng dùng modal chung, bỏ lựa chọn đã tối đa, chặn submit lặp
+  và lưu ngay. Builder/validator bảo vệ catalog kỹ năng phần thưởng trong scene.
+- Cường hóa cũng đóng bằng Esc. Cài đặt tách khỏi progress; test dùng key riêng.
+- Đợt menu/kho/phần thưởng đạt 77/77 EditMode, 93/93 PlayMode và validator
+  sau hai lượt builder; đã kiểm tra ảnh 16:9, 16:10 và 4:3.
+- Trạng thái test/ảnh và backlog còn thiếu: `Docs/Verification/UI_FLOW_REVIEW_2026-10-22.md`.
+
+## Khôi phục save không đọc được (U5)
+
+- `ProgressSnapshot` parse/validate/migrate v1 vào DTO độc lập rồi mới áp dụng.
+  Primary rỗng/lỗi không bị xóa hoặc ghi đè bằng autosave. `.Backup` giữ lần lưu
+  hợp lệ khác gần nhất, không bị đẩy mất bởi save giống hệt.
+- Menu tự thông báo và xem trước cấp/vàng nếu backup hợp lệ. Để sau/Esc giữ dữ liệu;
+  khôi phục cần xác nhận, kiểm tra lại revision và ở lại menu cho người chơi Tiếp tục.
+  Primary mới hợp lệ được ưu tiên; backup thay đổi phải xem/xác nhận lại.
+- Chơi mới khi có primary/backup cần xác nhận, reset cả hai về campaign mới.
+  `.Unreadable` giữ nguyên raw primary lỗi của sự cố gần nhất đã giải quyết.
+  Backup vẫn nằm trong PlayerPrefs, không phải bản sao ngoài máy/chống mất điện.
+- Chặn callback nền/lặp/panel cũ, trả focus khi đóng; menu tăng chữ phụ/hướng dẫn
+  lên 20 để đủ 14 pixel trong ba tỷ lệ đã kiểm tra. Không đổi builder/content.
+- Bằng chứng và giới hạn: `Docs/Verification/SAVE_RECOVERY_FLOW_VERIFICATION.md`.
+
+## Vệ Thần Rừng và đạn qua map (23/10/2026)
+
+- Boss hủy routine/signature/quán tính/vòng báo/tư thế cũ khi chết, disable hoặc
+  reset; giữ Dead và cho phép bắt đầu windup mới sau reenable.
+- Slam/radial khóa tâm/gốc phóng theo vòng báo, animation dùng đúng mốc windup.
+  Slam hất lùi ra xa tâm impact đã báo dù caster bị dời. Có nhịp hồi phục trước
+  khi đuổi lại. Charge chốt vòng báo điểm đáp theo collider từ Rigidbody,
+  di chuyển bằng FixedUpdate/MovePosition và hủy nổ khi bị cản/hất lệch; giữ
+  quãng đường nominal của impulse cũ. Marker giữ tới khi đáp/hủy, ưu tiên không
+  bị impact VFX thu hồi khi pool đầy. Chi tiết:
+  `Docs/Verification/FOREST_GUARDIAN_CHARGE_VERIFICATION.md`.
+- VFX vòng báo có owner tùy chọn, reset khi dùng lại; biên vùng giữ nguyên trong
+  windup. Ancient Quake không tạo nhịp echo/hazard mới sau khi boss chết.
+- Pool đạn thu hồi shot theo Scene lúc Launch khi scene đó unload. Đạn/hazard
+  đã phóng trong cùng scene kiểm tra Unity null trước khi truy cập caster.
+- PlayMode dùng bản sao cấu hình input và tạm tắt thiết bị native trong từng
+  bài để phím mô phỏng không lệ thuộc focus Game View; callback khôi phục cả
+  settings/flags/thiết bị sau test. Không đổi thiết lập input khi chơi thường.
+- Kiểm chứng và phần boss/cảnh vật còn mở:
+  `Docs/Verification/FOREST_GUARDIAN_FLOW_VERIFICATION.md`.
+
+## Đền Kỹ Năng Map03 (23/10/2026)
+
+- Builder đầy đủ tạo 8 Cung Thủ và 4 Pháp Sư làm seed cho population; spawner
+  bổ sung tới 18 con bằng pool 26. Dùng 21 anchor đặt trong hành lang, không
+  mở rộng hướng tâm qua tường. Điểm seed không trùng rương hoặc sát mép tường.
+- `additionalSpawnPoints` mặc định rỗng cho map khác; giữ guard ngoài camera,
+  cách người chơi ít nhất 7 đơn vị và kiểm tra overlap khi hồi sinh.
+- Validator từ chối vùng săn thiếu/tắt spawner hoặc không có seed hoạt động
+  với EnemyData/EnemyHealth hợp lệ. Map boss giữ quy tắc riêng.
+- Tên quái, biến thể và di vật hiển thị tiếng Việt; id lưu/catalog giữ nguyên.
+- Thanh máu tái sử dụng child runtime đã clone khi prewarm pool, tránh tạo hai
+  thanh/nhãn chồng nhau; bật lại luôn cập nhật tên/cấp từ profile của chính quái.
+- Kiểm chứng đường đi, loot, hồi sinh, rương và cửa boss:
+  `Docs/Verification/MAP03_HUNTING_FLOW_VERIFICATION.md`.
+
+## Cửa chuyển vùng (U5)
+
+- Builder gắn MapData đích cho cửa chiến đấu; biển và lời nhắc dùng cùng tên/cấp
+  tiếng Việt. Cửa về Lobby hiển thị Trạm nghỉ Tán Rừng. Validator chặn metadata
+  thiếu hoặc sai id; các cửa vẫn mở theo thiết kế săn quái, không cần dọn map.
+- MapDoor kiểm tra khoảng cách vật lý, nhân vật sống/hoạt động, trạng thái cửa,
+  scene và modal trước khi TryLoadScene chụp tiến trình. Mở vùng mới khi đến nơi
+  qua SetSafeRespawn hiện có; hủy fade không mở vùng sớm.
+- Fade giữ quyền input/pause bằng GameplayState, chặn chuyến lặp; disable dọn
+  coroutine/độ mờ/loading. Lobby bàn giao input sau nghi thức và phục hồi nếu fade
+  bị ngắt. Lời nhắc có nền tối, không nhận click và chỉ hiện khi có nội dung.
+- Kiểm chứng, ảnh ba tỷ lệ và giới hạn: `Docs/Verification/MAP_TRANSITION_FLOW_VERIFICATION.md`.
+
+## Hồi phục sau thất bại (U5)
+
+- `GameOverUI` nhận lần gục thật, khóa gameplay và gọi
+  `GameProgressManager.CaptureDefeatedPlayer`. API chụp cấp/XP/vàng/tiềm năng,
+  loadout, kỹ năng và trạng thái manager hiện tại; lưu HP/mana hồi đầy cho lần
+  vào tiếp theo. Avatar đang gục vẫn chết; không hồi sinh ngay trong scene cũ.
+- Ba lựa chọn: thử lại khu vực ở điểm xuất phát; về thẳng Lobby chuẩn bị; về
+  MainMenu rồi Tiếp tục ở Lobby. Cả ba cùng dùng checkpoint mới, giữ tiến trình
+  đã nhận. Schema/key save và thông số combat không thay đổi.
+- Callback chỉ chạy khi màn thua đang mở, component hoạt động và không bị modal
+  khác chặn; mỗi lần rời chỉ lên lịch một scene load. Disable dọn focus/pause;
+  enable lại khi avatar còn chết khôi phục màn thua.
+- Bằng chứng, ảnh và giới hạn: `Docs/Verification/RECOVERY_FLOW_VERIFICATION.md`.
+
+## Hướng dẫn lần đầu (U4, đã kiểm chứng binding hiện tại)
+
+- Chơi mới tự mở sáu bước ở Lobby; không tự chuyển bước hoặc ẩn theo thời gian.
+- Quay lại/Tiếp theo/Bỏ qua bằng chuột hoặc navigation; Esc tương đương Bỏ qua.
+- Bỏ qua/hoàn tất lưu ngay `tutorialCompleted`; Chơi mới đặt lại, Tiếp tục giữ.
+- Save v1 cũ chưa có trạng thái tutorial được migrate là đã xem, giữ tiến trình.
+- Hướng dẫn ở MainMenu/Pause có nút xem lại từng bước; xem lại không sửa save.
+- Đóng scene/disable panel giữa chừng không được tính là người chơi bỏ qua.
+- Builder tạo `FirstEntryTutorial` cùng reference; validator kiểm tra reference.
+- Đã dựng hai lượt, validator đạt, 77/77 EditMode và 105/105 PlayMode đạt,
+  có 18 ảnh cho sáu bước × ba tỷ lệ. Bước 2 đã được cập nhật và kiểm tra lại cùng G1: Space/nút dưới gamepad để né, miễn đòn trực tiếp 0,18 giây đầu.
+
+## Âm thanh (U1, hệ thống đã kiểm chứng; còn thiếu clip)
+
+- Sửa fade ghi đè âm lượng vừa chỉnh, restart cùng theme và loop giữ lại khi
+  đổi nhanh; gain fade và âm lượng bus dùng cùng đường cập nhật.
+- Pool mở rộng bật đúng voice 19–32, vẫn giữ cap; loop không giảm nhầm giới hạn
+  one-shot dùng cùng cue. Cue rỗng cảnh báo một lần, bỏ entry clip null.
+- Sáu test audio dùng clip tổng hợp đã đạt trong lượt 105/105 PlayMode.
+- Music/ambient Resources vẫn là placeholder; chưa có theme theo vùng hoàn chỉnh.
+
+## Chọn vùng truyền tống (U5)
+
+- Tên/cấp đề nghị lấy từ MapData do builder gắn vào LobbyPortal; validator kiểm
+  tra catalog null/trùng/thiếu. Tên vùng hiển thị tiếng Việt, giữ nguyên scene id.
+- Mỗi thẻ có ba dòng tên/cấp/trạng thái; mở vùng mới qua cửa ra vùng trước.
+- Mặc định chọn Ở lại sảnh, khóa navigation mọi canvas nền và trả focus khi đóng.
+- Hai lượt builder + validator đạt; toàn bộ 107/107 PlayMode đạt, gồm hai bài
+  chọn vùng và bộ regression menu/tutorial/audio. Sáu ảnh khóa/đã mở ở ba tỷ lệ.
+- EditMode trên source cuối đạt 77/77; Editor trả về MainMenu, không ở Play.
+
+## Lò rèn (U5, đã kiểm chứng)
+
+- Chọn đồ không dựng lại card hoặc làm mất focus; navigation chỉ ở trong lò rèn,
+  Esc trả focus về Lobby. Card ngoài viewport tự cuộn vào khi nhận focus.
+- Đổi ưu đãi chuyển sang món khác khi còn lựa chọn, lưu phí 100 vàng ngay;
+  không thu phí khi mỗi nhóm còn tối đa một món chưa sở hữu.
+- Vàng thay đổi cập nhật nút/giá ngay; mua tự trang bị, trang bị món đã có miễn
+  phí. Cửa hàng đóng không nhận lệnh mua/đổi lượt.
+- Màn hình hẹp dưới tỷ lệ 1,5 dùng hai cột hàng hóa/chi tiết để tăng cỡ hiển thị;
+  màn hình rộng giữ chân dung thợ rèn. Tên dài trên thẻ được chia hai dòng.
+- Năm test tập trung đạt, gồm kiểm tra từng món của cả năm nhóm và ảnh 14 trạng
+  thái/tỷ lệ. Toàn bộ 77/77 EditMode, 111/111 PlayMode và validator đạt;
+  kết quả/giới hạn ở báo cáo UI 22/10/2026.
+
+## Hành trang và cường hóa (U5, đã kiểm chứng)
+
+- Hành trang giữ ô đồ/focus khi chọn, lọc, sắp xếp hoặc equip/unequip; nhóm trống
+  xóa chi tiết. Ô có focus được cuộn vào vùng nhìn thấy, kể cả sau sắp xếp.
+- Màn hình hẹp có Túi đồ / Nhân vật & Chỉ số, chi tiết đồ ở bên phải; màn rộng
+  giữ ba cột. Bảng chỉ số đủ sáu dòng, giữ các số chiến đấu hiện có.
+- Cường hóa có năm thẻ chọn bằng chuột, navigation hoặc 1–5; xem trước chỉ số,
+  sức mạnh, phí và Tinh hoa còn lại/thiếu. +20 và ô trống có thông báo riêng.
+- U/nút nâng cấp chỉ thực hiện một lần mỗi frame; kết quả được lưu qua API sẵn
+  có. I/nút Mở hành trang chuyển từ cường hóa sang túi đồ khi cần trang bị món.
+- Hai bảng khóa navigation nền, trả focus khi đóng, dọn panel/launcher và khóa
+  modal khi disable/destroy; controller tắt không được tự mở lại.
+- Sáu test mới đã đạt; 77/77 EditMode, 117/117 PlayMode và validator đạt trên
+  source của đợt hành trang/cường hóa. Có 23 ảnh ba tỷ lệ, xem báo cáo UI.
+
+## Kỹ năng và tiềm năng (U5, đã kiểm chứng)
+
+- Hai bảng có focus mặc định, khóa navigation nền, trả focus và cleanup theo
+  vòng đời; thẻ kỹ năng giữ nguyên khi trang bị/tháo/nâng cấp.
+- Mũi tên/Enter dùng navigation/Submit; 1–4 chọn ô, U nâng kỹ năng, Backspace
+  tháo. Nâng cấp/cộng điểm chỉ thực hiện một giao dịch mỗi frame, giữ API save.
+- Khung gọn 1440×1080 tăng cỡ hiển thị ở 4:3; tiềm năng có bốn thẻ 2×2.
+- Sửa tutorial: mua ở lò rèn tự trang bị, I để đổi/tháo. Source cuối đạt 77/77
+  EditMode, 122/122 PlayMode và validator; Console 0 lỗi. Có 15 ảnh mới và 18
+  ảnh tutorial được render lại. Chưa nghiệm thu đầy đủ bản Windows/accessibility.
+
+## Né đòn (G1, đã kiểm chứng kỹ thuật)
+
+- Space/nút dưới gamepad né tám hướng; đứng yên dùng hướng nhìn cuối, đang đi
+  theo click dùng hướng di chuyển. Né hủy đường click, nhận điểm đi mới sau đó.
+- 0,28 giây, 0,18 giây đầu miễn sát thương trực tiếp, hồi 1 giây; độc đang có
+  vẫn tick. Dùng MovePosition/cast-and-slide, giữ collider; pause đóng băng đồng hồ.
+- Khóa đánh/cast/tương tác trong né; không né khi đang attack/cast, nhập chữ,
+  chết hoặc modal. Nút gamepad Submit ưu tiên UI khi focus launcher.
+- HUD hiển thị Sẵn sàng/Đang né/Hồi; builder gắn reference, validator kiểm binding.
+- Builder hai lượt, validator 0 lỗi, 78/78 EditMode và 130/130 PlayMode đạt;
+  Console 0 error, 18 ảnh Lobby/Map01 ở ba tỷ lệ. Test dùng save key riêng.
+- Còn đánh giá cảm giác/tư thế trong combat thật; xem
+  `Docs/Verification/DODGE_FLOW_VERIFICATION.md`. HUD chiến đấu đã được thu gọn và bổ sung số HP/mana trong đợt U5 bên dưới.
+
+## HUD chiến đấu (U5, đã kiểm chứng)
+
+- Tên vùng tách cấp đề nghị/số quái; hiển thị số máu/mana trên thanh, cấp/XP và
+  vàng/Tinh hoa bằng tiếng Việt. Khung boss giữa cạnh trên có số máu.
+- Thanh bốn skill giữa cạnh dưới gọn 596×180, mỗi ô có icon/phím/tên hai dòng,
+  hồi chiêu bằng số, thiếu mana, sẵn sàng hoặc ô trống nhắc K để trang bị.
+- Các graphic hiển thị không ăn click đi, modal vẫn vẽ phía trên và sở hữu focus.
+- Bốn bài tập trung đã đạt, gồm 30 ảnh sáu map/ba tỷ lệ và các trạng thái skill;
+  78/78 EditMode, 134/134 PlayMode, validator đạt và Console 0 lỗi. Chi tiết ở
+  `Docs/Verification/COMBAT_HUD_VERIFICATION.md`.
+- Đây là UI runtime, không thay builder, scene, save hoặc cân bằng combat.
+
+## Phản hồi combat và cài đặt (U3 đã kiểm chứng; U2 còn Windows)
+
+- Đòn player trúng enemy trong khung hình dừng nhịp 35 ms (chí mạng 55 ms),
+  mỗi đợt tối đa 65 ms và có recovery; không để multi-hit đứng game liên tục.
+- Camera follow giữ vị trí gốc riêng, chỉ cộng offset rung nhỏ khi đòn nặng,
+  direct hit vào player, dậm/lao boss và AoE thiên thạch/sét. Pause, cinematic,
+  mất target, disable hoặc tắt rung trả offset về zero; vẫn kẹp bounds map.
+- Settings từ MainMenu/Pause có Rung camera và Dừng nhẹ khi trúng độc lập,
+  lưu ngay bằng key Feedback riêng. Chơi mới không reset; test dùng key Tests.
+- GameplayState cùng quản lý pause/hitstop. Mở menu hủy hitstop; tắt service
+  hoặc hết timer không resume sau lưng một modal khác. UI dùng unscaled time.
+- Poison/periodic damage, hit bị né và damage ngoài màn hình không hitstop.
+- Bảy test tập trung đạt, 78/78 EditMode, 141/141 PlayMode và validator đạt;
+  Console 0 error/timeScale=1. Có 12 ảnh cài đặt ba tỷ lệ; giới hạn ở
+  `Docs/Verification/COMBAT_FEEDBACK_VERIFICATION.md`. Không đổi builder/save/balance.
 
 ## Điều khiển cử chỉ tay (AI1, đang kiểm tra)
 

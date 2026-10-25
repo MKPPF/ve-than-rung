@@ -16,6 +16,7 @@ namespace TopDownGame.Enemies
         Colossus
     }
 
+    /// <summary>Owns physics locomotion and committed charge routes so combat controllers never move bodies outside the collision solver.</summary>
     [RequireComponent(typeof(Rigidbody2D))]
     public sealed class EnemyMovement : MonoBehaviour
     {
@@ -52,6 +53,11 @@ namespace TopDownGame.Enemies
         private float stuckTimer;
         private float unstickUntil;
         private float weaveSeed;
+        private Vector2 chargeStart;
+        private Vector2 chargeDestination;
+        private Vector2 chargeExpectedPosition;
+        private float chargeElapsed;
+        private float chargeDuration;
         private readonly Collider2D[] nearbyColliders = new Collider2D[12];
         private readonly List<RaycastHit2D> obstacleHits =
             new List<RaycastHit2D>(4);
@@ -65,6 +71,9 @@ namespace TopDownGame.Enemies
         public bool IsUnsticking => Time.time < unstickUntil;
         public bool IsAvoidingObstacle { get; private set; }
         public Vector2 LastResolvedVelocity { get; private set; }
+        public Vector2 Position => body.position;
+        public bool IsCharging { get; private set; }
+        public bool HasReachedChargeDestination { get; private set; }
 
         private void Awake()
         {
@@ -97,6 +106,11 @@ namespace TopDownGame.Enemies
 
         private void FixedUpdate()
         {
+            if (IsCharging)
+            {
+                AdvanceCharge();
+                return;
+            }
             RefreshNavigation(Time.fixedDeltaTime);
             UpdateSteeredVelocity(Time.fixedDeltaTime);
             impulseVelocity = Vector2.MoveTowards(impulseVelocity, Vector2.zero,
@@ -245,6 +259,8 @@ namespace TopDownGame.Enemies
 
         public void StopImmediately(bool clearImpulse = true)
         {
+            IsCharging = false;
+            HasReachedChargeDestination = false;
             desiredVelocity = Vector2.zero;
             currentVelocity = Vector2.zero;
             if (clearImpulse)
@@ -261,7 +277,78 @@ namespace TopDownGame.Enemies
 
         public void AddImpulse(Vector2 impulse)
         {
+            if (IsCharging && impulse.sqrMagnitude > 0.0001f)
+                StopImmediately();
             impulseVelocity += impulse / Mathf.Max(0.1f, body.mass);
+        }
+
+        /// <summary>Preserves the old damped impulse's nominal travel, clamped to the first solid surface before it is shown to the player.</summary>
+        public Vector2 PlanChargeDestination(Vector2 impulse, float duration)
+        {
+            float speed = impulse.magnitude / Mathf.Max(0.1f, body.mass);
+            float distance = 0f;
+            float remaining = Mathf.Max(0.01f, duration);
+            while (remaining > 0.00001f)
+            {
+                float step = Mathf.Min(remaining, Mathf.Max(0.001f, Time.fixedDeltaTime));
+                speed = Mathf.MoveTowards(speed, 0f, impulseDamping * step);
+                distance += speed * step;
+                remaining -= step;
+            }
+            return ResolveStraightMovement(body.position, body.position + impulse.normalized * distance);
+        }
+
+        /// <summary>Follows an already warned route with eased endpoints; knockback or a new obstacle interrupts it instead of moving its impact.</summary>
+        public void BeginCharge(Vector2 destination, float duration)
+        {
+            StopImmediately();
+            chargeStart = body.position;
+            chargeExpectedPosition = chargeStart;
+            chargeDestination = destination;
+            chargeDuration = Mathf.Max(0.01f, duration);
+            chargeElapsed = 0f;
+            IsAvoidingObstacle = false;
+            IsCharging = true;
+        }
+
+        private void AdvanceCharge()
+        {
+            if (Vector2.Distance(body.position, chargeExpectedPosition) > 0.12f)
+            {
+                StopImmediately();
+                return;
+            }
+            chargeElapsed = Mathf.Min(chargeDuration, chargeElapsed + Time.fixedDeltaTime);
+            Vector2 next = Vector2.Lerp(chargeStart, chargeDestination,
+                Mathf.SmoothStep(0f, 1f, chargeElapsed / chargeDuration));
+            Vector2 resolved = ResolveStraightMovement(body.position, next);
+            Vector2 velocity = (resolved - body.position) / Time.fixedDeltaTime;
+            bool blocked = Vector2.Distance(resolved, next) > 0.001f;
+            body.MovePosition(resolved);
+            chargeExpectedPosition = resolved;
+            LastResolvedVelocity = velocity;
+            currentVelocity = velocity;
+            lastPosition = body.position;
+            if (blocked || chargeElapsed >= chargeDuration - 0.00001f)
+            {
+                IsCharging = false;
+                HasReachedChargeDestination = !blocked;
+                currentVelocity = Vector2.zero;
+            }
+        }
+
+        private Vector2 ResolveStraightMovement(Vector2 start, Vector2 destination)
+        {
+            Vector2 delta = destination - start;
+            float distance = delta.magnitude;
+            if (distance < 0.0001f) return start;
+            Vector2 direction = delta / distance;
+            obstacleHits.Clear();
+            body.Cast(start, body.rotation, direction, movementFilter,
+                obstacleHits, distance + surfaceSkin);
+            foreach (RaycastHit2D hit in obstacleHits)
+                distance = Mathf.Min(distance, Mathf.Max(0f, hit.distance - surfaceSkin));
+            return start + direction * distance;
         }
 
         public void ApplySlow(float multiplier, float duration)
@@ -311,6 +398,8 @@ namespace TopDownGame.Enemies
         public void ResetMotion()
         {
             StopAllCoroutines();
+            IsCharging = false;
+            HasReachedChargeDestination = false;
             desiredVelocity = Vector2.zero;
             currentVelocity = Vector2.zero;
             impulseVelocity = Vector2.zero;

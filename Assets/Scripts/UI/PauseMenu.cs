@@ -1,48 +1,56 @@
+using TopDownGame.Core;
+using TopDownGame.Save;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using TopDownGame.Save;
-using TopDownGame.Audio;
-using TMPro;
-using TopDownGame.Core;
 
 namespace TopDownGame.UI
 {
-    /// <summary>Owns its pause independently of nested help and other modal screens.</summary>
+    /// <summary>Keeps pause ownership and keyboard focus while shared settings or help are open.</summary>
     public sealed class PauseMenu : MonoBehaviour
     {
         [SerializeField] private GameObject panel;
         private MenuDialog dialog;
+        private SettingsPanel settings;
+        private Button resumeButton;
+        private readonly MenuModalFocus focus = new MenuModalFocus();
         private bool isOpen;
 
         private void Awake()
         {
-            // A nested help dialog must never release this menu's pause token.
             dialog = gameObject.AddComponent<MenuDialog>();
-            if (panel != null)
-            {
-                panel.SetActive(false);
-            }
-
-            if (panel != null)
-            {
-                BuildAudioControls();
-                Button[] buttons = panel.GetComponentsInChildren<Button>(true);
-                if (buttons.Length > 0) buttons[0].onClick.AddListener(Resume);
-                if (buttons.Length > 1) buttons[1].onClick.AddListener(ReturnToMenu);
-                if (buttons.Length > 0) buttons[0].GetComponentInChildren<TMP_Text>().text = "TIẾP TỤC CHƠI";
-                if (buttons.Length > 1) buttons[1].GetComponentInChildren<TMP_Text>().text = "LƯU VÀ VỀ MÀN HÌNH CHÍNH";
-                FantasyEquipmentUI.Button(panel.transform, "HelpButton", "HƯỚNG DẪN", 40, 435, 440, 46, dialog.ShowHelp);
-            }
+            settings = gameObject.AddComponent<SettingsPanel>();
+            if (panel == null) return;
+            FantasyEquipmentUI.Clear(panel.transform);
+            RectTransform rect = panel.GetComponent<RectTransform>();
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = rect.offsetMax = Vector2.zero;
+            Transform surface = EquipmentPanelLayout.CreateSurface(panel, new Vector2(780, 930));
+            Transform frame = FantasyEquipmentUI.Frame(surface, "PauseWindow", 650, 155, 620, 770, FantasyEquipmentUI.Ink);
+            FantasyEquipmentUI.Text(frame, "Eyebrow", "NGHỈ CHÂN TRÊN HÀNH TRÌNH", 40, 35, 540, 30, 17,
+                FantasyEquipmentUI.Muted, TextAlignmentOptions.Center);
+            FantasyEquipmentUI.Text(frame, "PanelTitle", "TẠM DỪNG", 40, 78, 540, 60, 40,
+                FantasyEquipmentUI.Gold, TextAlignmentOptions.Center);
+            resumeButton = FantasyEquipmentUI.Button(frame, "ResumeButton", "TIẾP TỤC CHƠI", 60, 185, 500, 66, Resume, true);
+            FantasyEquipmentUI.Button(frame, "SettingsButton", "CÀI ĐẶT", 60, 275, 500, 62, () => settings.Open(dialog));
+            FantasyEquipmentUI.Button(frame, "HelpButton", "HƯỚNG DẪN", 60, 359, 500, 62, dialog.ShowHelp);
+            FantasyEquipmentUI.Line(frame, 60, 463, 500);
+            FantasyEquipmentUI.Button(frame, "MenuButton", "LƯU VÀ VỀ MÀN HÌNH CHÍNH", 60, 500, 500, 66, ReturnToMenu);
+            FantasyEquipmentUI.Text(frame, "SaveHint", "Lưu tiến trình trước khi trở về menu.\nĐóng cài đặt hoặc hướng dẫn sẽ trở lại đây.",
+                60, 595, 500, 74, 20, FantasyEquipmentUI.Muted, TextAlignmentOptions.Center);
+            FantasyEquipmentUI.Text(frame, "KeyHint", "ESC  Tiếp tục chơi", 60, 705, 500, 30, 17,
+                FantasyEquipmentUI.Muted, TextAlignmentOptions.Center);
+            foreach (Button button in frame.GetComponentsInChildren<Button>())
+                EquipmentPanelLayout.StyleText(button.GetComponentInChildren<TMP_Text>(), 24);
+            panel.SetActive(false);
         }
 
         private void Update()
         {
-            if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
-            {
-                Toggle();
-            }
+            if (!GameplayState.NavigationInputConsumedThisFrame && Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) Toggle();
         }
 
         public void Toggle()
@@ -51,21 +59,20 @@ namespace TopDownGame.UI
             if (isOpen) { Resume(); return; }
             isOpen = true;
             GameplayState.EnterModal(this);
-            if (panel != null)
-            {
-                panel.SetActive(true);
-            }
+            if (panel == null) return;
+            panel.SetActive(true);
+            panel.transform.SetAsLastSibling();
+            focus.Capture(panel.transform);
+            resumeButton.Select();
         }
 
         public void Resume()
         {
             if (GameplayState.IsBlockedByOther(this)) return;
             isOpen = false;
+            if (panel != null) panel.SetActive(false);
             GameplayState.ExitModal(this);
-            if (panel != null)
-            {
-                panel.SetActive(false);
-            }
+            focus.Release();
         }
 
         public void ReturnToMenu()
@@ -82,92 +89,7 @@ namespace TopDownGame.UI
             isOpen = false;
             if (panel != null) panel.SetActive(false);
             GameplayState.ExitModal(this);
-        }
-
-        private void BuildAudioControls()
-        {
-            if (panel.transform.Find("AudioSettings") != null) return;
-            RectTransform panelRect = panel.GetComponent<RectTransform>();
-            if (panelRect != null) panelRect.sizeDelta = new Vector2(520f, 620f);
-            Transform title = panel.transform.Find("PanelTitle");
-            if (title != null)
-            {
-                title.GetComponent<TMP_Text>().text = "TẠM DỪNG";
-                title.GetComponent<RectTransform>().anchoredPosition =
-                    new Vector2(0f, 250f);
-            }
-
-            Transform audioRoot = new GameObject("AudioSettings",
-                typeof(RectTransform)).transform;
-            audioRoot.SetParent(panel.transform, false);
-            RectTransform audioRect = audioRoot.GetComponent<RectTransform>();
-            audioRect.anchorMin = audioRect.anchorMax = new Vector2(0.5f, 0.5f);
-            audioRect.sizeDelta = new Vector2(440f, 300f);
-            audioRect.anchoredPosition = new Vector2(0f, 30f);
-
-            GameAudioManager audio = GameAudioManager.EnsureExists();
-            CreateVolumeSlider(audioRoot, "Master", 105f, audio.MasterVolume,
-                audio.SetMasterVolume);
-            CreateVolumeSlider(audioRoot, "Music", 40f, audio.MusicVolume,
-                audio.SetMusicVolume);
-            CreateVolumeSlider(audioRoot, "Ambient", -25f, audio.AmbientVolume,
-                audio.SetAmbientVolume);
-            CreateVolumeSlider(audioRoot, "SFX", -90f, audio.SfxVolume,
-                audio.SetSfxVolume);
-
-            Button[] buttons = panel.GetComponentsInChildren<Button>(true);
-            if (buttons.Length > 0)
-                buttons[0].GetComponent<RectTransform>().anchoredPosition =
-                    new Vector2(0f, -205f);
-            if (buttons.Length > 1)
-                buttons[1].GetComponent<RectTransform>().anchoredPosition =
-                    new Vector2(0f, -280f);
-        }
-
-        private static void CreateVolumeSlider(Transform parent, string label,
-            float y, float value, UnityEngine.Events.UnityAction<float> callback)
-        {
-            GameObject labelObject = new GameObject(label + "Label",
-                typeof(RectTransform));
-            labelObject.transform.SetParent(parent, false);
-            RectTransform labelRect = labelObject.GetComponent<RectTransform>();
-            labelRect.anchorMin = labelRect.anchorMax = new Vector2(0f, 0.5f);
-            labelRect.pivot = new Vector2(0f, 0.5f);
-            labelRect.anchoredPosition = new Vector2(5f, y);
-            labelRect.sizeDelta = new Vector2(105f, 36f);
-            TMP_Text text = labelObject.AddComponent<TextMeshProUGUI>();
-            text.text = label;
-            text.fontSize = 20f;
-            text.alignment = TextAlignmentOptions.MidlineLeft;
-            text.color = new Color(0.84f, 0.9f, 1f);
-
-            GameObject sliderObject = new GameObject(label + "Volume",
-                typeof(RectTransform), typeof(Image), typeof(Slider));
-            sliderObject.transform.SetParent(parent, false);
-            RectTransform rect = sliderObject.GetComponent<RectTransform>();
-            rect.anchorMin = rect.anchorMax = new Vector2(0f, 0.5f);
-            rect.pivot = new Vector2(0f, 0.5f);
-            rect.anchoredPosition = new Vector2(118f, y);
-            rect.sizeDelta = new Vector2(300f, 22f);
-            Image background = sliderObject.GetComponent<Image>();
-            background.color = new Color(0.08f, 0.1f, 0.16f, 0.95f);
-
-            GameObject fillObject = new GameObject("Fill", typeof(RectTransform),
-                typeof(Image));
-            fillObject.transform.SetParent(sliderObject.transform, false);
-            RectTransform fillRect = fillObject.GetComponent<RectTransform>();
-            fillRect.anchorMin = Vector2.zero;
-            fillRect.anchorMax = Vector2.one;
-            fillRect.offsetMin = new Vector2(3f, 3f);
-            fillRect.offsetMax = new Vector2(-3f, -3f);
-            fillObject.GetComponent<Image>().color = new Color(0.3f, 0.82f, 0.65f);
-
-            Slider slider = sliderObject.GetComponent<Slider>();
-            slider.minValue = 0f;
-            slider.maxValue = 1f;
-            slider.fillRect = fillRect;
-            slider.SetValueWithoutNotify(value);
-            slider.onValueChanged.AddListener(callback);
+            focus.Release();
         }
     }
 }

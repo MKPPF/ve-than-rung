@@ -12,6 +12,7 @@ using UnityEngine.UI;
 
 namespace TopDownGame.UI
 {
+    /// <summary>Keeps combat resources and actionable skill states readable without covering the encounter space.</summary>
     public sealed class GameplayHUD : MonoBehaviour
     {
         [SerializeField] private Slider healthBar;
@@ -35,14 +36,19 @@ namespace TopDownGame.UI
         private PlayerHealth health;
         private PlayerStats stats;
         private PlayerInteraction interaction;
-        private PlayerCombat combat;
+
         private SkillManager skills;
         private EnemyHealth bossHealth;
         private Coroutine levelUpRoutine;
         private Coroutine huntNoticeRoutine;
-        private bool displayedAutoAttackState;
-        private bool hasDisplayedAutoAttackState;
+
+
         private float nextHuntHudRefresh;
+        private TMP_Text healthValue, manaValue, recommendation;
+        private readonly TMP_Text[] skillNames = new TMP_Text[4];
+        private readonly TMP_Text[] skillStates = new TMP_Text[4];
+        private GameObject displayRoot;
+        private GameObject promptBackdrop;
 
         private static readonly string[] SkillKeyLabels = { "Q", "E", "R", "F" };
 
@@ -66,7 +72,7 @@ namespace TopDownGame.UI
                 health = player.GetComponent<PlayerHealth>();
                 stats = player.GetComponent<PlayerStats>();
                 interaction = player.GetComponent<PlayerInteraction>();
-                combat = player.GetComponent<PlayerCombat>();
+
                 skills = player.GetComponent<SkillManager>();
                 health.HealthChanged += SetHealth;
                 stats.ManaChanged += SetMana;
@@ -76,7 +82,7 @@ namespace TopDownGame.UI
             }
 
             EnsureLabels();
-            RefreshAutoAttackHint(true);
+
             DisableDisplayRaycasts();
             SetHealth(health != null ? health.CurrentHealth : 100f,
                 stats != null ? stats.MaxHealth : 100f);
@@ -97,34 +103,35 @@ namespace TopDownGame.UI
                 bossHealth = boss.GetComponent<EnemyHealth>();
                 bossHealth.HealthChanged += SetBossHealth;
                 SetBossHealth(bossHealth.CurrentHealth, bossHealth.MaxHealth);
-                if (bossText != null) bossText.gameObject.SetActive(true);
+                if (bossText != null) bossText.transform.parent.gameObject.SetActive(true);
                 if (bossBar != null) bossBar.gameObject.SetActive(true);
             }
             else
             {
-                if (bossText != null) bossText.gameObject.SetActive(false);
+                if (bossText != null) bossText.transform.parent.gameObject.SetActive(false);
                 if (bossBar != null) bossBar.gameObject.SetActive(false);
             }
         }
 
         private void Update()
         {
-            RefreshAutoAttackHint(false);
+
 
             if (MapManager.Instance != null && Time.unscaledTime >= nextHuntHudRefresh)
             {
                 nextHuntHudRefresh = Time.unscaledTime + 0.2f;
                 int active = MapManager.Instance.RemainingEnemies;
                 int target = MapManager.Instance.TargetEnemyCount;
-                enemyCountText.text = "Lên cấp / Nhặt đồ   Quái: " + active +
-                    " / " + target;
+                enemyCountText.text = "Quái đang có: " + active + " / " + target;
                 MapData data = MapManager.Instance.Data;
                 mapText.text = data != null
-                    ? data.DisplayName + "   [" + data.RecommendedLevelLabel + "]"
+                    ? data.DisplayName
                     : UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+                recommendation.text = data != null ? "Cấp đề nghị: " + data.RecommendedLevelLabel.Replace("Lv. ", "") : string.Empty;
             }
 
             promptText.text = interaction != null ? interaction.CurrentPrompt : string.Empty;
+            if (promptBackdrop != null) promptBackdrop.SetActive(!string.IsNullOrWhiteSpace(promptText.text));
 
             if (skills != null && skills.Inventory != null)
             {
@@ -134,8 +141,14 @@ namespace TopDownGame.UI
                     float duration = skills.GetCooldownDuration(i);
                     SkillData data = skills.GetSkillData(i);
 
-                    // Chỉ hiển thị phím Q/E/R/F
                     skillTexts[i].text = SkillKeyLabels[i];
+                    skillNames[i].text = data != null ? data.DisplayName : "Ô trống";
+                    bool dead = health != null && !health.IsAlive;
+                    bool insufficientMana = data != null && stats != null && stats.CurrentMana < data.ManaCost;
+                    skillStates[i].text = data == null ? "K: TRANG BỊ" : dead ? "ĐÃ GỤC" : remaining > 0f ?
+                        "HỒI " + remaining.ToString("0.0") + " s" : insufficientMana ? "THIẾU MANA" : "SẴN SÀNG";
+                    skillStates[i].color = data == null ? FantasyEquipmentUI.Muted : dead ? new Color(1f,0.65f,0.56f) :
+                        remaining > 0f ? FantasyEquipmentUI.Gold : insufficientMana ? new Color(1f,0.65f,0.56f) : FantasyEquipmentUI.Green;
 
                     if (skillIconImages != null && i < skillIconImages.Length &&
                         skillIconImages[i] != null)
@@ -179,31 +192,6 @@ namespace TopDownGame.UI
             }
         }
 
-        private void RefreshAutoAttackHint(bool force)
-        {
-            if (controlsText == null || combat == null)
-            {
-                return;
-            }
-
-            bool enabled = combat.AutoAttackEnabled;
-            if (!force && hasDisplayedAutoAttackState &&
-                displayedAutoAttackState == enabled)
-            {
-                return;
-            }
-
-            displayedAutoAttackState = enabled;
-            hasDisplayedAutoAttackState = true;
-            controlsText.text =
-                "WASD / Chuột trái: Di chuyển   Chuột phải / J: Đánh   " +
-                "T: Tự đánh khi dừng " + (enabled ? "BẬT" : "TẮT") +
-                "   Q E R F: Kỹ năng";
-            controlsText.color = enabled
-                ? new Color(0.5f, 1f, 0.65f)
-                : new Color(0.8f, 0.9f, 1f);
-        }
-
         private void SetHealth(float current, float maximum)
         {
             if (healthBar != null)
@@ -211,6 +199,7 @@ namespace TopDownGame.UI
                 healthBar.maxValue = maximum;
                 healthBar.value = current;
             }
+            if (healthValue != null) healthValue.text = "MÁU  " + Mathf.CeilToInt(current).ToString("N0") + " / " + Mathf.CeilToInt(maximum).ToString("N0");
         }
 
         private void SetMana(float current, float maximum)
@@ -220,6 +209,7 @@ namespace TopDownGame.UI
                 manaBar.maxValue = maximum;
                 manaBar.value = current;
             }
+            if (manaValue != null) manaValue.text = "MANA  " + Mathf.FloorToInt(current).ToString("N0") + " / " + Mathf.FloorToInt(maximum).ToString("N0");
         }
 
         private void SetGold(int amount)
@@ -229,7 +219,7 @@ namespace TopDownGame.UI
                 int essence = GameProgressManager.Instance != null
                     ? GameProgressManager.Instance.HunterEssence
                     : 0;
-                goldText.text = "Gold: " + amount + "   Tinh hoa: " + essence;
+                goldText.text = amount.ToString("N0") + " vàng   •   " + essence.ToString("N0") + " tinh hoa";
             }
         }
 
@@ -242,8 +232,8 @@ namespace TopDownGame.UI
         {
             if (levelText != null)
             {
-                levelText.text = "Level " + level + "   XP " + currentExperience +
-                    " / " + requiredExperience;
+                levelText.text = "Cấp " + level + "   •   XP " + currentExperience.ToString("N0") +
+                    " / " + requiredExperience.ToString("N0");
             }
 
             if (experienceBar != null)
@@ -271,7 +261,7 @@ namespace TopDownGame.UI
         private void ShowHuntReward(HuntRewardNotice notice)
         {
             string message = notice.Experience > 0 || notice.Gold > 0
-                ? "+" + notice.Experience + " XP   +" + notice.Gold + " Gold"
+                ? "+" + notice.Experience + " XP   +" + notice.Gold + " vàng"
                 : "Đã nhặt chiến lợi phẩm";
             Color color = new Color(0.72f, 1f, 0.62f);
             if (notice.Loot != null)
@@ -292,7 +282,7 @@ namespace TopDownGame.UI
 
         private void ShowEliteSpawned(EnemyRuntimeProfile profile)
         {
-            ShowHuntNotice("ELITE APPEARED   Lv. " + profile.Level + " " +
+            ShowHuntNotice("TINH ANH XUẤT HIỆN   Cấp " + profile.Level + " " +
                 profile.DisplayName, new Color(1f, 0.64f, 0.15f), 3f);
         }
 
@@ -317,7 +307,7 @@ namespace TopDownGame.UI
 
         private IEnumerator LevelUpRoutine(int newLevel)
         {
-            levelUpText.text = "LEVEL UP!   " + newLevel;
+            levelUpText.text = "LÊN CẤP " + newLevel;
             levelUpText.gameObject.SetActive(true);
             yield return new WaitForSecondsRealtime(2.25f);
             levelUpText.gameObject.SetActive(false);
@@ -326,273 +316,113 @@ namespace TopDownGame.UI
 
         private void EnsureLabels()
         {
-            if (skillTexts == null || skillTexts.Length != 4)
-            {
-                skillTexts = new TMP_Text[4];
-            }
-            if (skillBoxes == null || skillBoxes.Length != 4)
-            {
-                skillBoxes = new Image[4];
-            }
-            if (skillIconImages == null || skillIconImages.Length != 4)
-            {
-                skillIconImages = new Image[4];
-            }
-            if (skillCooldownFills == null || skillCooldownFills.Length != 4)
-            {
-                skillCooldownFills = new Image[4];
-            }
-
             Canvas canvas = GetComponentInParent<Canvas>();
-            if (canvas == null)
+            if (canvas == null) return;
+            RectTransform root = FantasyEquipmentUI.Rect(canvas.transform, "CombatHUDRoot", 0, 0, 0, 0);
+            root.anchorMin = Vector2.zero;
+            root.anchorMax = Vector2.one;
+            root.offsetMin = root.offsetMax = Vector2.zero;
+            root.SetAsFirstSibling();
+            displayRoot = root.gameObject;
+
+            Transform card = FantasyEquipmentUI.Frame(root, "PlayerStatus", 22, 22, 400, 280, FantasyEquipmentUI.Ink);
+            mapText = Label(card, "Map", "", 16, 10, 368, 48, 24, FantasyEquipmentUI.Gold);
+            recommendation = Label(card, "RecommendedLevel", "", 16, 60, 368, 24, 20, FantasyEquipmentUI.Muted);
+            enemyCountText = Label(card, "Enemies", "", 16, 87, 368, 26, 21);
+            healthBar = ResourceBar(card, "HealthBar", 16, 120, 368, 28, new Color(0.64f,0.17f,0.21f));
+            healthValue = Label(healthBar.transform, "Value", "", 8, 0, 352, 28, 21);
+            manaBar = ResourceBar(card, "ManaBar", 16, 154, 368, 28, new Color(0.12f,0.38f,0.57f));
+            manaValue = Label(manaBar.transform, "Value", "", 8, 0, 352, 28, 21);
+            levelText = Label(card, "Level", "", 16, 190, 368, 26, 21, FantasyEquipmentUI.Gold);
+            experienceBar = ResourceBar(card, "ExperienceBar", 16, 221, 368, 6, FantasyEquipmentUI.Gold);
+            goldText = Label(card, "Gold", "", 16, 236, 368, 28, 21);
+
+            Transform hints = FantasyEquipmentUI.Frame(root, "ControlHints", 22, 390, 400, 96, FantasyEquipmentUI.Ink);
+            controlsText = Label(hints, "Controls", "WASD / Chuột trái: Di chuyển\nJ / Chuột phải: Đánh  •  E: Tương tác\nI: Túi  •  K: Kỹ năng  •  Esc: Tạm dừng", 14, 8, 372, 80, 20);
+            Transform dodgeCard = canvas.transform.Find("DodgeCard");
+            if (dodgeCard != null) ((RectTransform)dodgeCard).anchoredPosition = new Vector2(22,-310);
+
+            RectTransform strip = FantasyEquipmentUI.Rect(root, "SkillStrip", 0, 0, 596, 180);
+            strip.anchorMin = strip.anchorMax = strip.pivot = new Vector2(0.5f,0);
+            strip.anchoredPosition = new Vector2(0,16);
+            skillTexts = new TMP_Text[4];
+            skillBoxes = new Image[4];
+            skillIconImages = new Image[4];
+            skillCooldownFills = new Image[4];
+            for (int i = 0; i < 4; i++)
             {
-                return;
+                Transform slot = FantasyEquipmentUI.Frame(strip, "Skill" + i + "Box", i * 152, 0, 140, 180, FantasyEquipmentUI.Ink);
+                skillBoxes[i] = slot.Find("Brass").GetComponent<Image>();
+                skillIconImages[i] = FantasyEquipmentUI.Icon(slot, "Icon", null, 30, 8, 80, 80);
+                skillCooldownFills[i] = FantasyEquipmentUI.Box(slot, "Cooldown", 30, 8, 80, 80, new Color(0,0,0,0.72f));
+                skillCooldownFills[i].sprite = TopDownGame.Core.RuntimeSpriteFactory.WhiteSprite;
+                skillCooldownFills[i].type = Image.Type.Filled;
+                skillCooldownFills[i].fillMethod = Image.FillMethod.Radial360;
+                skillCooldownFills[i].fillOrigin = 2;
+                skillCooldownFills[i].fillClockwise = false;
+                FantasyEquipmentUI.Box(slot, "KeyBadge", 7, 7, 30, 30, FantasyEquipmentUI.Ink);
+                skillTexts[i] = Label(slot, "Label", SkillKeyLabels[i], 7, 7, 30, 30, 25, FantasyEquipmentUI.TextColor, TextAlignmentOptions.Center);
+                skillNames[i] = Label(slot, "Name", "", 8, 90, 124, 56, 21, FantasyEquipmentUI.TextColor, TextAlignmentOptions.Center);
+                skillStates[i] = Label(slot, "State", "", 6, 151, 128, 23, 20, FantasyEquipmentUI.Green, TextAlignmentOptions.Center);
             }
 
-            if (goldText == null) goldText = CreateText(canvas.transform, "Gold", new Vector2(15f, -15f));
-            if (mapText == null) mapText = CreateText(canvas.transform, "Map", new Vector2(15f, -45f));
-            if (enemyCountText == null) enemyCountText = CreateText(canvas.transform, "Enemies", new Vector2(15f, -75f));
-            enemyCountText.rectTransform.sizeDelta = new Vector2(480f, 40f);
-            if (levelText == null)
-            {
-                levelText = CreateText(canvas.transform, "Level", new Vector2(15f, -105f));
-                levelText.color = new Color(1f, 0.85f, 0.3f);
-            }
-            if (experienceBar == null) experienceBar = CreateSlider(canvas.transform,
-                "ExperienceBar", new Vector2(15f, -135f), new Color(1f, 0.72f, 0.15f));
-            if (levelUpText == null)
-            {
-                levelUpText = CreateText(canvas.transform, "LevelUp", new Vector2(0f, -145f));
-                RectTransform levelUpRect = levelUpText.rectTransform;
-                levelUpRect.anchorMin = new Vector2(0.5f, 1f);
-                levelUpRect.anchorMax = new Vector2(0.5f, 1f);
-                levelUpRect.pivot = new Vector2(0.5f, 1f);
-                levelUpRect.sizeDelta = new Vector2(700f, 70f);
-                levelUpText.alignment = TextAlignmentOptions.Center;
-                levelUpText.fontSize = 42f;
-                levelUpText.color = new Color(1f, 0.82f, 0.2f);
-                levelUpText.outlineWidth = 0.2f;
-                levelUpText.outlineColor = Color.black;
-                levelUpText.gameObject.SetActive(false);
-            }
-            if (huntNoticeText == null)
-            {
-                huntNoticeText = CreateText(canvas.transform, "HuntNotice",
-                    new Vector2(0f, -210f));
-                RectTransform noticeRect = huntNoticeText.rectTransform;
-                noticeRect.anchorMin = new Vector2(0.5f, 1f);
-                noticeRect.anchorMax = new Vector2(0.5f, 1f);
-                noticeRect.pivot = new Vector2(0.5f, 1f);
-                noticeRect.sizeDelta = new Vector2(720f, 90f);
-                huntNoticeText.alignment = TextAlignmentOptions.Center;
-                huntNoticeText.fontSize = 25f;
-                huntNoticeText.outlineWidth = 0.18f;
-                huntNoticeText.outlineColor = Color.black;
-                huntNoticeText.gameObject.SetActive(false);
-            }
-            if (promptText == null) promptText = CreateText(canvas.transform, "Prompt", new Vector2(15f, 20f));
-            if (controlsText == null)
-            {
-                controlsText = CreateText(canvas.transform, "Controls", new Vector2(15f, -225f));
-                controlsText.text = "WASD / Chuột trái: Di chuyển   Chuột phải / J: Đánh   Q E R F: Kỹ năng";
-                controlsText.fontSize = 14f;
-                controlsText.color = new Color(0.8f, 0.9f, 1f);
-            }
-            if (healthBar == null) healthBar = CreateSlider(canvas.transform, "HealthBar", new Vector2(15f, -165f), Color.red);
-            if (manaBar == null) manaBar = CreateSlider(canvas.transform, "ManaBar", new Vector2(15f, -195f), Color.cyan);
-            if (bossText == null)
-            {
-                bossText = CreateText(canvas.transform, "BossName", new Vector2(430f, -15f));
-                bossText.text = "FOREST GUARDIAN";
-            }
-            if (bossBar == null) bossBar = CreateSlider(canvas.transform, "BossHealth", new Vector2(430f, -50f), new Color(0.75f, 0.1f, 0.15f));
-
-            for (int i = 0; i < skillTexts.Length; i++)
-            {
-                if (skillTexts[i] == null)
-                {
-                    skillTexts[i] = CreateSkillBox(canvas.transform, "Skill" + i,
-                        new Vector2(15f + i * 295f, 15f), out skillBoxes[i],
-                        out skillIconImages[i], out skillCooldownFills[i]);
-                }
-                else
-                {
-                    // Áp dụng lại kích thước cho ô đã tồn tại trong scene
-                    Transform boxTransform = skillTexts[i].transform.parent;
-                    if (boxTransform != null)
-                    {
-                        RectTransform boxRect = boxTransform.GetComponent<RectTransform>();
-                        if (boxRect != null)
-                        {
-                            boxRect.sizeDelta = new Vector2(280f, 280f);
-                            boxRect.anchoredPosition = new Vector2(15f + i * 295f, 15f);
-                        }
-
-                        if (skillIconImages[i] == null)
-                        {
-                            Transform iconTransform = boxTransform.Find("Icon");
-                            if (iconTransform != null)
-                            {
-                                skillIconImages[i] = iconTransform.GetComponent<Image>();
-                            }
-                        }
-                    }
-                    // Cập nhật font cho label đã có
-                    skillTexts[i].enableAutoSizing = false;
-                    skillTexts[i].fontSize = 40f;
-                    skillTexts[i].fontSizeMin = 40f;
-                    skillTexts[i].fontSizeMax = 40f;
-                    skillTexts[i].overflowMode = TextOverflowModes.Overflow;
-                    skillTexts[i].color = Color.white;
-                }
-            }
+            Transform boss = FantasyEquipmentUI.Frame(root, "BossStatus", 0, 0, 500, 78, FantasyEquipmentUI.Ink);
+            RectTransform bossRect = (RectTransform)boss;
+            bossRect.anchorMin = bossRect.anchorMax = bossRect.pivot = new Vector2(0.5f,1);
+            bossRect.anchoredPosition = new Vector2(0,-22);
+            bossText = Label(boss, "BossName", "VỆ THẦN RỪNG", 16, 8, 468, 28, 23, FantasyEquipmentUI.Gold, TextAlignmentOptions.Center);
+            bossBar = ResourceBar(boss, "BossHealth", 16, 42, 468, 24, new Color(0.64f,0.17f,0.21f));
+            Label(bossBar.transform, "Value", "", 0, 0, 468, 24, 20, FantasyEquipmentUI.TextColor, TextAlignmentOptions.Center);
+            Transform hint = FantasyEquipmentUI.Frame(root, "InteractionHint", 0, 0, 720, 76, FantasyEquipmentUI.Ink);
+            RectTransform hintRect = (RectTransform)hint;
+            hintRect.anchorMin = hintRect.anchorMax = hintRect.pivot = new Vector2(0.5f, 0);
+            hintRect.anchoredPosition = new Vector2(0,198);
+            promptBackdrop = hint.gameObject;
+            promptBackdrop.SetActive(false);
+            promptText = FloatingLabel(root, "Prompt", new Vector2(0.5f,0), new Vector2(0,206), 680, 60, 23);
+            levelUpText = FloatingLabel(root, "LevelUp", new Vector2(0.5f,1), new Vector2(0,-116), 700, 50, 32);
+            levelUpText.color = FantasyEquipmentUI.Gold;
+            levelUpText.gameObject.SetActive(false);
+            huntNoticeText = FloatingLabel(root, "HuntNotice", new Vector2(0.5f,1), new Vector2(0,-178), 660, 88, 23);
+            huntNoticeText.gameObject.SetActive(false);
         }
 
-        private static TMP_Text CreateText(Transform parent, string name, Vector2 position)
+        private static TMP_Text Label(Transform parent, string name, string value, float x, float y, float width, float height,
+            float size, Color? color = null, TextAlignmentOptions alignment = TextAlignmentOptions.MidlineLeft)
         {
-            GameObject textObject = new GameObject(name, typeof(RectTransform));
-            textObject.transform.SetParent(parent, false);
-            RectTransform rect = textObject.GetComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0f, 1f);
-            rect.anchorMax = new Vector2(0f, 1f);
-            rect.pivot = new Vector2(0f, 1f);
-            rect.anchoredPosition = position;
-            rect.sizeDelta = new Vector2(240f, 40f);
-            TMP_Text text = textObject.AddComponent<TextMeshProUGUI>();
-            text.fontSize = 18f;
-            text.color = Color.white;
-            text.raycastTarget = false;
+            TMP_Text text = FantasyEquipmentUI.Text(parent,name,value,x,y,width,height,size,color,alignment);
+            text.enableAutoSizing = false;
+            text.textWrappingMode = TextWrappingModes.Normal;
+            text.overflowMode = TextOverflowModes.Ellipsis;
             return text;
         }
 
-        private static TMP_Text CreateSkillBox(Transform parent, string name, Vector2 position,
-            out Image backgroundImage, out Image skillIcon, out Image cooldownFill)
+        private static TMP_Text FloatingLabel(Transform parent, string name, Vector2 anchor, Vector2 position, float width, float height, float size)
         {
-            // === Lớp ngoài: Border màu skill ===
-            GameObject box = new GameObject(name + "Box", typeof(RectTransform), typeof(Image));
-            box.transform.SetParent(parent, false);
-            RectTransform boxRect = box.GetComponent<RectTransform>();
-            boxRect.anchorMin = Vector2.zero;
-            boxRect.anchorMax = Vector2.zero;
-            boxRect.pivot = Vector2.zero;
-            boxRect.anchoredPosition = position;
-            boxRect.sizeDelta = new Vector2(280f, 280f);
-            backgroundImage = box.GetComponent<Image>();
-            backgroundImage.color = new Color(0.25f, 0.32f, 0.55f, 1f); // border xanh mặc định
-            backgroundImage.raycastTarget = false;
-
-            // === Lớp trong: nền tối tạo hiệu ứng border ===
-            GameObject inner = new GameObject("Inner", typeof(RectTransform), typeof(Image));
-            inner.transform.SetParent(box.transform, false);
-            RectTransform innerRect = inner.GetComponent<RectTransform>();
-            innerRect.anchorMin = Vector2.zero;
-            innerRect.anchorMax = Vector2.one;
-            innerRect.offsetMin = new Vector2(5f, 5f);
-            innerRect.offsetMax = new Vector2(-5f, -5f);
-            inner.GetComponent<Image>().color = new Color(0.04f, 0.05f, 0.10f, 0.98f);
-            inner.GetComponent<Image>().raycastTarget = false;
-
-            GameObject iconObject = new GameObject("Icon", typeof(RectTransform), typeof(Image));
-            iconObject.transform.SetParent(box.transform, false);
-            RectTransform iconRect = iconObject.GetComponent<RectTransform>();
-            iconRect.anchorMin = Vector2.zero;
-            iconRect.anchorMax = Vector2.one;
-            iconRect.offsetMin = new Vector2(20f, 20f);
-            iconRect.offsetMax = new Vector2(-20f, -20f);
-            skillIcon = iconObject.GetComponent<Image>();
-            skillIcon.preserveAspect = true;
-            skillIcon.color = Color.white;
-            skillIcon.raycastTarget = false;
-
-            // === Lớp glow: ánh sáng mờ phía trên ===
-            GameObject glow = new GameObject("Glow", typeof(RectTransform), typeof(Image));
-            glow.transform.SetParent(box.transform, false);
-            RectTransform glowRect = glow.GetComponent<RectTransform>();
-            glowRect.anchorMin = new Vector2(0f, 0.55f);
-            glowRect.anchorMax = Vector2.one;
-            glowRect.offsetMin = new Vector2(6f, 0f);
-            glowRect.offsetMax = new Vector2(-6f, -6f);
-            glow.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.04f);
-            glow.GetComponent<Image>().raycastTarget = false;
-
-            // === Cooldown radial fill (đè lên tất cả) ===
-            GameObject overlay = new GameObject("Cooldown", typeof(RectTransform), typeof(Image));
-            overlay.transform.SetParent(box.transform, false);
-            RectTransform overlayRect = overlay.GetComponent<RectTransform>();
-            overlayRect.anchorMin = Vector2.zero;
-            overlayRect.anchorMax = Vector2.one;
-            overlayRect.offsetMin = Vector2.zero;
-            overlayRect.offsetMax = Vector2.zero;
-            cooldownFill = overlay.GetComponent<Image>();
-            cooldownFill.type = Image.Type.Filled;
-            cooldownFill.fillMethod = Image.FillMethod.Radial360;
-            cooldownFill.fillOrigin = 2;
-            cooldownFill.fillClockwise = false;
-            cooldownFill.color = new Color(0f, 0f, 0f, 0.76f);
-            cooldownFill.raycastTarget = false;
-
-            GameObject labelObject = new GameObject("Label", typeof(RectTransform));
-            labelObject.transform.SetParent(box.transform, false);
-            RectTransform labelRect = labelObject.GetComponent<RectTransform>();
-            labelRect.anchorMin = new Vector2(0f, 1f);
-            labelRect.anchorMax = new Vector2(0f, 1f);
-            labelRect.pivot = new Vector2(0f, 1f);
-            labelRect.anchoredPosition = new Vector2(12f, -8f);
-            labelRect.sizeDelta = new Vector2(64f, 58f);
-            TMP_Text label = labelObject.AddComponent<TextMeshProUGUI>();
-            label.alignment = TextAlignmentOptions.TopLeft;
-            label.enableAutoSizing = false;
-            label.fontSize = 40f;
-            label.fontSizeMin = 40f;
-            label.fontSizeMax = 40f;
-            label.overflowMode = TextOverflowModes.Overflow;
-            label.color = Color.white;
-            label.outlineWidth = 0.22f;
-            label.outlineColor = Color.black;
-            label.raycastTarget = false;
-            return label;
+            TMP_Text text = Label(parent,name,"",0,0,width,height,size,Color.white,TextAlignmentOptions.Center);
+            RectTransform rect = text.rectTransform;
+            rect.anchorMin = rect.anchorMax = rect.pivot = anchor;
+            rect.anchoredPosition = position;
+            text.outlineWidth = 0.2f;
+            text.outlineColor = Color.black;
+            return text;
         }
 
-        private static Slider CreateSlider(Transform parent, string name, Vector2 position, Color fillColor)
+        private static Slider ResourceBar(Transform parent, string name, float x, float y, float width, float height, Color color)
         {
-            GameObject sliderObject = new GameObject(name, typeof(RectTransform), typeof(Slider));
-            sliderObject.transform.SetParent(parent, false);
-            RectTransform rect = sliderObject.GetComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0f, 1f);
-            rect.anchorMax = new Vector2(0f, 1f);
-            rect.pivot = new Vector2(0f, 1f);
-            rect.anchoredPosition = position;
-            rect.sizeDelta = new Vector2(240f, 18f);
-            Slider slider = sliderObject.GetComponent<Slider>();
-            slider.minValue = 0f;
-            slider.maxValue = 100f;
-            slider.value = 100f;
+            RectTransform rect = FantasyEquipmentUI.Rect(parent,name,x,y,width,height);
+            var slider = rect.gameObject.AddComponent<Slider>();
             slider.interactable = false;
-
-            GameObject background = new GameObject("Background", typeof(RectTransform), typeof(Image));
-            background.transform.SetParent(sliderObject.transform, false);
-            RectTransform backgroundRect = background.GetComponent<RectTransform>();
-            backgroundRect.anchorMin = Vector2.zero;
-            backgroundRect.anchorMax = Vector2.one;
-            backgroundRect.offsetMin = Vector2.zero;
-            backgroundRect.offsetMax = Vector2.zero;
-            Image backgroundImage = background.GetComponent<Image>();
-            backgroundImage.color = new Color(0.05f, 0.05f, 0.05f, 0.9f);
-            backgroundImage.raycastTarget = false;
-
-            GameObject fill = new GameObject("Fill", typeof(RectTransform), typeof(Image));
-            fill.transform.SetParent(sliderObject.transform, false);
-            RectTransform fillRect = fill.GetComponent<RectTransform>();
-            fillRect.anchorMin = Vector2.zero;
-            fillRect.anchorMax = Vector2.one;
-            fillRect.offsetMin = Vector2.zero;
-            fillRect.offsetMax = Vector2.zero;
-            Image fillImage = fill.GetComponent<Image>();
-            fillImage.color = fillColor;
-            fillImage.raycastTarget = false;
-            slider.fillRect = fillRect;
-            slider.direction = Slider.Direction.LeftToRight;
+            slider.navigation = new Navigation { mode = Navigation.Mode.None };
             slider.transition = Selectable.Transition.None;
+            FantasyEquipmentUI.Box(rect,"Background",0,0,width,height,new Color(0.03f,0.04f,0.06f,1));
+            Image fill = FantasyEquipmentUI.Box(rect,"Fill",0,0,width,height,color);
+            // Slider drives the anchors; the fill must start with zero offsets.
+            fill.rectTransform.anchorMin = Vector2.zero;
+            fill.rectTransform.anchorMax = Vector2.one;
+            fill.rectTransform.offsetMin = fill.rectTransform.offsetMax = Vector2.zero;
+            slider.fillRect = fill.rectTransform;
+            slider.direction = Slider.Direction.LeftToRight;
             return slider;
         }
 
@@ -626,6 +456,7 @@ namespace TopDownGame.UI
 
         private void OnDestroy()
         {
+            if (displayRoot != null) Destroy(displayRoot);
             HuntRewardEvents.RewardGranted -= ShowHuntReward;
             HuntRewardEvents.EliteSpawned -= ShowEliteSpawned;
             if (GameProgressManager.Instance != null)
@@ -695,6 +526,7 @@ namespace TopDownGame.UI
 
             bossBar.maxValue = maximum;
             bossBar.value = current;
+            bossBar.GetComponentInChildren<TMP_Text>().text = Mathf.CeilToInt(current).ToString("N0") + " / " + Mathf.CeilToInt(maximum).ToString("N0");
         }
     }
 }

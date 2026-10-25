@@ -138,20 +138,35 @@ namespace TopDownGame.UI
             EquipmentPanelLayout.StyleButton(button);
             if (select != null) button.onClick.AddListener(select);
             button.interactable = item != null;
-            if (item != null)
-            {
-                Icon(frame, "Icon", item.Icon, 12, 10, size - 24, size - 24);
-                Box(frame, "RarityMark", size / 2 - 12, size - 8, 24, 2, rarity);
-                if (equipped)
-                {
-                    Box(frame, "EquippedBadge", size - 27, 4, 23, 21, Hex("37614B"));
-                    Text(frame, "Equipped", "E", size - 27, 4, 23, 21, 13, TextColor, TextAlignmentOptions.Center);
-                }
-                if (!string.IsNullOrEmpty(badge))
-                    Text(frame, "Badge", badge, 5, 3, size - 10, 20, 13, Gold);
-            }
-            else Text(frame, "Empty", "·", 0, 0, size, size, 28, Edge, TextAlignmentOptions.Center);
+            Icon(frame, "Icon", item != null ? item.Icon : null, 12, 10, size - 24, size - 24);
+            Box(frame, "RarityMark", size / 2 - 12, size - 8, 24, 2, rarity);
+            Box(frame, "EquippedBadge", size - 27, 4, 23, 21, Hex("37614B"));
+            Text(frame, "Equipped", "E", size - 27, 4, 23, 21, 13, TextColor, TextAlignmentOptions.Center);
+            Text(frame, "Badge", "", 5, 3, size - 10, 20, 13, Gold);
+            Text(frame, "Empty", "·", 0, 0, size, size, 28, Edge, TextAlignmentOptions.Center);
+            RefreshItemSlot(button, item, selected, equipped, badge);
             return button;
+        }
+
+        public static void RefreshItemSlot(Button button, EquipmentData item, bool selected, bool equipped, string badge = null)
+        {
+            Transform frame = button.transform;
+            Color rarity = item != null ? item.RarityColor : Edge;
+            frame.Find("Brass").GetComponent<Image>().color = selected ? Gold : Color.Lerp(Edge, rarity, 0.45f);
+            frame.Find("Inset").GetComponent<Image>().color = Color.Lerp(Ink, rarity, selected ? 0.2f : 0.055f);
+            button.interactable = item != null;
+            Image icon = frame.Find("Icon").GetComponent<Image>();
+            icon.sprite = item != null ? item.Icon : null;
+            icon.enabled = icon.sprite != null;
+            Image mark = frame.Find("RarityMark").GetComponent<Image>();
+            mark.color = rarity;
+            mark.gameObject.SetActive(item != null);
+            frame.Find("EquippedBadge").gameObject.SetActive(equipped);
+            frame.Find("Equipped").gameObject.SetActive(equipped);
+            TMP_Text badgeText = frame.Find("Badge").GetComponent<TMP_Text>();
+            badgeText.text = badge ?? "";
+            badgeText.gameObject.SetActive(item != null && !string.IsNullOrEmpty(badge));
+            frame.Find("Empty").gameObject.SetActive(item == null);
         }
 
         public static ScrollRect Grid(Transform parent, string name, float x, float y,

@@ -130,6 +130,13 @@ namespace TopDownGame.Player
         }
 
         public bool IsWalking => walking;
+        private Vector2 facingDirection = Vector2.down;
+        private Vector2 dodgeDirection;
+        private float dodgeStartTime, dodgeEndTime;
+        private bool dodgePoseApplied;
+        private Vector3 dodgeRestPosition, dodgeRestScale;
+        private Quaternion dodgeRestRotation;
+        public Vector2 FacingDirection => facingDirection;
         public float PresentedGaitPhase => displayedGaitPhase;
 
         public float SkillCastDuration => skillCastDuration;
@@ -169,6 +176,48 @@ namespace TopDownGame.Player
                 if (Time.deltaTime > 0f) UpdateVisual();
             }
             ApplyCastPose();
+            ApplyDodgePose();
+        }
+
+        public void PlayDodge(Vector2 direction, float duration)
+        {
+            ResolveVisualRenderer();
+            if (dying || visualRenderer == null) return;
+            CancelDodgePose();
+            dodgeDirection = direction.normalized;
+            FaceDirection(dodgeDirection);
+            dodgeStartTime = Time.time;
+            dodgeEndTime = Time.time + duration;
+            var visual = visualRenderer.transform;
+            dodgeRestPosition = visual.localPosition;
+            dodgeRestScale = visual.localScale;
+            dodgeRestRotation = visual.localRotation;
+            attackEndTime = castEndTime = hitEndTime = 0f;
+        }
+
+        private void ApplyDodgePose()
+        {
+            if (visualRenderer == null) return;
+            if (Time.time >= dodgeEndTime || dying) { CancelDodgePose(); return; }
+            float progress = Mathf.InverseLerp(dodgeStartTime, dodgeEndTime, Time.time);
+            float lean = Mathf.Sin(progress * Mathf.PI);
+            var visual = visualRenderer.transform;
+            visual.localPosition = dodgeRestPosition + (Vector3)(dodgeDirection * lean * 0.08f);
+            visual.localScale = Vector3.Scale(dodgeRestScale, new Vector3(1f + lean * 0.06f, 1f - lean * 0.12f, 1f));
+            visual.localRotation = dodgeRestRotation * Quaternion.Euler(0, 0, -dodgeDirection.x * lean * 12f);
+            dodgePoseApplied = true;
+        }
+
+        public void CancelDodgePose()
+        {
+            dodgeEndTime = Time.time;
+            if (!dodgePoseApplied || visualRenderer == null) return;
+            var visual = visualRenderer.transform;
+            visual.localPosition = dodgeRestPosition;
+            visual.localScale = dodgeRestScale;
+            visual.localRotation = dodgeRestRotation;
+            visualRenderer.color = restColor;
+            dodgePoseApplied = false;
         }
 
         private void ApplyCastPose()
@@ -248,6 +297,17 @@ namespace TopDownGame.Player
                 visualRenderer.color = restColor;
                 ShowTimedFrames(deathFrames, deathStartTime,
                     deathStartTime + deathDuration);
+                return;
+            }
+
+            if (Time.time < dodgeEndTime)
+            {
+                // Pose and facing remain owned here; a dodge uses the existing directional frames.
+                presentedDirection = dodgeDirection;
+                Sprite[] frames = ResolveWalkFrames();
+                float progress = Mathf.InverseLerp(dodgeStartTime, dodgeEndTime, Time.time);
+                if (HasFrames(frames)) ShowSprite(frames[Mathf.Min(frames.Length - 1, Mathf.FloorToInt(progress * frames.Length))]);
+                visualRenderer.color = Color.Lerp(restColor, new Color(0.45f, 0.9f, 1f), 0.32f);
                 return;
             }
 
@@ -381,6 +441,7 @@ namespace TopDownGame.Player
         {
             if (dying) return;
             dying = true;
+            CancelDodgePose();
             ResolveVisualRenderer();
             deathStartTime = Time.time;
             attackEndTime = castEndTime = hitEndTime = 0f;
@@ -467,6 +528,7 @@ namespace TopDownGame.Player
 
         private void FaceDirection(Vector2 direction)
         {
+            if (direction.sqrMagnitude > 0.001f) facingDirection = direction.normalized;
             if (visualRenderer != null && Mathf.Abs(direction.x) > 0.05f)
             {
                 visualRenderer.flipX = direction.x < 0f;
@@ -497,6 +559,9 @@ namespace TopDownGame.Player
                     ? WalkFacing.Down
                     : WalkFacing.Up;
             }
+            if (direction.sqrMagnitude > 0.001f)
+                facingDirection = walkFacing == WalkFacing.Left ? Vector2.left : walkFacing == WalkFacing.Right ? Vector2.right :
+                    walkFacing == WalkFacing.Up ? Vector2.up : Vector2.down;
 
             Sprite[] directionalFrames;
             switch (walkFacing)

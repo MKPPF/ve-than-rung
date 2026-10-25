@@ -39,11 +39,12 @@ namespace TopDownGame.Player
         private bool coolingDown;
         private float nextAutoTargetScanTime;
         private float lastMovementTime;
+        private PlayerDodge dodge;
 
         public Vector2 AimDirection { get; private set; } = Vector2.right;
         public bool AutoAttackEnabled => autoAttackEnabled;
         public bool IsAttacking => coolingDown;
-        public bool CanRunAutoCombat => autoAttackEnabled && !coolingDown &&
+        public bool CanRunAutoCombat => autoAttackEnabled && !coolingDown && !(dodge != null && dodge.IsDodging) &&
             IsStationaryForAutoCombat() &&
             Time.time >= lastMovementTime + autoCombatResumeDelay;
 
@@ -55,11 +56,13 @@ namespace TopDownGame.Player
             movement = GetComponent<PlayerMovement>();
             characterAnimator = GetComponent<PlayerCharacterAnimator>();
             skillManager = GetComponent<SkillManager>();
+            dodge = GetComponent<PlayerDodge>();
             mainCamera = Camera.main;
         }
 
         private void Update()
         {
+            if (dodge != null && dodge.IsDodging) return;
             if (skillManager != null && skillManager.IsCasting) return;
             if (TopDownGame.Core.GameplayState.IsInputBlocked || Time.timeScale <= 0f) return;
             UpdateAimDirection();
@@ -97,6 +100,7 @@ namespace TopDownGame.Player
 
         private void LateUpdate()
         {
+            if (dodge != null && dodge.IsDodging) return;
             if (skillManager != null && skillManager.IsCasting) return;
             if (TopDownGame.Core.GameplayState.IsInputBlocked || Time.timeScale <= 0f) return;
             if (!autoAttackEnabled || coolingDown || Time.time < nextShotTime)
@@ -163,7 +167,7 @@ namespace TopDownGame.Player
         public bool TryShoot(Vector2 direction)
         {
             PlayerHealth health = GetComponent<PlayerHealth>();
-            if (!isActiveAndEnabled || !clickToShoot || coolingDown ||
+            if (!isActiveAndEnabled || !clickToShoot || coolingDown || (dodge != null && dodge.IsDodging) ||
                 Time.time < nextShotTime || Time.timeScale <= 0f ||
                 TopDownGame.Core.GameplayState.ModalClosedThisFrame ||
                 TopDownGame.Core.GameplayState.IsInputBlocked ||

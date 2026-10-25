@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using TopDownGame.Enemies;
+using TopDownGame.Enemies.Spawning;
 using TopDownGame.Equipment;
 using TopDownGame.Maps;
 using TopDownGame.Player;
 using TopDownGame.Skills;
+using TopDownGame.UI;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 namespace TopDownGame.EditorTools
@@ -252,9 +255,20 @@ namespace TopDownGame.EditorTools
             else
             {
                 RequireComponent<PlayerMovement>(player, PlayerPrefabPath, result);
+                RequireComponent<PlayerDodge>(player, PlayerPrefabPath, result);
                 RequireComponent<PlayerHealth>(player, PlayerPrefabPath, result);
                 RequireComponent<PlayerStats>(player, PlayerPrefabPath, result);
                 RequireComponent<SkillManager>(player, PlayerPrefabPath, result);
+                PlayerDodge dodge = player.GetComponent<PlayerDodge>();
+                if (dodge != null && !dodge.HasRequiredReferences)
+                    result.AddError("Player dodge is missing movement, health, animator or input reference.", dodge);
+                if (dodge != null && player.GetComponent<PlayerMovement>() != null &&
+                    new SerializedObject(player.GetComponent<PlayerMovement>()).FindProperty("dodge").objectReferenceValue != dodge)
+                    result.AddError("Player movement is not connected to its dodge controller.", player);
+                InputAction dodgeAction = player.GetComponent<PlayerInput>()?.actions?.FindAction("Player/Dodge", false);
+                if (dodgeAction == null || !dodgeAction.bindings.Any(binding => binding.path == "<Keyboard>/space") ||
+                    !dodgeAction.bindings.Any(binding => binding.path == "<Gamepad>/buttonSouth"))
+                    result.AddError("Player dodge requires Space and gamepad South bindings.", player);
             }
 
             string[] enemyPrefabGuids = AssetDatabase.FindAssets("t:Prefab",
@@ -316,6 +330,37 @@ namespace TopDownGame.EditorTools
         private static void ValidateSceneManagers(Scene scene, string sceneName,
             ProjectValidationResult result)
         {
+            if (sceneName != "MainMenu")
+            {
+                DodgeHUD[] huds = FindComponentsInScene<DodgeHUD>(scene).ToArray();
+                if (huds.Length != 1) result.AddError($"Scene '{sceneName}' must contain exactly one dodge HUD.");
+                foreach (DodgeHUD hud in huds)
+                    if (!hud.HasRequiredReferences) result.AddError($"Dodge HUD in '{sceneName}' has missing references.", hud);
+            }
+            if (sceneName == "Lobby")
+            {
+                LobbyTutorialUI[] tutorials = FindComponentsInScene<LobbyTutorialUI>(scene).ToArray();
+                if (tutorials.Length != 1) result.AddError("Lobby must contain exactly one first-entry tutorial.");
+                foreach (LobbyTutorialUI tutorial in tutorials)
+                    if (new SerializedObject(tutorial).FindProperty("dialog").objectReferenceValue == null)
+                        result.AddError("Lobby tutorial has no dialog reference.", tutorial);
+            }
+            foreach (SkillSelectionUI rewards in FindComponentsInScene<SkillSelectionUI>(scene))
+            {
+                SerializedProperty catalog = new SerializedObject(rewards).FindProperty("skillDatabase");
+                var ids = new HashSet<SkillId>();
+                if (catalog != null)
+                    for (int i = 0; i < catalog.arraySize; i++)
+                    {
+                        SkillData data = catalog.GetArrayElementAtIndex(i).objectReferenceValue as SkillData;
+                        if (data == null)
+                            result.AddError($"Skill reward catalog in scene '{sceneName}' has an empty entry at {i}.", rewards);
+                        else if (!ids.Add(data.Id))
+                            result.AddError($"Skill reward catalog in scene '{sceneName}' duplicates '{data.Id}'.", rewards);
+                    }
+                foreach (SkillId id in Enum.GetValues(typeof(SkillId)))
+                    if (!ids.Contains(id)) result.AddError($"Skill reward catalog in scene '{sceneName}' is missing '{id}'.", rewards);
+            }
             foreach (MapManager manager in FindComponentsInScene<MapManager>(scene))
             {
                 if (manager.Data == null)
@@ -328,7 +373,29 @@ namespace TopDownGame.EditorTools
                     result.AddError($"MapManager in scene '{sceneName}' references MapData " +
                         $"'{manager.Data.MapId}'.", manager);
                 }
+                if (manager.Data != null && !manager.Data.IsBossMap)
+                    ValidateHuntingPopulation(scene, sceneName, manager, result);
             }
+        }
+
+        private static void ValidateHuntingPopulation(Scene scene, string sceneName,
+            MapManager manager, ProjectValidationResult result)
+        {
+            EnemySpawnManager spawner = manager.GetComponent<EnemySpawnManager>();
+            if (spawner == null || !spawner.enabled || !spawner.gameObject.activeInHierarchy)
+                result.AddError($"Scene '{sceneName}' hunting population has no active EnemySpawnManager.", manager);
+
+            int validSeeds = 0;
+            foreach (EnemyBase enemy in FindComponentsInScene<EnemyBase>(scene))
+            {
+                if (!enemy.enabled || !enemy.gameObject.activeInHierarchy) continue;
+                EnemyHealth health = enemy.GetComponent<EnemyHealth>();
+                if (enemy.Data == null || health == null || !health.enabled)
+                    result.AddError($"Scene '{sceneName}' hunting population seed '{enemy.name}' needs EnemyData and enabled EnemyHealth.", enemy);
+                else validSeeds++;
+            }
+            if (validSeeds == 0)
+                result.AddError($"Scene '{sceneName}' hunting population has no active enemy seed; its pool cannot initialize.", manager);
         }
 
         private static void ValidateSceneTargets(Scene scene, string sceneName,
@@ -340,6 +407,12 @@ namespace TopDownGame.EditorTools
                 string target = ReadStringProperty(door, "nextScene");
                 ValidateSceneTarget("MapDoor", sceneName, target, scenes,
                     enabledBuildScenes, result, door);
+                MapData destination = door.DestinationMap;
+                if (target != "Lobby" && (destination == null || destination.MapId != target ||
+                    string.IsNullOrWhiteSpace(destination.DisplayName)))
+                    result.AddError("MapDoor '" + sceneName + "' has missing or mismatched destination metadata.", door);
+                if (target == "Lobby" && destination != null)
+                    result.AddError("MapDoor to Lobby must not reference combat map metadata.", door);
             }
 
             foreach (LobbyPortal portal in FindComponentsInScene<LobbyPortal>(scene))
@@ -347,6 +420,17 @@ namespace TopDownGame.EditorTools
                 string target = ReadStringProperty(portal, "destinationScene");
                 ValidateSceneTarget("LobbyPortal", sceneName, target, scenes,
                     enabledBuildScenes, result, portal);
+                SerializedProperty catalog = new SerializedObject(portal).FindProperty("destinationMaps");
+                var ids = new HashSet<string>();
+                for (int i = 0; catalog != null && i < catalog.arraySize; i++)
+                {
+                    MapData data = catalog.GetArrayElementAtIndex(i).objectReferenceValue as MapData;
+                    if (data == null) result.AddError("Lobby travel catalog contains an empty map reference.", portal);
+                    else if (!ids.Add(data.MapId)) result.AddError("Lobby travel catalog duplicates '" + data.MapId + "'.", portal);
+                }
+                foreach (string destination in LobbyPortal.Destinations)
+                    if (portal.GetDestinationData(destination) == null)
+                        result.AddError("Lobby travel catalog is missing '" + destination + "'.", portal);
             }
         }
 

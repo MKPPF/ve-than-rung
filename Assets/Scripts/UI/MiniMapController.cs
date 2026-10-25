@@ -63,6 +63,9 @@ namespace TopDownGame.UI
                 return;
             }
 
+            Canvas canvas = GetComponent<Canvas>();
+            panel.localScale = Vector3.one * Mathf.Max(1f, 0.7f / Mathf.Max(0.01f, canvas.scaleFactor));
+
             if (Time.unscaledTime >= nextMarkerRefreshTime)
             {
                 RefreshMarkers();
@@ -120,7 +123,7 @@ namespace TopDownGame.UI
             panel.anchorMin = new Vector2(1f, 0f);
             panel.anchorMax = new Vector2(1f, 0f);
             panel.pivot = new Vector2(1f, 0f);
-            panel.sizeDelta = panelSize;
+            panel.sizeDelta = new Vector2(panelSize.x, Mathf.Max(310f, panelSize.y));
             panel.anchoredPosition = new Vector2(-panelMargin.x, panelMargin.y);
             Image panelImage = panelObject.GetComponent<Image>();
             panelImage.color = new Color(0.025f, 0.055f, 0.075f, 0.9f);
@@ -133,11 +136,11 @@ namespace TopDownGame.UI
             titleRect.anchorMin = new Vector2(0f, 1f);
             titleRect.anchorMax = new Vector2(1f, 1f);
             titleRect.pivot = new Vector2(0.5f, 1f);
-            titleRect.offsetMin = new Vector2(8f, -31f);
+            titleRect.offsetMin = new Vector2(8f, -62f);
             titleRect.offsetMax = new Vector2(-8f, -4f);
             TextMeshProUGUI title = titleObject.GetComponent<TextMeshProUGUI>();
-            title.text = "BẢN ĐỒ • " + ResolveMapName();
-            title.fontSize = 17f;
+            title.text = "BẢN ĐỒ\n" + ResolveMapName();
+            title.fontSize = 22f;
             title.fontStyle = FontStyles.Bold;
             title.alignment = TextAlignmentOptions.Center;
             title.color = new Color(0.75f, 0.95f, 1f);
@@ -149,8 +152,8 @@ namespace TopDownGame.UI
             RectTransform viewportRect = viewport.GetComponent<RectTransform>();
             viewportRect.anchorMin = Vector2.zero;
             viewportRect.anchorMax = Vector2.one;
-            viewportRect.offsetMin = new Vector2(8f, 8f);
-            viewportRect.offsetMax = new Vector2(-8f, -34f);
+            viewportRect.offsetMin = new Vector2(8f, 64f);
+            viewportRect.offsetMax = new Vector2(-8f, -66f);
             mapImage = viewport.GetComponent<RawImage>();
             mapImage.color = Color.white;
             mapImage.raycastTarget = false;
@@ -163,6 +166,20 @@ namespace TopDownGame.UI
             markerRoot.anchorMax = Vector2.one;
             markerRoot.offsetMin = Vector2.zero;
             markerRoot.offsetMax = Vector2.zero;
+
+            float legendY = panel.sizeDelta.y - 62;
+            Legend("Bạn", 12, legendY, new Color(0.25f, 0.95f, 1f), RuntimeSpriteFactory.RingSprite);
+            Legend("Lối đi", 158, legendY, new Color(0.3f, 1f, 0.45f), RuntimeSpriteFactory.RingSprite);
+            Legend("Rương", 12, legendY + 28, new Color(1f, 0.8f, 0.2f), RuntimeSpriteFactory.WhiteSprite);
+            Legend("Địch", 158, legendY + 28, new Color(1f, 0.22f, 0.16f), RuntimeSpriteFactory.CircleSprite);
+        }
+
+        private void Legend(string label, float x, float y, Color color, Sprite sprite)
+        {
+            Image icon = FantasyEquipmentUI.Icon(panel, "LegendIcon_" + label, sprite, x, y + 8, 12, 12);
+            icon.color = color;
+            TMP_Text text = FantasyEquipmentUI.Text(panel, "Legend_" + label, label, x + 20, y, 118, 28, 21);
+            text.enableAutoSizing = false;
         }
 
         private string ResolveMapName()
@@ -174,7 +191,8 @@ namespace TopDownGame.UI
                 return manager.Data.DisplayName.ToUpperInvariant();
             }
 
-            return SceneManager.GetActiveScene().name.ToUpperInvariant();
+            string scene = SceneManager.GetActiveScene().name;
+            return scene == "Lobby" ? "TRẠM NGHỈ TÁN RỪNG" : scene.ToUpperInvariant();
         }
 
         private void ResolveWorldBounds()

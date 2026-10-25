@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: CaveMap01
   m_EditorClassIdentifier: Assembly-CSharp::TopDownGame.Maps.MapData
   mapId: CaveMap01
-  displayName: Crystal Cave Entrance
+  displayName: "Hang Pha L\xEA"
   nextScene: RiftMap01
   isBossMap: 0
   opensSkillSelection: 0

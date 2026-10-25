@@ -30,9 +30,17 @@ namespace TopDownGame.Enemies.Progression
         public float VisualScale { get; private set; } = 1f;
         public bool IsElite => Variant == EnemyVariant.Elite;
         public bool IsBoss => Data != null && Data.Archetype == EnemyArchetype.Boss;
-        public string DisplayName => Variant == EnemyVariant.Normal
-            ? Data != null ? Data.DisplayName : "Enemy"
-            : Variant + " " + (Data != null ? Data.DisplayName : "Enemy");
+        public string VariantDisplayName => Variant switch
+        {
+            EnemyVariant.Swift => "Nhanh Nhẹn",
+            EnemyVariant.Armored => "Bọc Giáp",
+            EnemyVariant.Vampiric => "Hút Máu",
+            EnemyVariant.Explosive => "Bộc Phá",
+            EnemyVariant.Elite => "Tinh Anh",
+            _ => string.Empty
+        };
+        public string DisplayName => (Data != null ? Data.DisplayName : "Địch") +
+            (string.IsNullOrEmpty(VariantDisplayName) ? string.Empty : " " + VariantDisplayName);
 
         public void Configure(EnemyData data, int level, EnemyVariant variant)
         {

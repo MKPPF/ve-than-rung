@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using TopDownGame.Core;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace TopDownGame.Enemies.Spawning
 {
+    /// <summary>Keeps projectile allocations bounded while retiring shots with the scene that launched them.</summary>
     public sealed class EnemyProjectilePool : MonoBehaviour
     {
         private const int MaximumProjectiles = 72;
@@ -11,6 +13,21 @@ namespace TopDownGame.Enemies.Spawning
         private readonly List<EnemyProjectile> projectiles =
             new List<EnemyProjectile>(MaximumProjectiles);
         private int recycleCursor;
+
+        private void Awake() => SceneManager.sceneUnloaded += OnSceneUnloaded;
+
+        private void OnSceneUnloaded(Scene scene)
+        {
+            foreach (EnemyProjectile projectile in projectiles)
+                if (projectile != null && projectile.gameObject.activeSelf && projectile.LaunchScene == scene)
+                    projectile.Release();
+        }
+
+        private void OnDestroy()
+        {
+            SceneManager.sceneUnloaded -= OnSceneUnloaded;
+            if (instance == this) instance = null;
+        }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void EnsureInstance()

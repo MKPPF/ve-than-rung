@@ -268,7 +268,7 @@ namespace TopDownGame.EditorTools
             Set(obsidianGolem, "displayName", "Vệ Binh Hắc Diện");
             EnemyData boss = CreateEnemy("Forest Guardian", EnemyArchetype.Boss, 1200f, 35f, 1.1f, 5f, 2.3f, 100, new Color(0.7f, 0.15f, 0.2f));
 
-            ItemData forestRelic = CreateItem("forest_relic", "Forest Relic", "A token from the guardian.");
+            ItemData forestRelic = CreateItem("forest_relic", "Di Vật Rừng", "Vật kỷ niệm từ Vệ Thần Rừng.");
             CreatePlayerPrefab(skills, equipment);
             GameObject slimePrefab = CreateEnemyPrefab("Slime", slime,
                 typeof(SlimeEnemy), new Color(0.25f, 0.9f, 0.35f));
@@ -296,14 +296,14 @@ namespace TopDownGame.EditorTools
             MapData map01 = CreateMap("Map01", "Đầm Lầy Dịch Xanh",
                 "Map02", false, false);
             MapData map02 = CreateMap("Map02", "Tàn Tích Suối Ngọc", "Map03", false, false);
-            MapData map03 = CreateMap("Map03", "Skill Shrine", "BossMap01", false, true);
-            MapData bossMap = CreateMap("BossMap01", "Forest Guardian's Grove", "CaveMap01", true, false);
-            MapData caveMap = CreateMap("CaveMap01", "Crystal Cave Entrance", "RiftMap01", false, false);
+            MapData map03 = CreateMap("Map03", "Đền Kỹ Năng", "BossMap01", false, true);
+            MapData bossMap = CreateMap("BossMap01", "Lãnh Địa Vệ Thần", "CaveMap01", true, false);
+            MapData caveMap = CreateMap("CaveMap01", "Hang Pha Lê", "RiftMap01", false, false);
             MapData riftMap = CreateMap("RiftMap01", "Tàn Tích Nhật Thực", "Lobby", false, true);
 
             CreateCombatScene("Map01", map01, slimePrefab, 10, null, skills, forestRelic, "Map02");
             CreateCombatScene("Map02", map02, goblinPrefab, 8, archerPrefab, skills, forestRelic, "Map03");
-            CreateCombatScene("Map03", map03, null, 0, null, skills, forestRelic, "BossMap01");
+            CreateCombatScene("Map03", map03, archerPrefab, 8, magePrefab, skills, forestRelic, "BossMap01");
             CreateBossScene("BossMap01", bossMap, bossPrefab, slimePrefab, skills, forestRelic);
             CreateCombatScene("CaveMap01", caveMap, magePrefab, 3, tankPrefab, skills,
                 forestRelic, "RiftMap01", crystalScorpionPrefab, 3);
@@ -842,7 +842,12 @@ namespace TopDownGame.EditorTools
             }
 
             Set(asset, "enemyId", fileName.ToLowerInvariant());
-            Set(asset, "displayName", fileName);
+            Set(asset, "displayName", fileName switch
+            {
+                "Slime" => "Slime Độc", "Goblin" => "Yêu Tinh Rừng",
+                "Archer" => "Cung Thủ", "Mage" => "Pháp Sư", "Tank" => "Hộ Vệ",
+                "Forest Guardian" => "Vệ Thần Rừng", _ => fileName
+            });
             Set(asset, "archetype", archetype);
             Set(asset, "maxHealth", health);
             Set(asset, "damage", damage);
@@ -1014,7 +1019,17 @@ namespace TopDownGame.EditorTools
                 PlayerStats.ExperimentalManaRegeneration);
             EquipmentInventory equipmentInventory = player.AddComponent<EquipmentInventory>();
             SetArray(equipmentInventory, "catalog", equipment);
-            player.AddComponent<PlayerHealth>();
+            PlayerHealth health = player.AddComponent<PlayerHealth>();
+            PlayerDodge dodge = player.AddComponent<PlayerDodge>();
+            Set(dodge, "movement", movement);
+            Set(dodge, "health", health);
+            Set(dodge, "characterAnimator", characterAnimator);
+            Set(dodge, "playerInput", input);
+            Set(dodge, "duration", PlayerDodge.DefaultDuration);
+            Set(dodge, "invulnerability", PlayerDodge.DefaultInvulnerability);
+            Set(dodge, "cooldown", PlayerDodge.DefaultCooldown);
+            Set(dodge, "speed", PlayerDodge.DefaultSpeed);
+            Set(movement, "dodge", dodge);
             player.AddComponent<PlayerPoisonStatus>();
             PlayerCombat combat = player.AddComponent<PlayerCombat>();
             Set(combat, "autoAttackEnabled", true);
@@ -1439,6 +1454,14 @@ namespace TopDownGame.EditorTools
             portalCollider.isTrigger = true;
             portalCollider.size = new Vector2(2.4f, 1.25f);
             LobbyPortal portal = portalObject.AddComponent<LobbyPortal>();
+            MapData[] destinationMaps = new MapData[LobbyPortal.Destinations.Length];
+            for (int i = 0; i < destinationMaps.Length; i++)
+            {
+                string path = DataRoot + "/Maps/" + LobbyPortal.Destinations[i] + ".asset";
+                destinationMaps[i] = AssetDatabase.LoadAssetAtPath<MapData>(path);
+                if (destinationMaps[i] == null) throw new System.InvalidOperationException("Missing travel destination: " + path);
+            }
+            SetArray(portal, "destinationMaps", destinationMaps);
             Set(portal, "chargeDuration", 1.15f);
             Set(portal, "departureDuration", 3.0f);
             TeleportDepartureVisual departure = portalObject.AddComponent<TeleportDepartureVisual>();
@@ -1452,6 +1475,11 @@ namespace TopDownGame.EditorTools
                 storageObject.transform.position, "Map01", "RƯƠNG ĐỒ");
             CreateLobbyStationLabel(portalObject.transform, "PortalLabel", "TRUYỀN TỐNG TRẬN", new Color(0.6f, 1f, 0.85f), 1.55f);
             canvas.gameObject.AddComponent<LobbyWelcomeUI>();
+            GameObject tutorialObject = new GameObject("FirstEntryTutorial", typeof(RectTransform));
+            tutorialObject.transform.SetParent(canvas.transform, false);
+            MenuDialog tutorialDialog = tutorialObject.AddComponent<MenuDialog>();
+            LobbyTutorialUI tutorial = tutorialObject.AddComponent<LobbyTutorialUI>();
+            Set(tutorial, "dialog", tutorialDialog);
             EditorSceneManager.SaveScene(scene, SceneRoot + "/Lobby.unity");
         }
 
@@ -1506,8 +1534,16 @@ namespace TopDownGame.EditorTools
                 return;
             }
 
+            MapData destination = AssetDatabase.LoadAssetAtPath<MapData>(
+                DataRoot + "/Maps/" + nextScene + ".asset");
+            if (nextScene != "Lobby" && destination == null)
+                throw new InvalidOperationException("Missing destination MapData: " + nextScene);
+            string destinationName = nextScene == "Lobby" ? MapDoor.LobbyDisplayName : destination.DisplayName;
+            string destinationHint = destination != null
+                ? "CẤP ĐỀ NGHỊ: " + destination.RecommendedMinLevel + "-" + destination.RecommendedMaxLevel
+                : "NGHỈ NGƠI VÀ CHUẨN BỊ";
             GameObject exitLabel = CreateWorldLabel("Guidance_ExitLabel",
-                "CỔNG → " + nextScene,
+                "ĐẾN " + destinationName.ToUpperInvariant() + "\n" + destinationHint,
                 exitPosition + new Vector3(0f, 2.05f, 0f), accent, 0.058f);
             exitLabel.transform.SetParent(root.transform, true);
             GameObject rewardLabel = CreateWorldLabel("Guidance_RewardLabel",
@@ -2784,7 +2820,7 @@ namespace TopDownGame.EditorTools
                     new Vector3(-11f, -3f, 0f),
                     new Vector3(-2f, -1f, 0f),
                     new Vector3(2f, 1f, 0f),
-                    new Vector3(-5f, 8f, 0f),
+                    new Vector3(-5f, 6.5f, 0f),
                     new Vector3(2f, -8f, 0f),
                     new Vector3(9f, -2f, 0f),
                     new Vector3(15f, 7f, 0f),
@@ -2795,7 +2831,7 @@ namespace TopDownGame.EditorTools
                     new Vector3(0f, 2f, 0f),
                     new Vector3(11f, -3f, 0f),
                     new Vector3(12f, 7f, 0f),
-                    new Vector3(5f, -7f, 0f)
+                    new Vector3(5f, -8f, 0f)
                 }
             };
         }
@@ -3048,9 +3084,19 @@ namespace TopDownGame.EditorTools
             MapManager manager = mapObject.AddComponent<MapManager>();
             EnemySpawnManager spawnManager = mapObject.AddComponent<EnemySpawnManager>();
             Set(spawnManager, "reservePoolSize", 8);
-            // Forest alcoves use verified authored anchors; radial expansion can
-            // place reserve enemies on the far side of a thin maze boundary.
-            if (id == "Map02") Set(spawnManager, "expandSpawnAnchors", false);
+            // Narrow forest and temple lanes use authored anchors; radial expansion
+            // can place reserve enemies beyond a thin maze boundary.
+            if (id == "Map02" || id == "Map03")
+                Set(spawnManager, "expandSpawnAnchors", false);
+            if (id == "Map03")
+                SetVector2Array(spawnManager, "additionalSpawnPoints", new[]
+                {
+                    new Vector2(-14f, -3f), new Vector2(-7f, -3f),
+                    new Vector2(-5f, 0f), new Vector2(0f, 5f),
+                    new Vector2(5f, -2f), new Vector2(10f, -8f),
+                    new Vector2(11f, 8f), new Vector2(14f, 3f),
+                    new Vector2(-15f, 1f)
+                });
             mapObject.AddComponent<HuntingZoneScenery>();
             if (id == "Map01")
             {
@@ -3744,6 +3790,9 @@ namespace TopDownGame.EditorTools
             }
             MapDoor door = doorObject.AddComponent<MapDoor>();
             Set(door, "nextScene", nextScene);
+            if (nextScene != "Lobby")
+                Set(door, "destinationMap", AssetDatabase.LoadAssetAtPath<MapData>(
+                    DataRoot + "/Maps/" + nextScene + ".asset"));
             Set(door, "visual", visual);
             return door;
         }
@@ -3794,6 +3843,17 @@ namespace TopDownGame.EditorTools
 
         private static Canvas CreateGameplayCanvas(SkillData[] skills, bool lobby = false)
         {
+            // NewScene can unload native assets held only by the previous
+            // builder stack. Reacquire persistent skills before wiring UI.
+            Array skillIds = Enum.GetValues(typeof(SkillId));
+            skills = new SkillData[skillIds.Length];
+            for (int i = 0; i < skillIds.Length; i++)
+            {
+                string path = DataRoot + "/Skills/" + skillIds.GetValue(i) + ".asset";
+                skills[i] = AssetDatabase.LoadAssetAtPath<SkillData>(path);
+                if (skills[i] == null)
+                    throw new InvalidOperationException("Cannot build reward UI: missing SkillData at " + path);
+            }
             GameObject canvasObject = new GameObject("GameplayCanvas");
             Canvas canvas = canvasObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -3804,6 +3864,17 @@ namespace TopDownGame.EditorTools
             hudObject.transform.SetParent(canvasObject.transform, false);
             if (lobby) hudObject.AddComponent<LobbyHUD>();
             else hudObject.AddComponent<GameplayHUD>();
+            PlayerDodge dodge = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerDodge>();
+            DodgeHUD dodgeHud = hudObject.AddComponent<DodgeHUD>();
+            Transform dodgeCard = FantasyEquipmentUI.Frame(canvas.transform, "DodgeCard", lobby ? 22 : 15,
+                lobby ? 140 : 310, 260, 66, FantasyEquipmentUI.Ink);
+            FantasyEquipmentUI.Text(dodgeCard, "DodgeKey", "NÉ ĐÒN [SPACE]", 12, 6, 236, 22, 18, FantasyEquipmentUI.TextColor);
+            TMP_Text dodgeStatus = FantasyEquipmentUI.Text(dodgeCard, "DodgeStatus", "SẴN SÀNG", 12, 29, 236, 20, 16, FantasyEquipmentUI.Green);
+            FantasyEquipmentUI.Box(dodgeCard, "Track", 12, 55, 236, 4, FantasyEquipmentUI.Panel);
+            Image dodgeFill = FantasyEquipmentUI.Box(dodgeCard, "Cooldown", 12, 55, 236, 4, FantasyEquipmentUI.Green);
+            Set(dodgeHud, "dodge", dodge);
+            Set(dodgeHud, "status", dodgeStatus);
+            Set(dodgeHud, "fill", dodgeFill.rectTransform);
             SkillSelectionUI selection = hudObject.AddComponent<SkillSelectionUI>();
             SetArray(selection, "skillDatabase", skills);
             hudObject.AddComponent<InventoryUI>();

@@ -24,6 +24,18 @@
 Các báo cáo giữ kết quả tại thời điểm thực hiện, gồm cả giới hạn và lỗi còn mở.
 Kết quả của bản cũ không tự xác nhận bản hiện tại đã đạt mọi điều kiện phát hành.
 
+- [Rà soát UI và luồng trải nghiệm — 22/10/2026](Verification/UI_FLOW_REVIEW_2026-10-22.md).
+- [Né đòn — G1, luồng input/va chạm/miễn đòn/HUD](Verification/DODGE_FLOW_VERIFICATION.md).
+- [HUD chiến đấu — tài nguyên, trạng thái kỹ năng và bố cục ba tỷ lệ](Verification/COMBAT_HUD_VERIFICATION.md).
+- [Phản hồi combat — rung camera, hitstop, pause và cài đặt](Verification/COMBAT_FEEDBACK_VERIFICATION.md).
+- [HUD tiện ích — launcher, navigation, Lobby và minimap ba tỷ lệ](Verification/HUD_UTILITY_VERIFICATION.md).
+- [Hồi phục sau thất bại — giữ tiến trình, thử lại, về sảnh và Tiếp tục](Verification/RECOVERY_FLOW_VERIFICATION.md).
+- [Cửa chuyển vùng — tên đích, lưu tiến trình, chống lặp và hủy chuyển cảnh](Verification/MAP_TRANSITION_FLOW_VERIFICATION.md).
+- [Khôi phục save không đọc được — dự phòng, giữ dữ liệu và xác nhận chơi mới](Verification/SAVE_RECOVERY_FLOW_VERIFICATION.md).
+- [Đền Kỹ Năng — population Map03, loot/hồi sinh, rương và cửa boss](Verification/MAP03_HUNTING_FLOW_VERIFICATION.md).
+- [Vệ Thần Rừng — báo đòn, hủy hành động và vòng đời đạn qua map](Verification/FOREST_GUARDIAN_FLOW_VERIFICATION.md).
+- [Vệ Thần Rừng — điểm đáp đòn lao, địa hình và ngắt chuyển động](Verification/FOREST_GUARDIAN_CHARGE_VERIFICATION.md).
+
 - [AI1 — Kiểm tra notebook, model và bridge cử chỉ tay](Verification/HAND_GESTURE_CONTROL_VERIFICATION.md).
 - [AI1 — Sửa chọn tay, điều khiển nền và di chuyển bốn hướng V2](Verification/HAND_GESTURE_V2_FIX_VERIFICATION.md).
 - [Nút bật/tắt tự đánh và tự nhặt](Verification/AUTOMATION_CONTROLS_VERIFICATION.md).

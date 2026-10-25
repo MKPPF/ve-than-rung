@@ -172,6 +172,7 @@ namespace TopDownGame.Player
         [SerializeField] private LayerMask movementLayers = ~0;
 
         [Header("Combat Response")]
+        [SerializeField] private PlayerDodge dodge;
         [SerializeField, Min(0.1f)] private float impulseDamping =
             DefaultImpulseDamping;
 
@@ -266,12 +267,22 @@ namespace TopDownGame.Player
         }
         public bool IsMovementLocked => Time.time < movementLockedUntil;
 
+        /// <summary>Preserves eight-way intent for actions while normal walking remains cardinal.</summary>
+        public Vector2 ReadInputDirection()
+        {
+            Vector2 raw = moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
+            if (raw.sqrMagnitude <= 0.001f) raw = ReadKeyboardDirection();
+            if (raw.sqrMagnitude <= 0.001f && GestureInputState.IsActive) raw = GestureInputState.Movement;
+            return Vector2.ClampMagnitude(raw, 1f);
+        }
+
         private void Awake()
         {
             GameplayCollisionRules.ConfigurePlayer(gameObject);
             body = GetComponent<Rigidbody2D>();
             playerInput = GetComponent<PlayerInput>();
             stats = GetComponent<PlayerStats>();
+            if (dodge == null) dodge = GetComponent<PlayerDodge>();
             ConfigureKinematicBody();
             RebuildMovementFilter();
             PrepareMovementVisual();
@@ -463,6 +474,13 @@ namespace TopDownGame.Player
 
         private void FixedUpdate()
         {
+            if (dodge != null && dodge.IsDodging && !GameplayState.IsInputBlocked && Time.timeScale > 0f)
+            {
+                locomotionSpeed = 0f;
+                currentVelocity = impulseVelocity = Vector2.zero;
+                MoveKinematically(dodge.Direction * dodge.Speed * Time.fixedDeltaTime);
+                return;
+            }
             float effectiveSpeed = stats != null ? stats.MoveSpeed : moveSpeed;
             Vector2 previousPosition = body.position;
 

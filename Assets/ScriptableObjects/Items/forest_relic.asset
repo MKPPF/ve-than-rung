@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: forest_relic
   m_EditorClassIdentifier: Assembly-CSharp::TopDownGame.Items.ItemData
   itemId: forest_relic
-  displayName: Forest Relic
-  description: A token from the guardian.
+  displayName: "Di V\u1EADt R\u1EEBng"
+  description: "V\u1EADt k\u1EF7 ni\u1EC7m t\u1EEB V\u1EC7 Th\u1EA7n R\u1EEBng."
   icon: {fileID: 21300000, guid: 4ba04a3f13ead894387e5f9863411dc4, type: 3}

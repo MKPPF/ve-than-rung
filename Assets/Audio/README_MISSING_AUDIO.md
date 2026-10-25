@@ -18,3 +18,16 @@ Create `AudioCue` assets and assign licensed loop-safe clips for:
 For seamless ambience, use loop-ready WAV/OGG files without silence at the seam.
 The generated `GameAudioMixer` already contains Master, Music, Ambient, SFX and
 UI groups; cue buses are routed automatically when licensed clips are assigned.
+
+## Current generated sounds and verification (22 October 2026)
+
+`SwordSwingV3.wav` and `SwordContactV3.wav` are synthesized locally by
+`TopDownGameBuilder.CreateSwordSound` for the sword combo. They are not a regional
+music/ambient library. The Resources music/ambient cues still contain no clips.
+
+The runtime now preserves the same loop across repeated requests, arbitrates
+rapid transitions, applies live bus volume together with fade gain, and activates
+expanded pooled voices up to the 32-source cap. Empty cues warn once; mixed arrays
+skip null clips. All six synthetic-clip regression tests passed in the 105/105
+PlayMode run (`Logs/Onboarding_PlayMode.json`). This does not certify audio content
+or the full U1 roadmap item.

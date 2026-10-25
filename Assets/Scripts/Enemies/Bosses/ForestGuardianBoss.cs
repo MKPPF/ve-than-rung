@@ -19,6 +19,7 @@ namespace TopDownGame.Enemies.Bosses
         Dead
     }
 
+    /// <summary>Commits each attack to its warning and cancels pending work when the boss dies, leaves play, or returns to the pool.</summary>
     public sealed class ForestGuardianBoss : EnemyBase
     {
         [SerializeField] private string bossId = "forest_guardian";
@@ -31,12 +32,14 @@ namespace TopDownGame.Enemies.Bosses
         private bool acting;
         private bool phaseTwo;
         private int attackIndex;
+        private const float ActivePoseSeconds = 0.1f;
+        private const float RecoverySeconds = 0.25f;
 
         public BossState State { get; private set; } = BossState.Idle;
 
-        protected override void Start()
+        protected override void Awake()
         {
-            base.Start();
+            base.Awake();
             Health.Died += OnBossDied;
         }
 
@@ -95,69 +98,104 @@ namespace TopDownGame.Enemies.Bosses
             }
 
             acting = false;
+            State = BossState.Idle;
         }
 
         private IEnumerator SlamRoutine()
         {
             State = BossState.Skill;
-            EnemyCombatVfx.TelegraphCircle(transform.position, slamRadius, 0.65f,
-                new Color(0.3f, 1f, 0.24f, 0.76f));
-            CharacterAnimator?.PlaySkill(Vector2.down, 0.78f,
+            Movement.StopImmediately();
+            Vector2 lockedPosition = transform.position;
+            const float windup = 0.65f;
+            EnemyCombatVfx.TelegraphCircle(lockedPosition, slamRadius, windup,
+                new Color(0.3f, 1f, 0.24f, 0.76f), this);
+            CharacterAnimator?.PlaySkillPhased(Vector2.down, windup, ActivePoseSeconds, RecoverySeconds,
                 new Color(0.35f, 1f, 0.2f));
-            yield return new WaitForSeconds(0.65f);
-            EnemyCombatVfx.Burst(transform.position, slamRadius,
+            yield return new WaitForSeconds(windup);
+            if (!Health.IsAlive) yield break;
+            EnemyCombatVfx.Burst(lockedPosition, slamRadius,
                 new Color(0.28f, 1f, 0.18f, 0.9f), 0.45f);
-            DamagePlayersInRadius(transform.position, slamRadius, Damage * 1.4f);
+            TopDownGame.Core.CombatFeedback.WorldImpact(lockedPosition,0.14f);
+            DamagePlayersInRadius(lockedPosition, slamRadius, Damage * 1.4f);
+            yield return new WaitForSeconds(ActivePoseSeconds + RecoverySeconds);
         }
 
         private IEnumerator RadialProjectilesRoutine()
         {
             State = BossState.Skill;
+            Movement.StopImmediately();
+            Vector2 lockedPosition = transform.position;
             const float windup = 0.48f;
-            EnemyCombatVfx.TelegraphCircle(transform.position, 1.35f, windup,
-                new Color(0.66f, 0.2f, 1f, 0.72f));
-            CharacterAnimator?.PlaySkill(Vector2.up, windup,
+            EnemyCombatVfx.TelegraphCircle(lockedPosition, 1.35f, windup,
+                new Color(0.66f, 0.2f, 1f, 0.72f), this);
+            CharacterAnimator?.PlaySkillPhased(Vector2.up, windup, ActivePoseSeconds, RecoverySeconds,
                 new Color(0.72f, 0.24f, 1f));
             yield return new WaitForSeconds(windup);
-            EnemyCombatVfx.Burst(transform.position, 1.4f,
+            if (!Health.IsAlive) yield break;
+            EnemyCombatVfx.Burst(lockedPosition, 1.4f,
                 new Color(0.7f, 0.2f, 1f, 0.86f), 0.3f);
             const int projectileCount = 10;
             for (int i = 0; i < projectileCount; i++)
             {
                 float angle = i * 360f / projectileCount;
                 Vector2 direction = Quaternion.Euler(0f, 0f, angle) * Vector2.right;
-                CreateProjectile(direction);
+                CreateProjectile(lockedPosition, direction);
             }
-            yield return new WaitForSeconds(0.25f);
+            yield return new WaitForSeconds(ActivePoseSeconds + RecoverySeconds);
         }
 
         private IEnumerator ChargeRoutine()
         {
             State = BossState.BasicAttack;
-            Vector2 direction = (Target.position - transform.position).normalized;
+            Movement.StopImmediately();
+            Vector2 origin = Movement.Position;
+            Vector2 direction = Target != null ? ((Vector2)Target.position - origin).normalized : Vector2.right;
+            if (direction.sqrMagnitude < 0.001f) direction = Vector2.right;
             const float windup = 0.42f;
-            EnemyCombatVfx.TelegraphLine(transform.position, direction, 4.5f,
-                0.72f, windup, new Color(1f, 0.3f, 0.08f, 0.7f));
-            CharacterAnimator?.PlaySkill(direction, 0.72f,
+            const float active = 0.28f;
+            Vector2 landing = Movement.PlanChargeDestination(direction * chargeSpeed, active);
+            EnemyCombatVfx.TelegraphLine(origin, direction, Vector2.Distance(origin, landing),
+                0.3f, windup, new Color(1f, 0.7f, 0.32f, 0.24f), this, true);
+            EnemyCombatVfx.TelegraphCircle(landing, AttackRange, windup,
+                new Color(1f, 0.3f, 0.08f, 0.8f), this, true);
+            CharacterAnimator?.PlaySkillPhased(direction, windup, active, RecoverySeconds,
                 new Color(1f, 0.28f, 0.08f));
             yield return new WaitForSeconds(windup);
-            Movement.AddImpulse(direction * chargeSpeed);
-            yield return new WaitForSeconds(0.28f);
-            EnemyCombatVfx.Burst(transform.position, AttackRange,
-                new Color(1f, 0.3f, 0.08f, 0.8f), 0.28f);
-            DamagePlayersInRadius(transform.position, AttackRange, Damage * 1.2f);
+            if (!Health.IsAlive) yield break;
+            bool arrived = false;
+            if (Vector2.Distance(Movement.Position, origin) <= 0.12f && Movement.isActiveAndEnabled)
+            {
+                Movement.BeginCharge(landing, active);
+                while (Movement.IsCharging && Movement.isActiveAndEnabled) yield return null;
+                arrived = Movement.HasReachedChargeDestination && Vector2.Distance(Movement.Position, landing) <= 0.08f;
+            }
+            EnemyCombatVfx.CancelWarnings(this);
+            Movement.StopImmediately(false);
+            if (!Health.IsAlive) yield break;
+            if (arrived)
+            {
+                EnemyCombatVfx.Burst(landing, AttackRange,
+                    new Color(1f, 0.3f, 0.08f, 0.8f), 0.28f);
+                TopDownGame.Core.CombatFeedback.WorldImpact(landing, 0.1f);
+                DamagePlayersInRadius(landing, AttackRange, Damage * 1.2f);
+            }
+            else CharacterAnimator?.CancelAction();
+            yield return new WaitForSeconds(RecoverySeconds);
         }
 
         private IEnumerator SummonRoutine()
         {
             State = BossState.Summon;
+            Movement.StopImmediately();
+            Vector2 lockedPosition = transform.position;
             const float windup = 0.7f;
-            EnemyCombatVfx.TelegraphCircle(transform.position, 2.2f, windup,
-                new Color(0.2f, 0.9f, 0.36f, 0.68f));
-            CharacterAnimator?.PlaySkill(Vector2.up, windup,
+            EnemyCombatVfx.TelegraphCircle(lockedPosition, 2.2f, windup,
+                new Color(0.2f, 0.9f, 0.36f, 0.68f), this);
+            CharacterAnimator?.PlaySkillPhased(Vector2.up, windup, ActivePoseSeconds, RecoverySeconds,
                 new Color(0.22f, 0.95f, 0.35f));
             yield return new WaitForSeconds(windup);
-            EnemyCombatVfx.Burst(transform.position, 2.2f,
+            if (!Health.IsAlive) yield break;
+            EnemyCombatVfx.Burst(lockedPosition, 2.2f,
                 new Color(0.2f, 0.95f, 0.34f, 0.82f), 0.45f);
             if (minionPrefab != null && summonPoints != null && summonPoints.Length > 0)
             {
@@ -189,7 +227,7 @@ namespace TopDownGame.Enemies.Bosses
                 }
             }
 
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(ActivePoseSeconds + RecoverySeconds);
         }
 
         private IEnumerator PhaseChangeRoutine()
@@ -197,27 +235,32 @@ namespace TopDownGame.Enemies.Bosses
             acting = true;
             phaseTwo = true;
             State = BossState.PhaseChange;
-            Movement.Stop();
+            Movement.StopImmediately();
+            Vector2 lockedPosition = transform.position;
             EnemyCombatVfx.TelegraphCircle(transform.position, 3f, 1f,
-                new Color(1f, 0.18f, 0.08f, 0.75f));
-            CharacterAnimator?.PlaySkill(Vector2.up, 1f,
+                new Color(1f, 0.18f, 0.08f, 0.75f), this);
+            CharacterAnimator?.PlaySkillPhased(Vector2.up, 1f, ActivePoseSeconds, RecoverySeconds,
                 new Color(1f, 0.18f, 0.08f));
             yield return new WaitForSeconds(1f);
-            EnemyCombatVfx.Burst(transform.position, 3f,
+            if (!Health.IsAlive) yield break;
+            EnemyCombatVfx.Burst(lockedPosition, 3f,
                 new Color(1f, 0.18f, 0.06f, 0.9f), 0.5f);
+            yield return new WaitForSeconds(ActivePoseSeconds + RecoverySeconds);
             acting = false;
+            State = BossState.Idle;
         }
 
-        private void CreateProjectile(Vector2 direction)
+        private void CreateProjectile(Vector2 origin, Vector2 direction)
         {
             EnemyProjectile projectile = EnemyProjectilePool.Acquire(null,
-                transform.position, direction, new Color(0.6f, 0.15f, 0.9f),
+                origin, direction, new Color(0.6f, 0.15f, 0.9f),
                 Vector3.one * 0.4f);
             projectile.Launch(direction, 6f, Damage, gameObject);
         }
 
         private void DamagePlayersInRadius(Vector2 position, float radius, float damage)
         {
+            if (!Health.IsAlive) return;
             Collider2D[] hits = Physics2D.OverlapCircleAll(position, radius, playerLayers);
             foreach (Collider2D hit in hits)
             {
@@ -228,7 +271,7 @@ namespace TopDownGame.Enemies.Bosses
 
                 IDamageable target = hit.GetComponentInParent<IDamageable>();
                 target?.TakeDamage(new DamageInfo(damage, gameObject,
-                    hit.ClosestPoint(position), hit.transform.position - transform.position, 4f));
+                    hit.ClosestPoint(position), (Vector2)hit.transform.position - position, 4f));
                 Profile?.ApplyLifeSteal(damage);
                 break;
             }
@@ -236,16 +279,39 @@ namespace TopDownGame.Enemies.Bosses
 
         private void OnBossDied(EnemyHealth enemyHealth)
         {
+            CancelCurrentAction();
             State = BossState.Dead;
             GameProgressManager.Instance?.MarkBossDefeated(bossId);
         }
 
         protected override void ResetCombatState()
         {
-            acting = false;
+            CancelCurrentAction();
             phaseTwo = false;
             attackIndex = 0;
             State = BossState.Idle;
+        }
+
+        private void CancelCurrentAction()
+        {
+            StopAllCoroutines();
+            acting = false;
+            Movement?.ResetMotion();
+            CharacterAnimator?.CancelAction();
+            SignatureAbility?.ResetForSpawn();
+            EnemyCombatVfx.CancelWarnings(this);
+        }
+
+        protected override void OnDisable()
+        {
+            CancelCurrentAction();
+            base.OnDisable();
+            State = Health != null && !Health.IsAlive ? BossState.Dead : BossState.Idle;
+        }
+
+        private void OnDestroy()
+        {
+            if (Health != null) Health.Died -= OnBossDied;
         }
     }
 }

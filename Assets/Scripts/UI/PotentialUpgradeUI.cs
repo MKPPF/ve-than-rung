@@ -2,6 +2,7 @@ using TMPro;
 using TopDownGame.Core;
 using TopDownGame.Player;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using F = TopDownGame.UI.FantasyEquipmentUI;
@@ -20,6 +21,11 @@ namespace TopDownGame.UI
         private readonly TMP_Text[] values = new TMP_Text[4];
         private readonly Button[] upgradeButtons = new Button[4];
         private PlayerStats stats;
+        private readonly MenuModalFocus focus = new MenuModalFocus();
+        private Button closeButton;
+        private TMP_Text status;
+        private bool subscribed;
+        private int lastSpendFrame = -1;
 
         public bool IsOpen => panel != null && panel.activeSelf;
 
@@ -29,8 +35,29 @@ namespace TopDownGame.UI
             stats = player != null ? player.GetComponent<PlayerStats>() : null;
             BuildPanel();
             if (panel != null) panel.SetActive(false);
-            if (stats != null) stats.PotentialChanged += Refresh;
+            Subscribe();
             Refresh();
+        }
+
+        private void OnEnable()
+        {
+            if (launcherButton != null) launcherButton.gameObject.SetActive(true);
+            Subscribe();
+            Refresh();
+        }
+
+        private void Subscribe()
+        {
+            if (subscribed || stats == null) return;
+            stats.PotentialChanged += Refresh;
+            subscribed = true;
+        }
+
+        private void Unsubscribe()
+        {
+            if (!subscribed) return;
+            if (stats != null) stats.PotentialChanged -= Refresh;
+            subscribed = false;
         }
 
         private void Update()
@@ -55,23 +82,35 @@ namespace TopDownGame.UI
 
         public void Open()
         {
-            if (IsOpen || panel == null || stats == null || Time.timeScale <= 0 ||
+            if (!isActiveAndEnabled || IsOpen || panel == null || stats == null || Time.timeScale <= 0 ||
                 GameplayState.IsBlockedByOther(this)) return;
             panel.SetActive(true);
             panel.transform.SetAsLastSibling();
+            focus.Capture(panel.transform);
+            launcherButton.gameObject.SetActive(false);
             GameplayState.EnterModal(this);
+            status.text = "Mỗi lần cộng được lưu ngay. Điểm đã cộng không thể hoàn lại trong màn hình này.";
             Refresh();
+            DefaultButton().Select();
         }
 
         public void Close()
         {
             if (panel != null) panel.SetActive(false);
+            if (launcherButton != null) launcherButton.gameObject.SetActive(isActiveAndEnabled);
             GameplayState.ExitModal(this);
+            focus.Release();
         }
 
         private void Spend(PotentialAttribute attribute)
         {
-            if (IsOpen && !GameplayState.IsBlockedByOther(this) && stats != null && stats.TrySpendPotential(attribute)) Refresh();
+            if (!IsOpen || GameplayState.IsBlockedByOther(this) || stats == null ||
+                stats.AvailablePotentialPoints <= 0 || lastSpendFrame == Time.frameCount) return;
+            lastSpendFrame = Time.frameCount;
+            if (!stats.TrySpendPotential(attribute)) return;
+            string[] names = { "Sinh lực", "Sức mạnh", "Phòng thủ", "Tinh thông" };
+            status.text = "Đã cộng 1 điểm " + names[(int)attribute] + ". Còn " + stats.AvailablePotentialPoints + " điểm. Đã lưu.";
+            Refresh();
         }
 
         private void Refresh()
@@ -112,7 +151,15 @@ namespace TopDownGame.UI
             {
                 if (button != null) button.interactable = stats.AvailablePotentialPoints > 0;
             }
+            if (IsOpen && EventSystem.current != null)
+            {
+                GameObject selected = EventSystem.current.currentSelectedGameObject;
+                if (selected == null || selected.GetComponent<Selectable>() is Selectable control && !control.IsInteractable())
+                    DefaultButton().Select();
+            }
         }
+
+        private Button DefaultButton() => stats != null && stats.AvailablePotentialPoints > 0 ? upgradeButtons[0] : closeButton;
 
         private void BuildPanel()
         {
@@ -124,16 +171,16 @@ namespace TopDownGame.UI
             launcherLabel=launcherButton.GetComponentInChildren<TMP_Text>();
             panel=new GameObject("PotentialPanel",typeof(RectTransform),typeof(Image));
             panel.transform.SetParent(canvas.transform,false);
-            var overlay=panel.AddComponent<Canvas>();overlay.overrideSorting=true;overlay.sortingOrder=2000;
-            panel.AddComponent<GraphicRaycaster>();
             var rect=panel.GetComponent<RectTransform>();rect.anchorMin=Vector2.zero;rect.anchorMax=Vector2.one;rect.offsetMin=rect.offsetMax=Vector2.zero;
             var window=F.Window(EquipmentPanelLayout.CreateSurface(panel),"TIỀM NĂNG","NHÂN VẬT  /  PHÁT TRIỂN",Close);
             window.Find("KeyHints").GetComponent<TMP_Text>().text="P / ESC  Đóng    •    1–4  Cộng điểm    •    Mỗi lần cộng được lưu ngay";
-            var profile=F.Frame(window,"Profile",24,122,450,724,F.Panel);
-            F.Text(profile,"Heading","TIỀM NĂNG THỢ SĂN",26,22,394,42,27,F.Gold);
-            summaryText=F.Text(profile,"Summary","",26,84,394,112,24);
-            statText=F.Text(profile,"Stats","",26,222,394,238,23,F.Muted);
-            F.Text(profile,"Note","Mỗi cấp nhận 1 điểm tiềm năng.\n\nĐiểm được cộng trực tiếp, không thể hoàn lại trong màn hình này.",26,510,394,160,21,F.Muted);
+            closeButton = window.Find("Close").GetComponent<Button>();
+            var balance = F.Text(window,"Points","ĐIỂM TIỀM NĂNG",814,39,392,42,24,F.Gold,TextAlignmentOptions.Right);
+            status = F.Text(window,"Status","",32,910,1272,26,17,F.Gold);
+            panel.GetComponent<EquipmentPanelLayout>().ConfigureWindow(window, true, balance, status);
+            var profile=F.Frame(window,"Profile",24,122,1288,130,F.Panel);
+            summaryText=F.Text(profile,"Summary","",24,16,410,100,24);
+            statText=F.Text(profile,"Stats","",470,12,790,110,23,F.Muted);
             string[] names={"SINH LỰC","SỨC MẠNH","PHÒNG THỦ","TINH THÔNG"};
             string[] descriptions={"+ "+PlayerStats.VitalityHealthPerPoint+" máu tối đa / điểm",
                 "+ "+PlayerStats.PowerDamagePerPoint+" sát thương / điểm","+ "+PlayerStats.GuardArmorPerPoint+" giáp / điểm",
@@ -141,19 +188,20 @@ namespace TopDownGame.UI
             for(int i=0;i<4;i++)
             {
                 int index=i;
-                var card=F.Frame(window,"Attribute"+i,498+(i%2)*598,122+(i/2)*372,574,352,F.Panel);
-                F.Text(card,"Title",names[i],26,22,522,38,28,F.Gold);
-                values[i]=F.Text(card,"Value","",26,80,522,100,25);
-                F.Text(card,"Effect",descriptions[i],26,188,522,52,21,F.Green);
-                upgradeButtons[i]=F.Button(card,"Spend"+i,"+1 ĐIỂM  ["+(i+1)+"]",26,272,522,54,()=>Spend((PotentialAttribute)index),true);
+                var card=F.Frame(window,"Attribute"+i,24+(i%2)*656,270+(i/2)*292,632,278,F.Panel);
+                F.Text(card,"Title",names[i],26,16,580,38,28,F.Gold);
+                values[i]=F.Text(card,"Value","",26,64,580,68,25);
+                F.Text(card,"Effect",descriptions[i],26,145,580,48,21,F.Green);
+                upgradeButtons[i]=F.Button(card,"Spend"+i,"+1 ĐIỂM  ["+(i+1)+"]",26,210,580,48,()=>Spend((PotentialAttribute)index),true);
             }
         }
 
-        private void OnDisable() { Close(); }
+        private void OnDisable() { Close(); Unsubscribe(); }
 
         private void OnDestroy()
         {
-            if (stats != null) stats.PotentialChanged -= Refresh;
+            Unsubscribe();
+            focus.Release();
             GameplayState.ExitModal(this);
             if(panel!=null)Destroy(panel);
             if(launcherButton!=null)Destroy(launcherButton.gameObject);

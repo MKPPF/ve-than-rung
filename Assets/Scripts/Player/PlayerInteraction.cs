@@ -20,11 +20,12 @@ namespace TopDownGame.Player
         private Camera worldCamera;
 
         public bool HasTarget => currentTarget != null && currentTarget.CanInteract;
+        public float InteractionRadius => interactionRadius;
         public string CurrentPrompt => HasTarget ? currentTarget.InteractionPrompt : string.Empty;
 
         private void Update()
         {
-            if (GameplayState.IsInputBlocked || Time.timeScale <= 0f) return;
+            if (GameplayState.IsInputBlocked || Time.timeScale <= 0f || GetComponent<PlayerDodge>()?.IsDodging == true) return;
             RefreshTarget();
             if (worldDoubleClickEnabled) HandleWorldDoubleClick();
             TryCompletePendingInteraction();

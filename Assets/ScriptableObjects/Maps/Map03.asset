@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Map03
   m_EditorClassIdentifier: Assembly-CSharp::TopDownGame.Maps.MapData
   mapId: Map03
-  displayName: Skill Shrine
+  displayName: "\u0110\u1EC1n K\u1EF9 N\u0103ng"
   nextScene: BossMap01
   isBossMap: 0
   opensSkillSelection: 1

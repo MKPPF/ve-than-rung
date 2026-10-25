@@ -4,6 +4,7 @@
   "references": [
     "TopDownGame.Runtime",
     "TopDownGame.Editor",
+    "Unity.InputSystem",
     "Unity.TextMeshPro"
   ],
   "includePlatforms": [

@@ -30,8 +30,19 @@ namespace TopDownGame.Audio
         public float MaximumDistance => Mathf.Max(minimumDistance, maximumDistance);
         public float RandomPitch => Random.Range(Mathf.Min(pitchRange.x, pitchRange.y),
             Mathf.Max(pitchRange.x, pitchRange.y));
-        public AudioClip RandomClip => clips != null && clips.Length > 0
-            ? clips[Random.Range(0, clips.Length)]
-            : null;
+        public AudioClip RandomClip
+        {
+            get
+            {
+                if (clips == null) return null;
+                int count = 0;
+                foreach (AudioClip clip in clips) if (clip != null) count++;
+                if (count == 0) return null;
+                int selected = Random.Range(0, count);
+                foreach (AudioClip clip in clips)
+                    if (clip != null && selected-- == 0) return clip;
+                return null;
+            }
+        }
     }
 }

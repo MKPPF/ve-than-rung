@@ -186,7 +186,15 @@ tốc ngắn; giữ di chuyển bốn hướng và bộ hình đang dùng. Đã 
 56/56 EditMode, 54/54 PlayMode và validator đạt; cần người chơi đánh giá
 cảm giác thực tế. Xem Docs/Verification/PLAYER_WALK_V11_VERIFICATION.md.
 
-### [ ] G1 — Dodge roll có i-frame
+### [-] G1 — Dodge roll có i-frame
+
+22/10/2026 — Đã triển khai né tám hướng bằng Space/nút dưới gamepad, 0,28 giây,
+miễn đòn trực tiếp 0,18 giây đầu và hồi 1 giây; solver va chạm, combat/cast gate,
+HUD và tutorial được nối qua builder. Hai lượt dựng đã hoàn tất; validator 0 lỗi,
+78/78 EditMode, 130/130 PlayMode đạt; có 18 ảnh ba trạng thái/ba tỷ lệ ở Lobby và
+Map01. Console 0 error. Giữ `[-]` cho đánh giá khoảng né/tư thế khi giao tranh
+thật; hiện dùng pose trên sprite hướng sẵn có, chưa có hình lộn vòng riêng.
+Xem `Verification/DODGE_FLOW_VERIFICATION.md`.
 
 **Phụ thuộc:** R2.
 
@@ -445,7 +453,14 @@ trong batch kể cả chạy riêng trước khi Map02 được load. Giữ `[-]
 đóng lỗi hồi quy và kiểm tra cảm giác giao chiến thủ công theo loadout.
 Chi tiết, ảnh, nguồn art imagegen và giới hạn: `Docs/Verification/MAP02_V3_VERIFICATION.md`.
 
-### [ ] U1 — AudioManager và audio event
+### [-] U1 — AudioManager và audio event
+
+22/10/2026 — Rà soát phát hiện fade ghi đè âm lượng vừa chỉnh, các lần chuyển
+nhanh có thể giữ loop cũ, và nguồn âm thanh thứ 19 trở đi chưa được kích hoạt.
+Đã sửa arbitration/gain/pool, tránh restart cùng cue, bỏ entry clip null và cảnh
+báo một lần khi cue không có clip. Sáu test dùng clip tổng hợp đã đạt trong
+lượt 105/105 PlayMode sau hai lượt dựng + validator. Nhạc/ambient trong
+Resources hiện vẫn là placeholder, chưa có bộ theme theo vùng đã nghiệm thu.
 
 **Phụ thuộc:** baseline ổn định.
 
@@ -465,7 +480,13 @@ Chi tiết, ảnh, nguồn art imagegen và giới hạn: `Docs/Verification/MAP
 - Chuyển scene/fade/pause hoạt động đúng; không có hai bản nhạc chồng nhau.
 - Thiếu clip không làm hỏng builder hoặc gameplay.
 
-### [ ] U2 — Settings dùng chung cho Main Menu và Pause
+### [-] U2 — Settings dùng chung cho Main Menu và Pause
+
+22/10/2026 — Trong đợt U5 đã thêm cửa sổ cài đặt âm lượng/hiển thị dùng chung,
+lưu riêng progress và hoàn tác preview sau 15 giây. U3 đã thêm rung camera/
+hitstop cùng hai nút tắt có tác dụng thật, lưu qua New Game/reload. Giữ `[-]`
+để nghiệm thu restart/đổi hiển thị trên Windows player.
+Kết quả cuối ở `Verification/UI_FLOW_REVIEW_2026-10-22.md`.
 
 **Phụ thuộc:** U1; camera shake service từ U3.
 
@@ -483,7 +504,15 @@ Chi tiết, ảnh, nguồn art imagegen và giới hạn: `Docs/Verification/MAP
 - Resolution list không trùng, chọn mode/resolution không crash trong Editor.
 - Mở/đóng từ Pause không vô tình resume game; từ Main Menu không tạo overlay trùng.
 
-### [ ] U3 — Camera shake, hitstop và combat feedback
+### [x] U3 — Camera shake, hitstop và combat feedback
+
+22/10/2026 — Đã triển khai driver hitstop có cap/recovery dùng chung quyền pause,
+rung offset không tích drift và hai setting lưu riêng. Bảy bài tập trung đạt,
+gồm boss slam/pause thật, direct/periodic/offscreen, smoothing/bounds/cleanup
+và 12 ảnh cài đặt ở ba tỷ lệ. Source cuối đạt 78/78 EditMode, 141/141 PlayMode,
+validator 0 lỗi, Console 0 error; timeScale=1 sau test. Ba tiêu chí kỹ thuật
+U3 đã đạt; còn theo dõi cảm giác khi chơi dài. Chi tiết và giới hạn tại
+`Verification/COMBAT_FEEDBACK_VERIFICATION.md`.
 
 **Phụ thuộc:** G1. Có thể làm trước U2.
 
@@ -502,7 +531,15 @@ Chi tiết, ảnh, nguồn art imagegen và giới hạn: `Docs/Verification/MAP
 - Multi-hit không đóng băng quá cap đã cấu hình.
 - Pause trong lúc hitstop và resume không làm `Time.timeScale` sai.
 
-### [ ] U4 — Tutorial lần đầu
+### [-] U4 — Tutorial lần đầu
+
+22/10/2026 — Đã triển khai sáu bước theo binding hiện tại, bỏ qua bằng Esc/nút,
+xem lại từ Hướng dẫn, migration save cũ và nối reference qua builder. Hai lượt
+dựng + validator đạt, 77/77 EditMode và 105/105 PlayMode đạt; có 18 ảnh sáu bước
+ở ba tỷ lệ màn hình. Đã cập nhật bước 2 theo G1: Space/nút dưới gamepad,
+miễn đòn 0,18 giây và không né giữa attack/cast; 14/14 bài tập trung né/tutorial
+và toàn bộ 130/130 PlayMode đạt, ảnh bước 2 ở 4:3 đã xem. Giữ `[-]` để đánh giá
+với người chơi mới, không cần đợi bổ sung binding né nữa.
 
 **Phụ thuộc:** G1 để nội dung phím điều khiển là cuối cùng.
 
@@ -521,6 +558,126 @@ Chi tiết, ảnh, nguồn art imagegen và giới hạn: `Docs/Verification/MAP
 - Skip/complete save ngay; có thể xem lại thủ công.
 
 ### [-] U5 — Accessibility và UI regression pass
+
+23/10/2026 — Tiếp phần charge của Vệ Thần Rừng: đã tái hiện side hit ngoài dải
+báo và nổ chuyển vị trí khi caster bị dời. Chốt điểm đáp bằng Rigidbody/cast
+collider; vòng cam khớp radius, MovePosition theo đường đã báo, ngắt nổ khi có
+vật cản mới/knockback/chết/disable. Giữ quãng đường nominal, thời gian và damage.
+Giữ marker tới khi đáp/hủy và ưu tiên không thu hồi marker khi pool đầy.
+19/19 boss tập trung, 1/1 stress pool, 89/89 EditMode và 189/189 PlayMode toàn bộ
+đạt (gồm 20 bài boss); validator đạt, Console gốc 0 lỗi/4 warning âm thanh đã
+biết. Sáu ảnh ba tỷ lệ đã xem; Editor ở MainMenu, không Play/compile, timeScale=1,
+settings/input native khôi phục. Chi tiết/giới hạn:
+`Verification/FOREST_GUARDIAN_CHARGE_VERIFICATION.md`.
+Giữ `[-]`: HUD 4:3 còn che một phần biên phải vòng báo; summon sát tường,
+cảnh vật/camera rìa map và toàn trận thắng/thưởng/ra cửa vẫn cần hoàn thiện.
+
+23/10/2026 — Vệ Thần Rừng: đã tái hiện bốn lỗi đòn sau chết/disable, tâm Slam
+lệch vòng báo và animation radial ra pha sớm. Boss nay hủy routine/signature/
+quán tính/vòng báo/tư thế cũ, khóa vị trí Slam/radial và giữ nhịp hồi phục.
+VFX giữ biên vùng báo; đạn theo scene thu hồi khi unload, guard source đã bị hủy.
+Slam cũng hất lùi ra xa tâm đã báo khi caster bị dời. Nguồn cuối đạt 89/89
+EditMode, 180/180 PlayMode, validator; Console gốc 0 lỗi/4 warning âm thanh đã
+biết. Đã xem sáu ảnh ba tỷ lệ bằng camera theo player. Sửa fixture Ancient Quake
+để chờ nhịp đầu thật; 13/13 bài input/quake tập trung đạt sau cô lập input test
+khỏi focus/thiết bị thật. Khôi phục settings/thiết bị; Editor về MainMenu,
+không Play/compile, timeScale=1. Chi tiết:
+`Verification/FOREST_GUARDIAN_FLOW_VERIFICATION.md`.
+Giữ `[-]`: chưa nghiệm thu hình học line/impact của charge, summon sát tường,
+camera/cảnh vật rìa map hoặc cân bằng toàn trận. Không đổi builder/content/stat.
+
+23/10/2026 — Đền Kỹ Năng Map03 đã được thống nhất giữa hai đường dựng: 8 Cung
+Thủ/4 Pháp Sư seed, target 18, pool 26 và 21 anchor trong hành lang. Dời seed
+trùng rương/sát tường; validator chặn vùng săn không thể khởi tạo population.
+Việt hóa tên quái/biến thể/di vật, giữ id. Sửa clone pool tạo hai thanh máu và
+nhãn cũ chồng nhau; kiểm tra mỗi quái chỉ có một thanh, nhãn theo profile mới.
+Hai lượt builder cùng nguồn cuối, validator, 6/6 tập trung, 89/89 EditMode và
+169/169 PlayMode đạt; Console 0 lỗi/4 warning âm thanh đã biết, chín ảnh ba tỷ lệ.
+Editor ở MainMenu, không Play/compile, timeScale=1. Chi tiết:
+`Verification/MAP03_HUNTING_FLOW_VERIFICATION.md`.
+Giữ `[-]`; phạm vi mới tiếp tục hoàn thiện chuyển động/kỹ năng/quái/boss/cảnh vật
+trên các map sẵn có. Ảnh cửa với camera đặt riêng chưa xác minh camera chơi thật
+ở rìa map; soundtrack, balance và nghiệm thu người chơi/Windows vẫn còn mở.
+
+22/10/2026 — Đã tái hiện và sửa việc xóa primary rỗng/JSON lỗi lúc LoadProgress.
+DTO parse/validate độc lập giữ live manager; backup lần lưu khác gần nhất, không
+cho autosave ghi đè khi chưa giải quyết. Menu xem trước cấp/vàng, mặc định Để sau,
+khôi phục xác nhận lại revision; primary mới hợp lệ được ưu tiên. Chơi mới có
+xác nhận, reset cả backup và giữ raw lỗi gần nhất. Chặn callback nền/lặp/panel cũ,
+Esc/Hủy trả focus và giữ record. 12/12 tập trung, 86/86 EditMode, 165/165 PlayMode,
+validator đạt; Console 0 lỗi/4 warning âm thanh đã biết; 15 ảnh năm trạng thái/ba
+tỷ lệ. Không đổi builder/content/schema v1. Chi tiết và giới hạn PlayerPrefs:
+`Verification/SAVE_RECOVERY_FLOW_VERIFICATION.md`. Giữ `[-]` cho Map03 thiếu seed
+quái, soundtrack, nghiệm thu accessibility/người chơi và Windows restart thật.
+
+22/10/2026 — Tiếp tục kiểm tra sáu cửa giữa các map: builder gắn metadata đích,
+biển/lời nhắc hiển thị tên vùng/cấp tiếng Việt, nền prompt dễ đọc. Chặn callback
+xa/disable/chết/modal/scene sai và chuyến lặp; giữ quyền input/pause trong fade,
+hủy trả điều khiển, vùng mới chỉ mở khi đến. Đã đi đủ chuỗi đến Lobby với tiến
+trình/loadout/kho được giữ và kiểm tra nghi thức Lobby. Hai lượt dựng, validator,
+9/9 tập trung, 80/80 EditMode và 157/157 PlayMode đạt; Console 0 lỗi, 18 ảnh ba
+tỷ lệ. Kết quả cuối tại `Verification/MAP_TRANSITION_FLOW_VERIFICATION.md`.
+Giữ `[-]`: còn luồng save hỏng, Map03 thiếu seed quái trong builder và nghiệm thu
+người chơi/Windows; chưa đánh dấu toàn bộ UI hoặc game hoàn tất.
+
+22/10/2026 — Đã tái hiện và sửa mất cấp/XP/kỹ năng mới khi gục và callback
+Thử lại vẫn hoạt động lúc màn thua đóng. CaptureDefeatedPlayer chụp tiến trình
+hiện tại và lưu HP/mana hồi đầy cho avatar scene kế tiếp, không hồi sinh xác
+đang gục. Ba nhánh: thử lại, về sảnh trực tiếp, về menu rồi Tiếp tục; khóa hành
+động lặp/modal khác và dọn focus/pause theo vòng đời. 7/7 tập trung (6 bài mới),
+78/78 EditMode, 151/151 PlayMode và validator đạt; Console 0 lỗi. Sáu ảnh ba
+tỷ lệ tại map thường/boss. Chi tiết: `Verification/RECOVERY_FLOW_VERIFICATION.md`.
+Không đổi builder/schema/balance; giữ `[-]` cho nghiệm thu người chơi/Windows
+và các luồng còn thiếu đã ghi trong báo cáo.
+
+22/10/2026 — Đã thống nhất launcher 300×54 và scale tối thiểu cho chữ trên
+Lobby/combat, tăng chữ thẻ Lobby/né/prompt; minimap có tên vùng hai dòng và
+bốn chú giải. Tab/View vào/rời nhóm nút; Navigate/Submit dùng action UI thật
+và không đồng thời điều khiển nhân vật. Modal giữ focus scope, tự động hóa giữ
+trạng thái riêng; thông báo cử chỉ dùng HUD, tránh overlay trùng ở đáy màn hình.
+4/4 bài tập trung, 78/78 EditMode, 145/145 PlayMode và validator đạt; Console
+0 lỗi. 15 ảnh ba tỷ lệ, gồm trạng thái chờ camera. Chi tiết tại
+`Verification/HUD_UTILITY_VERIFICATION.md`. Giữ `[-]` cho người chơi mới,
+tay cầm/webcam thật và Windows player/restart.
+
+22/10/2026 — HUD chiến đấu đã thêm số HP/mana, vùng/cấp/quái tách dòng, thanh
+skill 596×180 có tên/phím/cooldown/thiếu mana/ô trống và khung boss có số máu.
+Bốn bài tập trung đạt; 30 ảnh sáu map/ba tỷ lệ đã sinh, tên dài 4:3 đã xem.
+78/78 EditMode, 134/134 PlayMode, validator đạt; Console 0 error. Chi tiết ở
+`Verification/COMBAT_HUD_VERIFICATION.md`. Còn nghiệm thu
+chữ launcher cũ, accessibility người mới, Windows và phản hồi combat U3.
+
+22/10/2026 — Đã kiểm chứng kỹ năng/tiềm năng: focus scope, cache thẻ kỹ năng,
+navigation/Submit thống nhất, phản hồi hành động và chống chi tiêu lặp mỗi frame.
+Khung gọn tăng cỡ chữ ở 4:3; sửa tutorial cho đúng việc mua đồ tự trang bị.
+77/77 EditMode, 122/122 PlayMode, validator đạt; 0 lỗi Console và 15 ảnh mới.
+Giữ `[-]` cho nghiệm thu accessibility, người chơi mới và Windows player.
+
+22/10/2026 — Đã kiểm chứng hành trang/cường hóa: giữ slot/focus, lọc trống
+không giữ chi tiết món khác nhóm, chọn năm ô bằng chuột/phím số, xem trước chỉ
+số/chi phí và cleanup khi disable/destroy. Hai bảng dùng khung responsive chung
+với lò rèn; 77/77 EditMode, 117/117 PlayMode, validator và 23 ảnh ba tỷ lệ đạt.
+
+22/10/2026 — Tiếp tục kiểm tra lò rèn: giữ focus khi chọn đồ, cô lập canvas nền,
+đổi ưu đãi thực sự sang món khác khi còn lựa chọn và lưu phí ngay. Bố cục hai
+cột ở màn hình hẹp, tên dài hai dòng. Kiểm tra cả 40 món, 14 ảnh; 77/77 EditMode,
+111/111 PlayMode và validator đạt. Giữ `[-]`: hành trang/cường hóa vẫn cần
+rà soát focus, thao tác chuột và cleanup; còn kiểm tra Windows/accessibility.
+
+22/10/2026 — Đang rà soát luồng MainMenu → cài đặt/hướng dẫn → Pause → thử lại.
+Ưu tiên bố cục vừa màn hình, focus bàn phím, khóa thao tác nền và cài đặt dùng
+chung. Tiêu chí: validator, toàn bộ EditMode/PlayMode và ảnh 16:9, 16:10, 4:3;
+chỉ xác nhận phần đã kiểm tra, không đóng toàn bộ backlog U5.
+
+Mở rộng cùng lượt sang kho/nhận thưởng: sửa modal ownership, lưu lựa chọn skill,
+catalog thưởng null trong scene và thêm kiểm tra vào builder/validator. Chi tiết:
+`Verification/UI_FLOW_REVIEW_2026-10-22.md`.
+
+Chọn vùng truyền tống đã đồng bộ tên/cấp từ MapData, Việt hóa ba tên còn lại,
+tách ba dòng tên/cấp/trạng thái và khóa navigation xuyên canvas. Hai lượt dựng
++ validator đạt; toàn bộ 107/107 PlayMode đạt (0 failed/skipped), gồm tutorial,
+audio và hai bài chọn vùng. Đã xem ảnh cuối ở 1080p/4:3; giữ `[-]` do còn
+backlog accessibility và kiểm tra bản Windows.
 
 10/09/2026 — Sửa lỗi font sau build: bake tiếng Việt vào atlas chính static,
 giữ GUID, bổ sung guard và test glyph; không dựa vào fallback động để kiểm tra

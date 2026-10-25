@@ -18,12 +18,18 @@ namespace TopDownGame.Player
         private float currentHealth;
         private bool invulnerable;
         private float shieldReduction;
+        private float dodgeInvulnerableUntil;
 
         public event Action<float, float> HealthChanged;
         public event Action Died;
 
         public bool IsAlive { get; private set; } = true;
         public float CurrentHealth => currentHealth;
+        public bool IsDodgeInvulnerable => IsAlive && Time.time < dodgeInvulnerableUntil;
+
+        /// <summary>A separate scaled-time window cannot erase post-hit immunity or disable physics contacts.</summary>
+        public void BeginDodgeInvulnerability(float duration) => dodgeInvulnerableUntil = Time.time + Mathf.Max(0f, duration);
+        public void EndDodgeInvulnerability() => dodgeInvulnerableUntil = Time.time;
 
         private void Awake()
         {
@@ -42,10 +48,12 @@ namespace TopDownGame.Player
 
         public void TakeDamage(DamageInfo damageInfo)
         {
-            if (!IsAlive || invulnerable)
+            if (!IsAlive || invulnerable || IsDodgeInvulnerable)
             {
                 return;
             }
+
+            GetComponent<PlayerDodge>()?.Cancel();
 
             float amount = damageInfo.IgnoreArmor
                 ? damageInfo.Amount
@@ -56,6 +64,7 @@ namespace TopDownGame.Player
             DamagePopup.Spawn(transform.position + Vector3.up, amount,
                 damageInfo.IsCritical, damagePopupPrefab);
             GetComponent<PlayerCharacterAnimator>()?.PlayHit(damageInfo.Direction);
+            if (amount > 0f) TopDownGame.Core.CombatFeedback.PlayerHit(damageInfo);
 
             if (body != null && damageInfo.Knockback > 0f)
             {
@@ -162,6 +171,7 @@ namespace TopDownGame.Player
             }
 
             IsAlive = false;
+            GetComponent<PlayerDodge>()?.Cancel();
             Died?.Invoke();
             if (movement != null)
             {

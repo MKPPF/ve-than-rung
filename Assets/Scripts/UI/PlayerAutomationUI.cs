@@ -23,6 +23,8 @@ namespace TopDownGame.UI
 
         public static void Ensure(GameObject owner)
         {
+            if (owner.GetComponent<HudUtilityLayout>() == null)
+                owner.AddComponent<HudUtilityLayout>();
             if (owner.GetComponent<PlayerAutomationUI>() == null)
                 owner.AddComponent<PlayerAutomationUI>();
         }
@@ -39,28 +41,27 @@ namespace TopDownGame.UI
                 "AutomationControls", 0, 0, 250, 218);
             root = rect.gameObject;
             rect.anchorMin = rect.anchorMax = rect.pivot = Vector2.one;
-            bool lobby = GetComponent<LobbyHUD>() != null;
-            rect.anchoredPosition = lobby ? new Vector2(-22, -214) : new Vector2(-30, -266);
-            if (lobby) rect.localScale = Vector3.one * 0.76f;
             attackButton = FantasyEquipmentUI.Button(rect, "AutoAttackToggle", "",
                 0, 0, 250, 44, ToggleAttack);
             pickupButton = FantasyEquipmentUI.Button(rect, "AutoPickupToggle", "",
                 0, 54, 250, 44, TogglePickup);
             gestureButton = FantasyEquipmentUI.Button(rect, "GestureToggle", "",
                 0, 108, 250, 44, ToggleGestures);
+            FantasyEquipmentUI.Frame(rect, "GestureHintBacking", 0, 158, 250, 54, FantasyEquipmentUI.Ink);
             gestureStatus = FantasyEquipmentUI.Text(rect, "GestureStatus", "",
                 0, 158, 250, 54, 14, FantasyEquipmentUI.Gold);
             gestureStatus.textWrappingMode = TextWrappingModes.Normal;
+            FantasyEquipmentUI.Box(rect, "NavigationHintBacking", 0, 218, 250, 64, FantasyEquipmentUI.Ink);
+            FantasyEquipmentUI.Text(rect, "NavigationHint", "ESC / B: gọn · TAB: rời HUD\nMũi tên / D-pad: chọn nút\nENTER / A: xác nhận",
+                0, 218, 250, 56, 21, FantasyEquipmentUI.TextColor);
             gestureReceiver = FindAnyObjectByType<GestureInputReceiver>();
-            attackButton.navigation = new Navigation { mode = Navigation.Mode.None };
-            pickupButton.navigation = new Navigation { mode = Navigation.Mode.None };
-            gestureButton.navigation = new Navigation { mode = Navigation.Mode.None };
+            gestureReceiver?.RegisterStatusDisplay(gestureStatus.gameObject);
             attackLabel = attackButton.GetComponentInChildren<TMP_Text>();
             pickupLabel = pickupButton.GetComponentInChildren<TMP_Text>();
             Refresh();
         }
 
-        private bool CanToggle => !GameplayState.IsInputBlocked && Time.timeScale > 0f &&
+        private bool CanToggle => !GameplayState.IsBlockedByOther(this) && Time.timeScale > 0f &&
             (health == null || health.IsAlive);
 
         private void ToggleAttack()
@@ -108,7 +109,7 @@ namespace TopDownGame.UI
             if (displayedGesture != gestures)
             {
                 displayedGesture = gestures;
-                SetState(gestureButton, gestureButton.GetComponentInChildren<TMP_Text>(), "TAY [F8]", gestures);
+                SetState(gestureButton, gestureButton.GetComponentInChildren<TMP_Text>(), "CỬ CHỈ [F8]", gestures);
             }
             string connection = gestureReceiver != null ? gestureReceiver.StatusText : "Chưa có bộ nhận điều khiển tay.";
             if (gestureStatus.text != connection) gestureStatus.text = connection;

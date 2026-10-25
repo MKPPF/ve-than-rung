@@ -185,9 +185,24 @@ namespace TopDownGame.Tests.PlayMode
         private void AssertSurfaceFits(string panelName)
         {
             var panel = (RectTransform)canvasObject.transform.Find(panelName);
-            var surface = (RectTransform)panel.Find("Surface");
-            Assert.That(surface.rect.width * surface.localScale.x, Is.LessThanOrEqualTo(panel.rect.width + 1));
-            Assert.That(surface.rect.height * surface.localScale.y, Is.LessThanOrEqualTo(panel.rect.height + 1));
+            // Responsive layouts can retain an oversized transparent design surface.
+            // The visible window and interactive controls must actually fit the screen.
+            AssertRectFits(panel, (RectTransform)panel.Find("Surface/EquipmentWindow"));
+            AssertRectFits(panel, (RectTransform)panel.Find("Surface/WindowShadow"));
+            foreach (Button button in panel.GetComponentsInChildren<Button>())
+                AssertRectFits(panel, (RectTransform)button.transform);
+        }
+
+        private static void AssertRectFits(RectTransform panel, RectTransform target)
+        {
+            var corners = new Vector3[4];
+            target.GetWorldCorners(corners);
+            foreach (Vector3 corner in corners)
+            {
+                Vector3 point = panel.InverseTransformPoint(corner);
+                Assert.That(point.x, Is.InRange(panel.rect.xMin - 1, panel.rect.xMax + 1), target.name);
+                Assert.That(point.y, Is.InRange(panel.rect.yMin - 1, panel.rect.yMax + 1), target.name);
+            }
         }
 
         private void Capture(string name)

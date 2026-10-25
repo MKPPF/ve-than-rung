@@ -38,6 +38,8 @@ namespace TopDownGame.Tests.PlayMode
             originalProgress = JsonUtility.ToJson(progress);
             hadSave = PlayerPrefs.HasKey("TopDownGame.Tests.Progress.v1");
             originalSave = PlayerPrefs.GetString("TopDownGame.Tests.Progress.v1", "");
+            // Navigation/art checks run after onboarding; TutorialFlowTests cover entry.
+            progress.CompleteTutorial();
             applied = (bool)typeof(GameProgressManager).GetField("playerProgressApplied", Private).GetValue(progress);
             typeof(GameProgressManager).GetField("hasSafeRespawn", Private).SetValue(progress, false);
             previous = SceneManager.GetActiveScene();
@@ -324,6 +326,8 @@ namespace TopDownGame.Tests.PlayMode
             Assert.That(stats.VitalityPoints,Is.EqualTo(1));
             Assert.That(stats.MaxHealth,Is.EqualTo(health+PlayerStats.VitalityHealthPerPoint));
             Assert.That(GameProgressManager.Instance.PotentialPoints,Is.EqualTo(1));
+            // A second user click occurs on a later frame; same-frame submits are deduplicated.
+            yield return null;
             spend.onClick.Invoke();Assert.That(spend.interactable,Is.False);
             spend.onClick.Invoke();Assert.That(stats.VitalityPoints,Is.EqualTo(2));
             foreach(var resolution in new[]{new Vector2Int(1920,1080),new Vector2Int(1280,720),new Vector2Int(1024,768)})

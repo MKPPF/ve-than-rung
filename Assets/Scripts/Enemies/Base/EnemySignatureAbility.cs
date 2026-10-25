@@ -366,13 +366,13 @@ namespace TopDownGame.Enemies
             const float radius = 2.45f;
             Color color = new Color(0.42f, 1f, 0.18f, 0.78f);
             EnemyCombatVfx.TelegraphCircle(lockedPosition, radius, windup,
-                color);
+                color, owner);
             EnemyCombatVfx.TelegraphCircle(lockedPosition + tangent * 1.55f,
                 radius * 0.72f, windup,
-                new Color(0.32f, 0.9f, 0.12f, 0.5f));
+                new Color(0.32f, 0.9f, 0.12f, 0.5f), owner);
             EnemyCombatVfx.TelegraphCircle(lockedPosition - tangent * 1.55f,
                 radius * 0.72f, windup,
-                new Color(0.32f, 0.9f, 0.12f, 0.5f));
+                new Color(0.32f, 0.9f, 0.12f, 0.5f), owner);
             characterAnimator?.PlaySkillPhased(direction, windup, 0.18f,
                 0.32f, color);
             yield return new WaitForSeconds(windup * 0.7f);
@@ -384,6 +384,7 @@ namespace TopDownGame.Enemies
             EnemyCombatVfx.Burst(lockedPosition, radius, color, 0.52f);
             DamageTargetNear(lockedPosition, radius, 1.42f, 5.5f);
             yield return new WaitForSeconds(0.12f);
+            if (!CanContinue()) yield break;
             Vector2 leftQuake = lockedPosition + tangent * 1.55f;
             Vector2 rightQuake = lockedPosition - tangent * 1.55f;
             EnemyCombatVfx.Burst(leftQuake, radius * 0.72f,

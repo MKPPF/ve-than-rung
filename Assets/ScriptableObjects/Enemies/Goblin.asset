@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Goblin
   m_EditorClassIdentifier: Assembly-CSharp::TopDownGame.Enemies.EnemyData
   enemyId: goblin
-  displayName: Goblin
+  displayName: "Y\xEAu Tinh R\u1EEBng"
   archetype: 1
   maxHealth: 140
   damage: 12

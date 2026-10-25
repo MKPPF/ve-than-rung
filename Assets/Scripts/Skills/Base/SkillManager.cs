@@ -236,7 +236,7 @@ namespace TopDownGame.Skills
         private bool TryCastSlot(int slotIndex, bool ignoreInteraction,
             Vector2? targetPosition)
         {
-            if (IsCasting || castController==null || !castController.isActiveAndEnabled ||
+            if (GetComponent<PlayerDodge>()?.IsDodging == true || IsCasting || castController==null || !castController.isActiveAndEnabled ||
                 !isActiveAndEnabled || inventory == null || stats == null ||
                 (health != null && !health.IsAlive) ||
                 TopDownGame.Core.GameplayState.IsInputBlocked || Time.timeScale <= 0f ||

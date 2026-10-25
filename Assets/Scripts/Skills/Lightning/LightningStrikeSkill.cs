@@ -203,6 +203,7 @@ namespace TopDownGame.Skills
         // ─────────────────────────────────────────────────────
         private void DealAreaDamage(Vector2 targetPosition)
         {
+            TopDownGame.Core.CombatFeedback.WorldImpact(targetPosition,0.065f);
             HashSet<int> hitTargets = new HashSet<int>();
             foreach (Collider2D hit in Physics2D.OverlapCircleAll(targetPosition, radius, enemyLayers))
             {

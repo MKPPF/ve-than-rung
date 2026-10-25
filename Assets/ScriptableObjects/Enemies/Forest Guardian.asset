@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Forest Guardian
   m_EditorClassIdentifier: Assembly-CSharp::TopDownGame.Enemies.EnemyData
   enemyId: forest guardian
-  displayName: Forest Guardian
+  displayName: "V\u1EC7 Th\u1EA7n R\u1EEBng"
   archetype: 7
   maxHealth: 1200
   damage: 35
