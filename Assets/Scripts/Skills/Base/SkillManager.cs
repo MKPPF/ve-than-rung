@@ -181,7 +181,7 @@ namespace TopDownGame.Skills
             {
                 thanhGiongHero = GetComponent<ThanhGiongHeroController>();
             }
-            if (thanhGiongHero != null && thanhGiongHero.IsThanhGiongActive)
+            if (thanhGiongHero != null && thanhGiongHero.IsCustomHeroActive)
             {
                 return thanhGiongHero.GetSlotCooldownRemaining(slotIndex);
             }
@@ -201,16 +201,16 @@ namespace TopDownGame.Skills
             {
                 thanhGiongHero = GetComponent<ThanhGiongHeroController>();
             }
-            if (thanhGiongHero != null && thanhGiongHero.IsThanhGiongActive)
+            if (thanhGiongHero != null && thanhGiongHero.IsCustomHeroActive)
             {
                 float tracked = thanhGiongHero.GetSlotCooldownDuration(slotIndex);
                 if (tracked > 0f)
                 {
                     return tracked;
                 }
-                SkillData tgData = thanhGiongHero.GetThanhGiongSkillData(slotIndex);
-                return tgData != null
-                    ? EffectiveCooldown(tgData, thanhGiongHero.GetEffectiveSkillLevel(slotIndex))
+                SkillData heroData = thanhGiongHero.GetActiveHeroSkillData(slotIndex);
+                return heroData != null
+                    ? EffectiveCooldown(heroData, thanhGiongHero.GetEffectiveSkillLevel(slotIndex))
                     : 0f;
             }
 
@@ -240,9 +240,9 @@ namespace TopDownGame.Skills
             {
                 thanhGiongHero = GetComponent<ThanhGiongHeroController>();
             }
-            if (thanhGiongHero != null && thanhGiongHero.IsThanhGiongActive)
+            if (thanhGiongHero != null && thanhGiongHero.IsCustomHeroActive)
             {
-                return thanhGiongHero.GetThanhGiongSkillData(slotIndex);
+                return thanhGiongHero.GetActiveHeroSkillData(slotIndex);
             }
 
             if (inventory == null || skillDatabase == null || slotIndex < 0 ||
@@ -293,9 +293,9 @@ namespace TopDownGame.Skills
             {
                 thanhGiongHero = GetComponent<ThanhGiongHeroController>();
             }
-            if (thanhGiongHero != null && thanhGiongHero.IsThanhGiongActive)
+            if (thanhGiongHero != null && thanhGiongHero.IsCustomHeroActive)
             {
-                return thanhGiongHero.TryCastThanhGiongSkill(slotIndex, targetPosition, ~0);
+                return thanhGiongHero.TryCastActiveHeroSkill(slotIndex, targetPosition, ~0);
             }
 
             SkillSlot slot = inventory.Slots[slotIndex];

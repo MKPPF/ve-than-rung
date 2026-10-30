@@ -144,36 +144,55 @@ namespace TopDownGame.Maps
         private void Update() {elapsed+=Time.deltaTime;Animate();}
         private void Animate()
         {
-            if (butterflies==null) return;
-            for(int i=0;i<butterflies.Length;i++)
+            if (butterflies != null && leftWings != null && rightWings != null && flowerBeds != null && flowerBeds.Length > 0)
             {
-                float phase=elapsed*(0.65f+i*0.035f)+i*2.1f;
-                butterflies[i].localPosition=flowerBeds[i/2]+new Vector2(Mathf.Sin(phase)*0.48f,0.16f+Mathf.Sin(phase*1.73f)*0.23f);
-                butterflies[i].localEulerAngles=new Vector3(0,0,Mathf.Sin(phase)*28);
-                float fold=0.18f+Mathf.Abs(Mathf.Sin(elapsed*12+i))*0.82f;
-                leftWings[i].localScale=new Vector3(fold,1,1);rightWings[i].localScale=new Vector3(-fold,1,1);
+                for(int i=0;i<butterflies.Length;i++)
+                {
+                    if (butterflies[i] == null) continue;
+                    int bedIdx = (i / 2) % flowerBeds.Length;
+                    float phase=elapsed*(0.65f+i*0.035f)+i*2.1f;
+                    butterflies[i].localPosition=flowerBeds[bedIdx]+new Vector2(Mathf.Sin(phase)*0.48f,0.16f+Mathf.Sin(phase*1.73f)*0.23f);
+                    butterflies[i].localEulerAngles=new Vector3(0,0,Mathf.Sin(phase)*28);
+                    float fold=0.18f+Mathf.Abs(Mathf.Sin(elapsed*12+i))*0.82f;
+                    if (leftWings[i] != null) leftWings[i].localScale=new Vector3(fold,1,1);
+                    if (rightWings[i] != null) rightWings[i].localScale=new Vector3(-fold,1,1);
+                }
             }
-            for(int i=0;i<birds.Length;i++)
+            if (birds != null && birdPerches != null && birdPerches.Length > 0 &&
+                birdFeet != null && foldedWings != null && birdLeftWings != null && birdRightWings != null && birdShadows != null)
             {
-                float clock=elapsed+i*3.4f,cycle=Mathf.Floor(clock/15f),t=Mathf.Repeat(clock,15f);
-                int from=(i+(int)cycle)%birdPerches.Length,to=(from+1)%birdPerches.Length;
-                bool flying=t>=10f;float progress=flying?Mathf.SmoothStep(0,1,(t-10)/5f):0;
-                Vector2 ground=Vector2.Lerp(birdPerches[from],birdPerches[to],progress);
-                float height=flying?Mathf.Sin(progress*Mathf.PI)*0.68f:Mathf.Max(0,Mathf.Sin(t*3f))*0.025f;
-                birds[i].localPosition=ground+Vector2.up*height;
-                float facing=birdPerches[to].x>=birdPerches[from].x?1:-1;
-                birds[i].localScale=new Vector3(facing,1,1);
-                float flap=flying?0.4f+0.6f*Mathf.Abs(Mathf.Sin(elapsed*17+i)):0.26f;
-                birdFeet[i].gameObject.SetActive(!flying);
-                foldedWings[i].gameObject.SetActive(!flying);
-                birdLeftWings[i].gameObject.SetActive(flying);
-                birdRightWings[i].gameObject.SetActive(flying);
-                birdLeftWings[i].localScale=flying?new Vector3(1,flap,1):new Vector3(0.85f,0.25f,1);
-                birdRightWings[i].localScale=flying?new Vector3(1,-flap,1):new Vector3(0.85f,0.22f,1);
-                birdLeftWings[i].localEulerAngles=new Vector3(0,0,flying?-16:-78);
-                birdRightWings[i].localEulerAngles=new Vector3(0,0,flying?16:-78);
-                birdShadows[i].transform.localPosition=ground+new Vector2(0.05f,-0.10f);
-                birdShadows[i].color=new Color(0,0,0,0.18f-height*0.12f);
+                for(int i=0;i<birds.Length;i++)
+                {
+                    if (birds[i] == null) continue;
+                    float clock=elapsed+i*3.4f,cycle=Mathf.Floor(clock/15f),t=Mathf.Repeat(clock,15f);
+                    int from=(i+(int)cycle)%birdPerches.Length,to=(from+1)%birdPerches.Length;
+                    bool flying=t>=10f;float progress=flying?Mathf.SmoothStep(0,1,(t-10)/5f):0;
+                    Vector2 ground=Vector2.Lerp(birdPerches[from],birdPerches[to],progress);
+                    float height=flying?Mathf.Sin(progress*Mathf.PI)*0.68f:Mathf.Max(0,Mathf.Sin(t*3f))*0.025f;
+                    birds[i].localPosition=ground+Vector2.up*height;
+                    float facing=birdPerches[to].x>=birdPerches[from].x?1:-1;
+                    birds[i].localScale=new Vector3(facing,1,1);
+                    float flap=flying?0.4f+0.6f*Mathf.Abs(Mathf.Sin(elapsed*17+i)):0.26f;
+                    if (birdFeet[i] != null) birdFeet[i].gameObject.SetActive(!flying);
+                    if (foldedWings[i] != null) foldedWings[i].gameObject.SetActive(!flying);
+                    if (birdLeftWings[i] != null)
+                    {
+                        birdLeftWings[i].gameObject.SetActive(flying);
+                        birdLeftWings[i].localScale=flying?new Vector3(1,flap,1):new Vector3(0.85f,0.25f,1);
+                        birdLeftWings[i].localEulerAngles=new Vector3(0,0,flying?-16:-78);
+                    }
+                    if (birdRightWings[i] != null)
+                    {
+                        birdRightWings[i].gameObject.SetActive(flying);
+                        birdRightWings[i].localScale=flying?new Vector3(1,-flap,1):new Vector3(0.85f,0.22f,1);
+                        birdRightWings[i].localEulerAngles=new Vector3(0,0,flying?16:-78);
+                    }
+                    if (birdShadows[i] != null)
+                    {
+                        birdShadows[i].transform.localPosition=ground+new Vector2(0.05f,-0.10f);
+                        birdShadows[i].color=new Color(0,0,0,0.18f-height*0.12f);
+                    }
+                }
             }
         }
         private void OnEnable() {if(visualRoot!=null)visualRoot.gameObject.SetActive(true);}

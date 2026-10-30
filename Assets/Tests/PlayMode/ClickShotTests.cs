@@ -60,7 +60,7 @@ namespace TopDownGame.Tests.PlayMode
                     { position = new Vector2(Screen.width * 0.7f, Screen.height * 0.5f) }
                     .WithButton(MouseButton.Left));
                 InputSystem.Update();mouse.MakeCurrent();combat.SendMessage("Update");
-                Assert.That(Object.FindObjectsByType<PlayerShot>(FindObjectsSortMode.None), Is.Empty);
+                Assert.That(Object.FindObjectsByType<PlayerShot>(), Is.Empty);
                 ui.SetActive(false);
                 InputSystem.QueueStateEvent(mouse, new MouseState
                     { position = new Vector2(Screen.width * 0.7f, Screen.height * 0.5f) });
@@ -69,7 +69,7 @@ namespace TopDownGame.Tests.PlayMode
                     { position = new Vector2(Screen.width * 0.7f, Screen.height * 0.5f) }
                     .WithButton(MouseButton.Left));
                 InputSystem.Update();mouse.MakeCurrent();combat.SendMessage("Update");
-                var shot = Object.FindFirstObjectByType<PlayerShot>();
+                var shot = Object.FindAnyObjectByType<PlayerShot>();
                 Assert.That(shot, Is.Not.Null);
                 Assert.That(shot.Direction.x, Is.GreaterThan(0.99f));
             }
@@ -87,7 +87,7 @@ namespace TopDownGame.Tests.PlayMode
         public IEnumerator Cleanup()
         {
             Time.timeScale = 1f;
-            foreach (var shot in Object.FindObjectsByType<PlayerShot>(FindObjectsSortMode.None))
+            foreach (var shot in Object.FindObjectsByType<PlayerShot>())
                 Object.Destroy(shot.gameObject);
             Object.Destroy(owner); Object.Destroy(target); Object.Destroy(wall);
             yield return null;
@@ -111,7 +111,7 @@ namespace TopDownGame.Tests.PlayMode
             var combat = CreateShooter();
             Assert.That(combat.TryShoot(Vector2.up), Is.True);
             Assert.That(combat.TryShoot(Vector2.left), Is.False);
-            var shot = Object.FindFirstObjectByType<PlayerShot>();
+            var shot = Object.FindAnyObjectByType<PlayerShot>();
             Assert.That(shot.Direction, Is.EqualTo(Vector2.up));
             combat.SetAimDirection(Vector2.left);
             Vector3 start = shot.transform.position;
@@ -125,7 +125,7 @@ namespace TopDownGame.Tests.PlayMode
             Assert.That(shot.Direction, Is.EqualTo(Vector2.up));
             Assert.That(combat.TryShoot(Vector2.left), Is.True);
             yield return new WaitForSeconds(1f);
-            Assert.That(Object.FindObjectsByType<PlayerShot>(FindObjectsSortMode.None), Is.Empty);
+            Assert.That(Object.FindObjectsByType<PlayerShot>(), Is.Empty);
         }
 
         [UnityTest]

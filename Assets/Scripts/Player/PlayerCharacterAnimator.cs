@@ -160,16 +160,27 @@ namespace TopDownGame.Player
                 restColor = visualRenderer.color;
             }
 
+            ThanhGiongHeroController tg = GetComponent<ThanhGiongHeroController>();
+            if ((tg != null && tg.IsCustomHeroActive) || ThanhGiongHeroController.LoadSavedHero() != HeroCharacterId.ForestWarrior)
+            {
+                enabled = false;
+                return;
+            }
+
             ShowFirstAvailableIdle();
         }
 
         private void Update()
         {
+            ThanhGiongHeroController tg = GetComponent<ThanhGiongHeroController>();
+            if (tg != null && tg.IsCustomHeroActive) return;
             if (!smoothLocomotion) UpdateVisual();
         }
 
         private void LateUpdate()
         {
+            ThanhGiongHeroController tg = GetComponent<ThanhGiongHeroController>();
+            if (tg != null && tg.IsCustomHeroActive) return;
             if(smoothLocomotion)
             {
                 SamplePresentation();
@@ -277,7 +288,7 @@ namespace TopDownGame.Player
             }
 
             ThanhGiongHeroController thanhGiong = GetComponent<ThanhGiongHeroController>();
-            if (thanhGiong != null && thanhGiong.IsThanhGiongActive)
+            if (thanhGiong != null && thanhGiong.IsCustomHeroActive)
             {
                 return;
             }
@@ -394,6 +405,8 @@ namespace TopDownGame.Player
         public void PlayAttack(Vector2 direction, float duration = 0f)
         {
             if (dying) return;
+            ThanhGiongHeroController tg = GetComponent<ThanhGiongHeroController>();
+            if (tg != null && tg.IsCustomHeroActive) return;
             ResolveVisualRenderer();
             FaceDirection(direction);
             attackStartTime = Time.time;
@@ -413,6 +426,8 @@ namespace TopDownGame.Player
         public void PlaySkillCast(Vector2 direction, float duration, float windup)
         {
             if (dying) return;
+            ThanhGiongHeroController tg = GetComponent<ThanhGiongHeroController>();
+            if (tg != null && tg.IsCustomHeroActive) return;
             ResolveVisualRenderer();
             FaceDirection(direction);
             castWindup = windup;
@@ -434,6 +449,8 @@ namespace TopDownGame.Player
         public void PlayHit(Vector2 direction)
         {
             if (dying) return;
+            ThanhGiongHeroController tg = GetComponent<ThanhGiongHeroController>();
+            if (tg != null && tg.IsCustomHeroActive) return;
             ResolveVisualRenderer();
             FaceDirection(direction);
             hitStartTime = Time.time;
@@ -456,20 +473,17 @@ namespace TopDownGame.Player
 
         private void ResolveVisualRenderer()
         {
-            if (visualRenderer != null)
+            if (visualRenderer == null || visualRenderer.gameObject == gameObject)
             {
-                return;
+                visualRenderer = movement != null ? movement.VisualRenderer : null;
+                if (visualRenderer == null)
+                {
+                    Transform visual = transform.Find("MovementVisual");
+                    visualRenderer = visual != null
+                        ? visual.GetComponent<SpriteRenderer>()
+                        : GetComponent<SpriteRenderer>();
+                }
             }
-
-            visualRenderer = movement != null ? movement.VisualRenderer : null;
-            if (visualRenderer == null)
-            {
-                Transform visual = transform.Find("MovementVisual");
-                visualRenderer = visual != null
-                    ? visual.GetComponent<SpriteRenderer>()
-                    : GetComponent<SpriteRenderer>();
-            }
-
         }
 
         private void UpdateWalkingState()

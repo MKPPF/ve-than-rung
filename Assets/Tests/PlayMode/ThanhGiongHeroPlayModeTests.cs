@@ -50,29 +50,19 @@ namespace TopDownGame.Tests.PlayMode
                 Object.Destroy(vfx.gameObject);
             }
 
+            foreach (SonTinhVfx vfx in Object.FindObjectsByType<SonTinhVfx>())
+            {
+                Object.Destroy(vfx.gameObject);
+            }
+
             yield return null;
         }
 
         [UnityTest]
         public IEnumerator ThanhGiongExecutesAllFiveIronSwordIronHorseAndBambooMoves()
         {
-            player = new GameObject("ThanhGiongTestPlayer");
-            player.tag = "Player";
-            player.transform.position = new Vector3(400f, 400f, 0f);
-            SpriteRenderer sr = player.AddComponent<SpriteRenderer>();
-            Rigidbody2D rb = player.AddComponent<Rigidbody2D>();
-            rb.bodyType = RigidbodyType2D.Kinematic;
-            rb.gravityScale = 0f;
-
-            PlayerStats stats = player.AddComponent<PlayerStats>();
-            PlayerHealth health = player.AddComponent<PlayerHealth>();
-            PlayerMovement movement = player.AddComponent<PlayerMovement>();
-            PlayerCharacterAnimator animator = player.AddComponent<PlayerCharacterAnimator>();
-            PlayerCombat combat = player.AddComponent<PlayerCombat>();
-            combat.SetAutoAttackEnabled(false);
-            SkillInventory inventory = player.AddComponent<SkillInventory>();
-            SkillManager skillManager = player.AddComponent<SkillManager>();
-            ThanhGiongHeroController hero = player.AddComponent<ThanhGiongHeroController>();
+            SetupTestPlayer("ThanhGiongTestPlayer", out SpriteRenderer sr, out Rigidbody2D rb,
+                out PlayerStats stats, out PlayerCombat combat, out SkillManager skillManager, out ThanhGiongHeroController hero);
 
             yield return null;
 
@@ -147,6 +137,125 @@ namespace TopDownGame.Tests.PlayMode
                 "Skill 4 (Iron Horse + Bamboo Bundle Charge) must charge a long distance forward.");
             Assert.That(chargeEnemy.CurrentHealth, Is.LessThan(hpBefore),
                 "Skill 4 must sweep and damage enemies along the charge path.");
+        }
+
+        [UnityTest]
+        public IEnumerator SonTinhExecutesNormalAttackAndAllFourMountainSkills()
+        {
+            SetupTestPlayer("SonTinhTestPlayer", out SpriteRenderer sr, out Rigidbody2D rb,
+                out PlayerStats stats, out PlayerCombat combat, out SkillManager skillManager, out ThanhGiongHeroController hero);
+
+            yield return null;
+
+            hero.SelectHero(HeroCharacterId.SonTinh, false);
+            Assert.That(hero.IsSonTinhActive, Is.True);
+            Assert.That(skillManager.GetSkillData(0).DisplayName, Is.EqualTo("Ném Đại Thạch"));
+            Assert.That(skillManager.GetSkillData(1).DisplayName, Is.EqualTo("Dâng Núi Trấn Địch"));
+            Assert.That(skillManager.GetSkillData(2).DisplayName, Is.EqualTo("Đấm Đất Dựng Núi"));
+            Assert.That(skillManager.GetSkillData(3).DisplayName, Is.EqualTo("Bát Phương Quần Sơn"));
+
+            yield return null;
+            Assert.That(sr.sprite, Is.Not.Null);
+            Assert.That(sr.sprite.texture.name, Does.Contain("SonTinh_Hero"));
+
+            // 1. Normal Attack: Stone Fist Strike
+            EnemyHealth meleeTarget = SpawnDummyEnemy(new Vector2(401.5f, 400f), 2000f);
+            float hpBefore = meleeTarget.CurrentHealth;
+            MethodInfo attackRoutine = typeof(PlayerCombat).GetMethod("AttackRoutine",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            yield return player.GetComponent<MonoBehaviour>().StartCoroutine(
+                (IEnumerator)attackRoutine.Invoke(combat, new object[] { Vector2.right, false }));
+            Assert.That(meleeTarget.CurrentHealth, Is.LessThan(hpBefore),
+                "Son Tinh normal attack must damage enemies in front.");
+            Object.Destroy(meleeTarget.gameObject);
+
+            // 2. Skill 1 (Q - Slot 0): Throw Giant Boulder at Enemy
+            rb.position = new Vector2(400f, 400f);
+            player.transform.position = new Vector3(400f, 400f, 0f);
+            stats.RestoreFullMana();
+            EnemyHealth boulderEnemy = SpawnDummyEnemy(new Vector2(404.2f, 400f), 2000f);
+            hpBefore = boulderEnemy.CurrentHealth;
+            Assert.That(hero.TryCastSonTinhSkill(0, new Vector2(404.2f, 400f), ~0), Is.True);
+            yield return new WaitForSeconds(0.50f);
+            Assert.That(boulderEnemy.CurrentHealth, Is.LessThan(hpBefore),
+                "Skill 1 (Q - Nem Dai Thach) must hurl giant boulder and damage the target enemy.");
+            Object.Destroy(boulderEnemy.gameObject);
+
+            // 3. Skill 2 (E - Slot 1): Skyward Upturned Palms -> Raise Mountain at Enemy Area
+            rb.position = new Vector2(400f, 400f);
+            player.transform.position = new Vector3(400f, 400f, 0f);
+            stats.RestoreFullMana();
+            EnemyHealth zoneEnemyA = SpawnDummyEnemy(new Vector2(404.6f, 402.2f), 2000f);
+            EnemyHealth zoneEnemyB = SpawnDummyEnemy(new Vector2(405.1f, 401.8f), 2000f);
+            float hpA = zoneEnemyA.CurrentHealth;
+            float hpB = zoneEnemyB.CurrentHealth;
+            Assert.That(hero.TryCastSonTinhSkill(1, null, ~0), Is.True);
+            yield return new WaitForSeconds(0.58f);
+            Assert.That(zoneEnemyA.CurrentHealth, Is.LessThan(hpA),
+                "Skill 2 (E - Dang Nui Tran Dich) must automatically raise a mountain at the enemy cluster.");
+            Assert.That(zoneEnemyB.CurrentHealth, Is.LessThan(hpB),
+                "Skill 2 AoE mountain eruption must hit nearby enemies in that zone.");
+            Object.Destroy(zoneEnemyA.gameObject);
+            Object.Destroy(zoneEnemyB.gameObject);
+
+            // 4. Skill 3 (R - Slot 2): Slam Ground -> Cascading Mountain Ridges Forward
+            rb.position = new Vector2(400f, 400f);
+            player.transform.position = new Vector3(400f, 400f, 0f);
+            stats.RestoreFullMana();
+            EnemyHealth nearRidgeEnemy = SpawnDummyEnemy(new Vector2(402.4f, 400f), 2000f);
+            EnemyHealth farRidgeEnemy = SpawnDummyEnemy(new Vector2(405.8f, 400f), 2000f);
+            float nearBefore = nearRidgeEnemy.CurrentHealth;
+            float farBefore = farRidgeEnemy.CurrentHealth;
+            Assert.That(hero.TryCastSonTinhSkill(2, new Vector2(406f, 400f), ~0), Is.True);
+            yield return new WaitForSeconds(0.68f);
+            Assert.That(nearRidgeEnemy.CurrentHealth, Is.LessThan(nearBefore),
+                "Skill 3 (R - Dam Dat Dung Nui) must hit enemies near the start of the advancing mountain chain.");
+            Assert.That(farRidgeEnemy.CurrentHealth, Is.LessThan(farBefore),
+                "Skill 3 advancing mountain chain must progress forward and hit distant enemies.");
+            Object.Destroy(nearRidgeEnemy.gameObject);
+            Object.Destroy(farRidgeEnemy.gameObject);
+
+            // 5. Skill 4 (F - Slot 3): Skyward Upturned Palms -> 360° Surrounding Mountains
+            rb.position = new Vector2(400f, 400f);
+            player.transform.position = new Vector3(400f, 400f, 0f);
+            stats.RestoreFullMana();
+            EnemyHealth surroundNorth = SpawnDummyEnemy(new Vector2(400f, 402.6f), 2000f);
+            EnemyHealth surroundSouth = SpawnDummyEnemy(new Vector2(400f, 397.4f), 2000f);
+            EnemyHealth surroundEast = SpawnDummyEnemy(new Vector2(402.6f, 400f), 2000f);
+            EnemyHealth surroundWest = SpawnDummyEnemy(new Vector2(397.4f, 400f), 2000f);
+            float nBefore = surroundNorth.CurrentHealth;
+            float sBefore = surroundSouth.CurrentHealth;
+            float eBefore = surroundEast.CurrentHealth;
+            float wBefore = surroundWest.CurrentHealth;
+
+            Assert.That(hero.TryCastSonTinhSkill(3, null, ~0), Is.True);
+            yield return new WaitForSeconds(1.05f);
+            Assert.That(surroundNorth.CurrentHealth, Is.LessThan(nBefore), "Skill 4 (F) must hit North enemy.");
+            Assert.That(surroundSouth.CurrentHealth, Is.LessThan(sBefore), "Skill 4 (F) must hit South enemy.");
+            Assert.That(surroundEast.CurrentHealth, Is.LessThan(eBefore), "Skill 4 (F) must hit East enemy.");
+            Assert.That(surroundWest.CurrentHealth, Is.LessThan(wBefore), "Skill 4 (F) must hit West enemy.");
+        }
+
+        private void SetupTestPlayer(string name, out SpriteRenderer sr, out Rigidbody2D rb,
+            out PlayerStats stats, out PlayerCombat combat, out SkillManager skillManager, out ThanhGiongHeroController hero)
+        {
+            player = new GameObject(name);
+            player.tag = "Player";
+            player.transform.position = new Vector3(400f, 400f, 0f);
+            sr = player.AddComponent<SpriteRenderer>();
+            rb = player.AddComponent<Rigidbody2D>();
+            rb.bodyType = RigidbodyType2D.Kinematic;
+            rb.gravityScale = 0f;
+
+            stats = player.AddComponent<PlayerStats>();
+            player.AddComponent<PlayerHealth>();
+            player.AddComponent<PlayerMovement>();
+            player.AddComponent<PlayerCharacterAnimator>();
+            combat = player.AddComponent<PlayerCombat>();
+            combat.SetAutoAttackEnabled(false);
+            player.AddComponent<SkillInventory>();
+            skillManager = player.AddComponent<SkillManager>();
+            hero = player.AddComponent<ThanhGiongHeroController>();
         }
 
         private EnemyHealth SpawnDummyEnemy(Vector2 position, float maxHp)

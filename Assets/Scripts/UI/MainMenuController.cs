@@ -2,6 +2,7 @@ using TMPro;
 using TopDownGame.Core;
 using TopDownGame.Save;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -18,6 +19,25 @@ namespace TopDownGame.UI
         private bool leaving;
         private bool recoveryPromptPending;
 
+        public static bool SkipSplashOnce { get; set; } = false;
+        private static bool hasShownInitialSplash = false;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStaticState()
+        {
+            SkipSplashOnce = false;
+            hasShownInitialSplash = false;
+        }
+
+        private GameObject splashPanel;
+        private Transform menuSurface;
+        private bool inSplash = true;
+        private float splashLoadProgress;
+        private float splashAutoAdvanceTimer;
+        private RectTransform splashFillRect;
+        private TMP_Text splashPromptText;
+        private TMP_Text splashStatusText;
+
         private void Awake()
         {
             dialog = gameObject.AddComponent<MenuDialog>();
@@ -29,9 +49,9 @@ namespace TopDownGame.UI
             rect.anchorMin = Vector2.zero;
             rect.anchorMax = Vector2.one;
             rect.offsetMin = rect.offsetMax = Vector2.zero;
-            Transform surface = EquipmentPanelLayout.CreateSurface(menu.gameObject, new Vector2(900, 1080));
+            menuSurface = EquipmentPanelLayout.CreateSurface(menu.gameObject, new Vector2(900, 1080));
             menu.GetComponent<Image>().color = new Color(0.012f, 0.016f, 0.027f, 0.55f);
-            Transform frame = FantasyEquipmentUI.Frame(surface, "MainMenuWindow", 590, 80, 740, 920, FantasyEquipmentUI.Ink);
+            Transform frame = FantasyEquipmentUI.Frame(menuSurface, "MainMenuWindow", 590, 80, 740, 920, FantasyEquipmentUI.Ink);
             FantasyEquipmentUI.Text(frame, "Eyebrow", "PHIÊU LƯU HÀNH ĐỘNG 2D", 55, 42, 630, 30, 20,
                 FantasyEquipmentUI.Muted, TextAlignmentOptions.Center);
             FantasyEquipmentUI.Text(frame, "Title", "VỆ THẦN RỪNG", 40, 88, 660, 90, 52,
@@ -61,15 +81,167 @@ namespace TopDownGame.UI
             }
             RefreshProgressView();
             recoveryPromptPending = progress != null && progress.NeedsSaveRecovery;
+
+            bool shouldShowSplash = !SkipSplashOnce && !hasShownInitialSplash && !GamePreferences.IsAutomatedTestRun;
+            SkipSplashOnce = false;
+
+            if (shouldShowSplash)
+            {
+                hasShownInitialSplash = true;
+                inSplash = true;
+                BuildSplashScreen(menu);
+            }
+            else
+            {
+                inSplash = false;
+                if (menuSurface != null)
+                {
+                    menuSurface.gameObject.SetActive(true);
+                }
+            }
+        }
+
+        private void BuildSplashScreen(Transform parent)
+        {
+            splashPanel = new GameObject("SplashScreenRoot", typeof(RectTransform), typeof(CanvasGroup));
+            splashPanel.transform.SetParent(parent, false);
+            RectTransform splashRect = splashPanel.GetComponent<RectTransform>();
+            splashRect.anchorMin = Vector2.zero;
+            splashRect.anchorMax = Vector2.one;
+            splashRect.offsetMin = splashRect.offsetMax = Vector2.zero;
+
+            // Fullscreen click catcher
+            Button clickCatcher = splashPanel.AddComponent<Button>();
+            clickCatcher.onClick.AddListener(DismissSplash);
+            Image bg = splashPanel.AddComponent<Image>();
+            bg.color = new Color(0.015f, 0.02f, 0.035f, 0.98f);
+            clickCatcher.targetGraphic = bg;
+
+            Transform surface = EquipmentPanelLayout.CreateSurface(splashPanel, new Vector2(1000, 1080));
+
+            // Epic Title Banner
+            FantasyEquipmentUI.Text(surface, "SplashEyebrow", "PHIÊU LƯU HÀNH ĐỘNG 2D  •  VỆ THẦN RỪNG",
+                0, 240, 1920, 36, 22, FantasyEquipmentUI.Green, TextAlignmentOptions.Center);
+            FantasyEquipmentUI.Text(surface, "SplashTitle", "VỆ THẦN RỪNG",
+                0, 280, 1920, 110, 74, FantasyEquipmentUI.Gold, TextAlignmentOptions.Center);
+            FantasyEquipmentUI.Text(surface, "SplashSubtitle", "HUYỀN THOẠI PHÙ ĐỔNG THIÊN VƯƠNG",
+                0, 400, 1920, 40, 26, FantasyEquipmentUI.TextColor, TextAlignmentOptions.Center);
+
+            FantasyEquipmentUI.Line(surface, 660, 470, 600);
+
+            // Loading Section
+            Transform track = FantasyEquipmentUI.Frame(surface, "LoadingTrack", 680, 680, 560, 22, FantasyEquipmentUI.Ink);
+            Image fillImage = FantasyEquipmentUI.Box(track, "LoadingFill", 2, 2, 0, 18, FantasyEquipmentUI.Gold);
+            splashFillRect = fillImage.rectTransform;
+
+            splashStatusText = FantasyEquipmentUI.Text(surface, "LoadingStatus", "Đang nạp dữ liệu thế giới...",
+                0, 720, 1920, 36, 20, FantasyEquipmentUI.Muted, TextAlignmentOptions.Center);
+
+            // Press Any Key Prompt (hidden initially until loading finishes)
+            splashPromptText = FantasyEquipmentUI.Text(surface, "PressPrompt", "✦ NHẤN NÚT BẤT KỲ HAY DÙNG CHUỘT ĐỂ TIẾP TỤC ✦",
+                0, 690, 1920, 50, 26, FantasyEquipmentUI.Gold, TextAlignmentOptions.Center);
+            splashPromptText.gameObject.SetActive(false);
+
+            if (menuSurface != null)
+            {
+                menuSurface.gameObject.SetActive(false);
+            }
         }
 
         private void Start()
         {
-            firstButton?.Select();
+            if (!inSplash)
+            {
+                firstButton?.Select();
+            }
+        }
+
+        private void Update()
+        {
+            if (inSplash)
+            {
+                UpdateSplashScreen();
+                return;
+            }
+
             TryShowPendingRecovery();
         }
 
-        private void Update() => TryShowPendingRecovery();
+        private void UpdateSplashScreen()
+        {
+            if (splashLoadProgress < 1f)
+            {
+                splashLoadProgress += Time.unscaledDeltaTime * 1.15f;
+                if (splashFillRect != null)
+                {
+                    splashFillRect.sizeDelta = new Vector2(Mathf.Clamp01(splashLoadProgress) * 556f, 18f);
+                }
+
+                if (splashStatusText != null)
+                {
+                    splashStatusText.text = splashLoadProgress < 0.35f
+                        ? "Đang khởi tạo tài nguyên đại ngàn..."
+                        : splashLoadProgress < 0.75f
+                            ? "Đang nạp kỹ năng và anh hùng Phù Đổng..."
+                            : "Sẵn sàng phiêu lưu!";
+                }
+
+                if (splashLoadProgress >= 1f)
+                {
+                    if (splashFillRect != null && splashFillRect.parent != null)
+                    {
+                        splashFillRect.parent.gameObject.SetActive(false);
+                    }
+                    if (splashStatusText != null)
+                    {
+                        splashStatusText.gameObject.SetActive(false);
+                    }
+                    if (splashPromptText != null)
+                    {
+                        splashPromptText.gameObject.SetActive(true);
+                    }
+                }
+            }
+            else
+            {
+                splashAutoAdvanceTimer += Time.unscaledDeltaTime;
+
+                // Pulsing glow animation on prompt text
+                if (splashPromptText != null)
+                {
+                    float alpha = 0.38f + Mathf.PingPong(Time.unscaledTime * 1.4f, 0.62f);
+                    Color c = FantasyEquipmentUI.Gold;
+                    c.a = alpha;
+                    splashPromptText.color = c;
+                }
+
+                bool keyPressed = Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame;
+                bool mousePressed = Mouse.current != null &&
+                    (Mouse.current.leftButton.wasPressedThisFrame || Mouse.current.rightButton.wasPressedThisFrame);
+
+                // Tự động chuyển vào Main Menu sau khi loading hoặc bấm phím / nhấp chuột ngay
+                if (keyPressed || mousePressed || splashAutoAdvanceTimer >= 1.2f)
+                {
+                    DismissSplash();
+                }
+            }
+        }
+
+        public void DismissSplash()
+        {
+            if (!inSplash) return;
+            inSplash = false;
+            if (splashPanel != null)
+            {
+                splashPanel.SetActive(false);
+            }
+            if (menuSurface != null)
+            {
+                menuSurface.gameObject.SetActive(true);
+            }
+            firstButton?.Select();
+            TryShowPendingRecovery();
+        }
 
         private void TryShowPendingRecovery()
         {

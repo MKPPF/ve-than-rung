@@ -216,6 +216,7 @@ namespace TopDownGame.Save
             tutorialInitialized = true;
             tutorialCompleted = false;
             playerProgressApplied = false;
+            PlayerPrefs.SetInt(TopDownGame.Core.GamePreferences.Key("TopDownGame.SelectedHero"), (int)HeroCharacterId.ForestWarrior);
             NormalizeCollections();
             string json = JsonUtility.ToJson(CreateSnapshot());
             // A new campaign owns its own backup; an older campaign must not
@@ -410,7 +411,8 @@ namespace TopDownGame.Save
             equippedPantsId = equippedPantsId, equippedNecklaceId = equippedNecklaceId, chestItems = chestItems,
             chestInitialized = chestInitialized, unlockedRegions = unlockedRegions, safeRespawnScene = safeRespawnScene,
             safeRespawnPosition = safeRespawnPosition, hasSafeRespawn = hasSafeRespawn,
-            tutorialInitialized = tutorialInitialized, tutorialCompleted = tutorialCompleted
+            tutorialInitialized = tutorialInitialized, tutorialCompleted = tutorialCompleted,
+            selectedHero = PlayerPrefs.GetInt(TopDownGame.Core.GamePreferences.Key("TopDownGame.SelectedHero"), (int)HeroCharacterId.ForestWarrior)
         };
 
         private void ApplySnapshot(ProgressSnapshot snapshot)
@@ -426,6 +428,13 @@ namespace TopDownGame.Save
             chestInitialized = snapshot.chestInitialized; unlockedRegions = snapshot.unlockedRegions; safeRespawnScene = snapshot.safeRespawnScene;
             safeRespawnPosition = snapshot.safeRespawnPosition; hasSafeRespawn = snapshot.hasSafeRespawn;
             tutorialInitialized = snapshot.tutorialInitialized; tutorialCompleted = snapshot.tutorialCompleted;
+            int heroVal = snapshot.selectedHero >= 0 ? snapshot.selectedHero : (int)HeroCharacterId.ForestWarrior;
+            if (!ThanhGiongHeroController.IsHeroUnlocked((HeroCharacterId)heroVal))
+            {
+                heroVal = (int)HeroCharacterId.ForestWarrior;
+            }
+            PlayerPrefs.SetInt(TopDownGame.Core.GamePreferences.Key("TopDownGame.SelectedHero"), heroVal);
+            PlayerPrefs.Save();
         }
 
         public void PrepareRetry()
@@ -466,7 +475,39 @@ namespace TopDownGame.Save
                 inventory?.LoadProgress(ownedSkills, equippedSkills);
             }
 
+            ThanhGiongHeroController heroController = stats.GetComponent<ThanhGiongHeroController>();
+            if (heroController == null)
+            {
+                heroController = ThanhGiongHeroController.Ensure(stats.gameObject);
+            }
+            int savedHero = PlayerPrefs.GetInt(TopDownGame.Core.GamePreferences.Key("TopDownGame.SelectedHero"), (int)HeroCharacterId.ForestWarrior);
+            if (!ThanhGiongHeroController.IsHeroUnlocked((HeroCharacterId)savedHero))
+            {
+                savedHero = (int)HeroCharacterId.ForestWarrior;
+                PlayerPrefs.SetInt(TopDownGame.Core.GamePreferences.Key("TopDownGame.SelectedHero"), (int)HeroCharacterId.ForestWarrior);
+                PlayerPrefs.Save();
+            }
+            heroController?.SelectHero((HeroCharacterId)savedHero, false);
+
             playerProgressApplied = true;
+        }
+
+        public static void ResetAllGameProgress()
+        {
+            PlayerPrefs.DeleteKey(TopDownGame.Core.GamePreferences.Key("TopDownGame.Progress.v1"));
+            PlayerPrefs.DeleteKey(TopDownGame.Core.GamePreferences.Key("TopDownGame.Progress.v1.backup"));
+            PlayerPrefs.DeleteKey(TopDownGame.Core.GamePreferences.Key("TopDownGame.Progress.v1.unreadable"));
+            PlayerPrefs.DeleteKey(TopDownGame.Core.GamePreferences.Key("TopDownGame.SelectedHero"));
+            PlayerPrefs.DeleteKey("TopDownGame.Progress.v1");
+            PlayerPrefs.DeleteKey("TopDownGame.Progress.v1.backup");
+            PlayerPrefs.DeleteKey("TopDownGame.Progress.v1.unreadable");
+            PlayerPrefs.DeleteKey("TopDownGame.SelectedHero");
+            PlayerPrefs.Save();
+
+            if (Instance != null)
+            {
+                Instance.BeginNewGame();
+            }
         }
 
         public void AddGold(int amount)

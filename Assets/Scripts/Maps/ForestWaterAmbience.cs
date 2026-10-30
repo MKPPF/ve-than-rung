@@ -30,23 +30,31 @@ namespace TopDownGame.Maps
         }
         private void Update()
         {
-            if (ripples == null) return;
+            if (ripples == null && spray == null) return;
             elapsed += Time.deltaTime;
-            for (int i = 0; i < ripples.Length; i++)
+            if (ripples != null)
             {
-                float t = Mathf.Repeat(elapsed * 0.36f + i * 0.163f, 1f);
-                Vector2 offset = new Vector2(Mathf.Sin(i * 2.4f) * pondRadius.x * 0.55f,
-                    Mathf.Cos(i * 2.4f) * pondRadius.y * 0.55f);
-                ripples[i].transform.position = pondCenter + offset;
-                ripples[i].transform.localScale = new Vector3(0.1f + t * 0.75f, 0.08f + t * 0.3f, 1);
-                ripples[i].color = new Color(0.66f, 1f, 0.95f, Mathf.Sin(t * Mathf.PI) * 0.19f);
+                for (int i = 0; i < ripples.Length; i++)
+                {
+                    if (ripples[i] == null) continue;
+                    float t = Mathf.Repeat(elapsed * 0.36f + i * 0.163f, 1f);
+                    Vector2 offset = new Vector2(Mathf.Sin(i * 2.4f) * pondRadius.x * 0.55f,
+                        Mathf.Cos(i * 2.4f) * pondRadius.y * 0.55f);
+                    ripples[i].transform.position = pondCenter + offset;
+                    ripples[i].transform.localScale = new Vector3(0.1f + t * 0.75f, 0.08f + t * 0.3f, 1);
+                    ripples[i].color = new Color(0.66f, 1f, 0.95f, Mathf.Sin(t * Mathf.PI) * 0.19f);
+                }
             }
-            for (int i = 0; i < spray.Length; i++)
+            if (spray != null)
             {
-                float t = Mathf.Repeat(elapsed * 0.85f + i * 0.083f, 1);
-                spray[i].transform.position = waterfallBottom + new Vector2(Mathf.Sin(i * 4.3f) * t * 0.6f, (1 - t) * 0.8f - t * 0.18f);
-                spray[i].transform.localScale = new Vector3(0.025f, 0.08f, 1);
-                spray[i].color = new Color(0.8f, 1f, 1f, Mathf.Sin(t * Mathf.PI) * 0.48f);
+                for (int i = 0; i < spray.Length; i++)
+                {
+                    if (spray[i] == null) continue;
+                    float t = Mathf.Repeat(elapsed * 0.85f + i * 0.083f, 1);
+                    spray[i].transform.position = waterfallBottom + new Vector2(Mathf.Sin(i * 4.3f) * t * 0.6f, (1 - t) * 0.8f - t * 0.18f);
+                    spray[i].transform.localScale = new Vector3(0.025f, 0.08f, 1);
+                    spray[i].color = new Color(0.8f, 1f, 1f, Mathf.Sin(t * Mathf.PI) * 0.48f);
+                }
             }
         }
         private void OnDestroy()

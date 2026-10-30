@@ -174,7 +174,8 @@ namespace TopDownGame.EditorTools
         public static void OpenMainMenu()
         {
             string mainMenuPath = SceneRoot + "/MainMenu.unity";
-            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(mainMenuPath) == null)
+            SceneAsset mainScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(mainMenuPath);
+            if (mainScene == null)
             {
                 Debug.LogError("Main menu scene is missing. Run Top Down Game/Build Complete MVP first.");
                 return;
@@ -185,8 +186,16 @@ namespace TopDownGame.EditorTools
                 return;
             }
 
+            EditorSceneManager.playModeStartScene = mainScene;
             EditorSceneManager.OpenScene(mainMenuPath);
-            Selection.activeObject = AssetDatabase.LoadAssetAtPath<SceneAsset>(mainMenuPath);
+            Selection.activeObject = mainScene;
+        }
+
+        [MenuItem("Top Down Game/Reset All Save Data", priority = 200)]
+        public static void ResetAllSaveData()
+        {
+            TopDownGame.Save.GameProgressManager.ResetAllGameProgress();
+            Debug.Log("[TopDownGame] Da reset toan bo tien trinh game va nhan vat ve mac dinh (Chien Binh Rung).");
         }
 
         [MenuItem("Top Down Game/Edit Map01", priority = 1)]
@@ -327,7 +336,13 @@ namespace TopDownGame.EditorTools
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            EditorSceneManager.OpenScene(SceneRoot + "/MainMenu.unity");
+            string mainMenuPath = SceneRoot + "/MainMenu.unity";
+            SceneAsset mainScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(mainMenuPath);
+            if (mainScene != null)
+            {
+                EditorSceneManager.playModeStartScene = mainScene;
+            }
+            EditorSceneManager.OpenScene(mainMenuPath);
             Debug.Log("Top Down Game MVP built: MainMenu, Lobby, combat maps and weapon shop.");
         }
 
@@ -1491,7 +1506,7 @@ namespace TopDownGame.EditorTools
             HeroSelectionStation stationComponent = heroShrine.AddComponent<HeroSelectionStation>();
             Set(stationComponent, "selectionUI", heroSelectionUI);
             GameObject shrineLabel = CreateWorldLabel("HeroShrineLabel",
-                "ĐÀI THÁNH GIÓNG\nE / NHẤP ĐÚP  •  PHÍM H",
+                "ĐÀI ANH HÙNG\nE / NHẤP ĐÚP  •  PHÍM H",
                 heroShrine.transform.position + new Vector3(0f, 1.15f, 0f),
                 new Color(1f, 0.86f, 0.28f), 0.032f);
             shrineLabel.transform.SetParent(heroShrine.transform, true);
@@ -3472,9 +3487,14 @@ namespace TopDownGame.EditorTools
                 importer.spritePixelsPerUnit = resolvedPixelsPerUnit;
                 bool useGroundedPivot = TryResolveGroundedPlayerPivot(path,
                     resolvedPixelsPerUnit, out Vector2 groundedPivot);
-                importer.alphaIsTransparency = folder == CharacterArtRoot ||
+                bool isJpg = path.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
+                    path.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase);
+                importer.alphaSource = isJpg
+                    ? TextureImporterAlphaSource.None
+                    : TextureImporterAlphaSource.FromInput;
+                importer.alphaIsTransparency = !isJpg && (folder == CharacterArtRoot ||
                     folder == PropsArtRoot || folder == SkillIconArtRoot ||
-                    folder == EquipmentIconArtRoot;
+                    folder == EquipmentIconArtRoot);
                 importer.mipmapEnabled = false;
                 // Painted scenery is not pixel art. Point sampling magnifies
                 // texels and shimmers under camera motion; preserve smooth edges.

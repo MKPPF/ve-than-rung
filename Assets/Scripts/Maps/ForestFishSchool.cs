@@ -120,24 +120,33 @@ namespace TopDownGame.Maps
             return obj.transform;
         }
 
-        private void Update() { if(fish==null)return; elapsed+=Time.deltaTime; Animate(); }
+        private void Update() { if(fish==null || habitats==null || habitatRadii==null || habitatCenters==null)return; elapsed+=Time.deltaTime; Animate(); }
         private void Animate()
         {
             for(int i=0;i<fish.Length;i++)
             {
+                if(fish[i]==null || i>=habitats.Length) continue;
                 int h=habitats[i];
+                if(habitatRadii==null || h>=habitatRadii.Length || habitatCenters==null || h>=habitatCenters.Length) continue;
                 float phase=elapsed*(0.32f+(i%4)*0.035f)+i*2.39996f;
-                Vector2 safe=habitatRadii[h]-Vector2.one*(lengths[i]*0.5f);
+                float len = lengths!=null && i<lengths.Length ? lengths[i] : 0.3f;
+                Vector2 safe=habitatRadii[h]-Vector2.one*(len*0.5f);
                 float scale=0.55f+(i%3)*0.11f;
                 Vector2 offset=new Vector2(Mathf.Cos(phase)*safe.x,Mathf.Sin(phase)*safe.y)*scale;
                 fish[i].localPosition=habitatCenters[h]+offset;
                 Vector2 tangent=new Vector2(-Mathf.Sin(phase)*safe.x,Mathf.Cos(phase)*safe.y);
                 fish[i].localRotation=Quaternion.Euler(0,0,Mathf.Atan2(tangent.y,tangent.x)*Mathf.Rad2Deg);
-                tails[i].localRotation=Quaternion.Euler(0,0,Mathf.Sin(elapsed*8+i)*24);
-                float wake=Mathf.Repeat(elapsed*0.45f+i*0.317f,1);
-                wakes[i].transform.localPosition=fish[i].localPosition;
-                wakes[i].transform.localScale=new Vector3(0.10f+wake*0.20f,0.045f+wake*0.075f,1);
-                wakes[i].color=new Color(0.75f,0.96f,1f,Mathf.Sin(wake*Mathf.PI)*0.10f);
+                if(tails!=null && i<tails.Length && tails[i]!=null)
+                {
+                    tails[i].localRotation=Quaternion.Euler(0,0,Mathf.Sin(elapsed*8+i)*24);
+                }
+                if(wakes!=null && i<wakes.Length && wakes[i]!=null)
+                {
+                    float wake=Mathf.Repeat(elapsed*0.45f+i*0.317f,1);
+                    wakes[i].transform.localPosition=fish[i].localPosition;
+                    wakes[i].transform.localScale=new Vector3(0.10f+wake*0.20f,0.045f+wake*0.075f,1);
+                    wakes[i].color=new Color(0.75f,0.96f,1f,Mathf.Sin(wake*Mathf.PI)*0.10f);
+                }
             }
         }
         private void OnEnable() { if(visualRoot!=null)visualRoot.SetActive(true); }

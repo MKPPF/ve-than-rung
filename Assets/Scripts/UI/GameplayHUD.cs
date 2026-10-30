@@ -136,20 +136,33 @@ namespace TopDownGame.UI
 
             if (skills != null && skills.Inventory != null)
             {
+                EnsureSkillLabelsResolved();
                 for (int i = 0; i < 4 && i < skillTexts.Length; i++)
                 {
                     float remaining = skills.GetCooldownRemaining(i);
                     float duration = skills.GetCooldownDuration(i);
                     SkillData data = skills.GetSkillData(i);
 
-                    skillTexts[i].text = SkillKeyLabels[i];
-                    skillNames[i].text = data != null ? data.DisplayName : "Ô trống";
+                    if (skillTexts[i] != null)
+                    {
+                        skillTexts[i].text = SkillKeyLabels[i];
+                    }
+
+                    if (skillNames != null && i < skillNames.Length && skillNames[i] != null)
+                    {
+                        skillNames[i].text = data != null ? data.DisplayName : "Ô trống";
+                    }
+
                     bool dead = health != null && !health.IsAlive;
                     bool insufficientMana = data != null && stats != null && stats.CurrentMana < data.ManaCost;
-                    skillStates[i].text = data == null ? "K: TRANG BỊ" : dead ? "ĐÃ GỤC" : remaining > 0f ?
-                        "HỒI " + remaining.ToString("0.0") + " s" : insufficientMana ? "THIẾU MANA" : "SẴN SÀNG";
-                    skillStates[i].color = data == null ? FantasyEquipmentUI.Muted : dead ? new Color(1f,0.65f,0.56f) :
-                        remaining > 0f ? FantasyEquipmentUI.Gold : insufficientMana ? new Color(1f,0.65f,0.56f) : FantasyEquipmentUI.Green;
+
+                    if (skillStates != null && i < skillStates.Length && skillStates[i] != null)
+                    {
+                        skillStates[i].text = data == null ? "K: TRANG BỊ" : dead ? "ĐÃ GỤC" : remaining > 0f ?
+                            "HỒI " + remaining.ToString("0.0") + " s" : insufficientMana ? "THIẾU MANA" : "SẴN SÀNG";
+                        skillStates[i].color = data == null ? FantasyEquipmentUI.Muted : dead ? new Color(1f,0.65f,0.56f) :
+                            remaining > 0f ? FantasyEquipmentUI.Gold : insufficientMana ? new Color(1f,0.65f,0.56f) : FantasyEquipmentUI.Green;
+                    }
 
                     if (skillIconImages != null && i < skillIconImages.Length &&
                         skillIconImages[i] != null)
@@ -199,6 +212,10 @@ namespace TopDownGame.UI
             {
                 healthBar.maxValue = maximum;
                 healthBar.value = current;
+                if (healthValue == null)
+                {
+                    healthValue = healthBar.transform.Find("Value")?.GetComponent<TMP_Text>();
+                }
             }
             if (healthValue != null) healthValue.text = "MÁU  " + Mathf.CeilToInt(current).ToString("N0") + " / " + Mathf.CeilToInt(maximum).ToString("N0");
         }
@@ -209,6 +226,10 @@ namespace TopDownGame.UI
             {
                 manaBar.maxValue = maximum;
                 manaBar.value = current;
+                if (manaValue == null)
+                {
+                    manaValue = manaBar.transform.Find("Value")?.GetComponent<TMP_Text>();
+                }
             }
             if (manaValue != null) manaValue.text = "MANA  " + Mathf.FloorToInt(current).ToString("N0") + " / " + Mathf.FloorToInt(maximum).ToString("N0");
         }
@@ -315,6 +336,60 @@ namespace TopDownGame.UI
             levelUpRoutine = null;
         }
 
+        private void EnsureSkillLabelsResolved()
+        {
+            if (skillNames != null && skillNames[0] != null && skillStates != null && skillStates[0] != null)
+            {
+                return;
+            }
+
+            if (skillBoxes == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < 4 && i < skillBoxes.Length; i++)
+            {
+                if (skillBoxes[i] == null)
+                {
+                    continue;
+                }
+
+                Transform slot = skillBoxes[i].transform.parent;
+                if (slot == null)
+                {
+                    continue;
+                }
+
+                if (skillNames != null && i < skillNames.Length && skillNames[i] == null)
+                {
+                    Transform tName = slot.Find("Name");
+                    if (tName != null)
+                    {
+                        skillNames[i] = tName.GetComponent<TMP_Text>();
+                    }
+                }
+
+                if (skillStates != null && i < skillStates.Length && skillStates[i] == null)
+                {
+                    Transform tState = slot.Find("State");
+                    if (tState != null)
+                    {
+                        skillStates[i] = tState.GetComponent<TMP_Text>();
+                    }
+                }
+
+                if (skillTexts != null && i < skillTexts.Length && skillTexts[i] == null)
+                {
+                    Transform tLabel = slot.Find("Label");
+                    if (tLabel != null)
+                    {
+                        skillTexts[i] = tLabel.GetComponent<TMP_Text>();
+                    }
+                }
+            }
+        }
+
         private void EnsureLabels()
         {
             Canvas canvas = GetComponentInParent<Canvas>();
@@ -326,23 +401,38 @@ namespace TopDownGame.UI
             root.SetAsFirstSibling();
             displayRoot = root.gameObject;
 
-            Transform card = FantasyEquipmentUI.Frame(root, "PlayerStatus", 22, 22, 400, 280, FantasyEquipmentUI.Ink);
-            mapText = Label(card, "Map", "", 16, 10, 368, 48, 24, FantasyEquipmentUI.Gold);
-            recommendation = Label(card, "RecommendedLevel", "", 16, 60, 368, 24, 20, FantasyEquipmentUI.Muted);
-            enemyCountText = Label(card, "Enemies", "", 16, 87, 368, 26, 21);
-            healthBar = ResourceBar(card, "HealthBar", 16, 120, 368, 28, new Color(0.64f,0.17f,0.21f));
-            healthValue = Label(healthBar.transform, "Value", "", 8, 0, 352, 28, 21);
-            manaBar = ResourceBar(card, "ManaBar", 16, 154, 368, 28, new Color(0.12f,0.38f,0.57f));
-            manaValue = Label(manaBar.transform, "Value", "", 8, 0, 352, 28, 21);
-            levelText = Label(card, "Level", "", 16, 190, 368, 26, 21, FantasyEquipmentUI.Gold);
-            experienceBar = ResourceBar(card, "ExperienceBar", 16, 221, 368, 6, FantasyEquipmentUI.Gold);
-            goldText = Label(card, "Gold", "", 16, 236, 368, 28, 21);
+            // Nút Menu / Tạm dừng ký hiệu mp3 (❚❚) ở góc trên cùng bên trái màn hình
+            Transform pauseFrame = FantasyEquipmentUI.Frame(root, "TopLeftPauseButton", 22, 22, 56, 56, FantasyEquipmentUI.Ink);
+            Button pauseBtn = pauseFrame.gameObject.AddComponent<Button>();
+            Image pauseFace = pauseFrame.Find("Inset").GetComponent<Image>();
+            pauseFrame.GetComponent<Image>().raycastTarget = true;
+            pauseBtn.targetGraphic = pauseFace;
+            EquipmentPanelLayout.StyleButton(pauseBtn);
+            pauseBtn.onClick.AddListener(() =>
+            {
+                PauseMenu pauseMenu = Object.FindAnyObjectByType<PauseMenu>();
+                if (pauseMenu != null) pauseMenu.Toggle();
+            });
+            TMP_Text pauseIcon = FantasyEquipmentUI.Text(pauseFrame, "PauseSymbol", "||", 0, 6, 56, 44, 26, FantasyEquipmentUI.Gold, TextAlignmentOptions.Center);
+            pauseIcon.fontStyle = FontStyles.Bold;
 
-            Transform hints = FantasyEquipmentUI.Frame(root, "ControlHints", 22, 390, 400, 96, FantasyEquipmentUI.Ink);
-            controlsText = Label(hints, "Controls", "WASD / Chuột trái: Di chuyển\nJ / Chuột phải: Đánh  •  E: Tương tác\nI: Túi  •  K: Kỹ năng  •  H: Nhân vật  •  Esc: Tạm dừng", 14, 8, 372, 80, 20);
+            Transform card = FantasyEquipmentUI.Frame(root, "PlayerStatus", 86, 22, 340, 280, FantasyEquipmentUI.Ink);
+            mapText = Label(card, "Map", "", 14, 10, 312, 48, 24, FantasyEquipmentUI.Gold);
+            recommendation = Label(card, "RecommendedLevel", "", 14, 60, 312, 24, 20, FantasyEquipmentUI.Muted);
+            enemyCountText = Label(card, "Enemies", "", 14, 87, 312, 26, 21);
+            healthBar = ResourceBar(card, "HealthBar", 14, 120, 312, 28, new Color(0.64f,0.17f,0.21f));
+            healthValue = Label(healthBar.transform, "Value", "", 8, 0, 296, 28, 21);
+            manaBar = ResourceBar(card, "ManaBar", 14, 154, 312, 28, new Color(0.12f,0.38f,0.57f));
+            manaValue = Label(manaBar.transform, "Value", "", 8, 0, 296, 28, 21);
+            levelText = Label(card, "Level", "", 14, 190, 312, 26, 21, FantasyEquipmentUI.Gold);
+            experienceBar = ResourceBar(card, "ExperienceBar", 14, 221, 312, 6, FantasyEquipmentUI.Gold);
+            goldText = Label(card, "Gold", "", 14, 236, 312, 28, 21);
 
-            Transform pauseCard = FantasyEquipmentUI.Frame(root, "HUDPauseCard", 22, 496, 400, 48, FantasyEquipmentUI.Ink);
-            Button pauseButton = FantasyEquipmentUI.Button(pauseCard, "HUDPauseButton", "⏸️ TẠM DỪNG & LƯU TIẾN TRÌNH", 4, 4, 392, 40, () =>
+            Transform hints = FantasyEquipmentUI.Frame(root, "ControlHints", 86, 310, 340, 96, FantasyEquipmentUI.Ink);
+            controlsText = Label(hints, "Controls", "WASD / Chuột trái: Di chuyển\nJ / Chuột phải: Đánh  •  E: Tương tác\nI: Túi  •  K: Kỹ năng  •  H: Nhân vật  •  Esc: Tạm dừng", 12, 8, 316, 80, 18);
+
+            Transform pauseCard = FantasyEquipmentUI.Frame(root, "HUDPauseCard", 22, 530, 400, 48, FantasyEquipmentUI.Ink);
+            Button pauseButton = FantasyEquipmentUI.Button(pauseCard, "HUDPauseButton", "|| TẠM DỪNG & LƯU TIẾN TRÌNH", 4, 4, 392, 40, () =>
             {
                 PauseMenu pause = Object.FindAnyObjectByType<PauseMenu>();
                 if (pause != null) pause.Toggle();
@@ -407,7 +497,7 @@ namespace TopDownGame.UI
             TMP_Text text = FantasyEquipmentUI.Text(parent,name,value,x,y,width,height,size,color,alignment);
             text.enableAutoSizing = false;
             text.textWrappingMode = TextWrappingModes.Normal;
-            text.overflowMode = TextOverflowModes.Ellipsis;
+            text.overflowMode = TextOverflowModes.Truncate;
             return text;
         }
 

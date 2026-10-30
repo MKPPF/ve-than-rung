@@ -44,26 +44,47 @@ namespace TopDownGame.Player
         private static readonly Color FlameMid = new Color(1.00f, 0.58f, 0.12f, 1f);
         private static readonly Color FlameOuter = new Color(0.92f, 0.22f, 0.06f, 1f);
 
+        private static bool IsValidSprite(Sprite s)
+        {
+            return s != null && s.texture != null;
+        }
+
+        private static bool IsValidArray(Sprite[] arr)
+        {
+            if (arr == null || arr.Length != 4) return false;
+            for (int i = 0; i < arr.Length; i++)
+            {
+                if (arr[i] == null || arr[i].texture == null) return false;
+            }
+            return true;
+        }
+
         public static Sprite GetMountedHeroSprite(int strideFrame, bool swordPose, bool bambooChargePose)
         {
             EnsureCharacterSprites();
             int index = Mathf.Abs(strideFrame) % 4;
             if (swordPose)
             {
-                return mountedSwordAttackSprites[index];
+                return mountedSwordAttackSprites != null && mountedSwordAttackSprites.Length > index
+                    ? mountedSwordAttackSprites[index]
+                    : null;
             }
 
             if (bambooChargePose)
             {
-                return mountedBambooAttackSprites[index];
+                return mountedBambooAttackSprites != null && mountedBambooAttackSprites.Length > index
+                    ? mountedBambooAttackSprites[index]
+                    : null;
             }
 
-            return mountedIdleAndGallopSprites[index];
+            return mountedIdleAndGallopSprites != null && mountedIdleAndGallopSprites.Length > index
+                ? mountedIdleAndGallopSprites[index]
+                : null;
         }
 
         public static Sprite GetIronSwordSprite()
         {
-            if (ironSwordSprite == null)
+            if (!IsValidSprite(ironSwordSprite))
             {
                 ironSwordSprite = BuildIronSwordSprite();
             }
@@ -73,7 +94,7 @@ namespace TopDownGame.Player
 
         public static Sprite GetSingleBambooSprite()
         {
-            if (singleBambooSprite == null)
+            if (!IsValidSprite(singleBambooSprite))
             {
                 singleBambooSprite = BuildSingleBambooSprite();
             }
@@ -83,7 +104,7 @@ namespace TopDownGame.Player
 
         public static Sprite GetBambooBundleSprite()
         {
-            if (bambooBundleSprite == null)
+            if (!IsValidSprite(bambooBundleSprite))
             {
                 bambooBundleSprite = BuildBambooBundleSprite();
             }
@@ -93,7 +114,7 @@ namespace TopDownGame.Player
 
         public static Sprite GetSlashArcSprite()
         {
-            if (slashArcSprite == null)
+            if (!IsValidSprite(slashArcSprite))
             {
                 slashArcSprite = BuildSlashArcSprite();
             }
@@ -103,7 +124,7 @@ namespace TopDownGame.Player
 
         public static Sprite GetFlameSprite()
         {
-            if (flameSprite == null)
+            if (!IsValidSprite(flameSprite))
             {
                 flameSprite = BuildFlameSprite();
             }
@@ -113,7 +134,7 @@ namespace TopDownGame.Player
 
         public static Sprite GetBambooLeafSprite()
         {
-            if (bambooLeafSprite == null)
+            if (!IsValidSprite(bambooLeafSprite))
             {
                 bambooLeafSprite = BuildBambooLeafSprite();
             }
@@ -123,7 +144,7 @@ namespace TopDownGame.Player
 
         public static Sprite GetShockwaveRingSprite()
         {
-            if (shockwaveRingSprite == null)
+            if (!IsValidSprite(shockwaveRingSprite))
             {
                 shockwaveRingSprite = BuildShockwaveRingSprite();
             }
@@ -133,7 +154,7 @@ namespace TopDownGame.Player
 
         public static Sprite GetShrineStatueSprite()
         {
-            if (shrineStatueSprite == null)
+            if (!IsValidSprite(shrineStatueSprite))
             {
                 shrineStatueSprite = BuildShrineStatueSprite();
             }
@@ -143,50 +164,35 @@ namespace TopDownGame.Player
 
         public static Sprite GetHeroPortraitSprite()
         {
-            if (portraitSprite != null)
+            if (IsValidSprite(portraitSprite))
             {
                 return portraitSprite;
             }
 
-            // 1. Try to load the user's authentic Thánh Gióng illustration from disk
-            string[] searchPaths =
+#if UNITY_EDITOR
+            // 1. In Unity Editor, load the officially imported Sprite
+            Sprite editorAsset = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Generated/Characters/ThanhGiong_Illustration.jpg");
+            if (editorAsset == null)
             {
-                Path.Combine(Application.dataPath, "Art", "Generated", "Characters", "ThanhGiong_Illustration.jpg"),
-                Path.Combine(Application.dataPath, "..", "Assets", "Art", "Generated", "Characters", "ThanhGiong_Illustration.jpg"),
-                "d:/DATAS/UnityProject/ve-than-rung/Assets/Art/Generated/Characters/ThanhGiong_Illustration.jpg"
-            };
-
-            foreach (string path in searchPaths)
-            {
-                try
+                var allAssets = UnityEditor.AssetDatabase.LoadAllAssetsAtPath("Assets/Art/Generated/Characters/ThanhGiong_Illustration.jpg");
+                foreach (var obj in allAssets)
                 {
-                    if (!string.IsNullOrEmpty(path) && File.Exists(path))
+                    if (obj is Sprite s)
                     {
-                        byte[] bytes = File.ReadAllBytes(path);
-                        if (bytes != null && bytes.Length > 0)
-                        {
-                            Texture2D tex = new Texture2D(2, 2, TextureFormat.RGBA32, false)
-                            {
-                                name = "ThanhGiong_Hero_Portrait_Texture",
-                                filterMode = FilterMode.Bilinear,
-                                wrapMode = TextureWrapMode.Clamp
-                            };
-                            if (tex.LoadImage(bytes))
-                            {
-                                portraitSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height),
-                                    new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect);
-                                return portraitSprite;
-                            }
-                        }
+                        editorAsset = s;
+                        break;
                     }
-                }
-                catch
-                {
-                    // Fall back to procedurally generated portrait
                 }
             }
 
-            // 2. Procedural Fallback Portrait
+            if (editorAsset != null)
+            {
+                portraitSprite = editorAsset;
+                return portraitSprite;
+            }
+#endif
+
+            // 2. High-fidelity Procedural Portrait with golden border and celestial background
             portraitSprite = BuildDedicatedPortraitSprite();
             return portraitSprite;
         }
@@ -243,13 +249,13 @@ namespace TopDownGame.Player
 
             tex.SetPixels(pixels);
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect);
+            return CreateSafeSprite(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100f, SpriteMeshType.FullRect);
         }
 
         public static Sprite GetSkillIcon(int slotIndex)
         {
             int clamped = Mathf.Clamp(slotIndex, 0, 3);
-            if (skillIcons[clamped] == null)
+            if (!IsValidSprite(skillIcons[clamped]))
             {
                 skillIcons[clamped] = BuildSkillIcon(clamped);
             }
@@ -259,7 +265,9 @@ namespace TopDownGame.Player
 
         private static void EnsureCharacterSprites()
         {
-            if (mountedIdleAndGallopSprites != null)
+            if (IsValidArray(mountedIdleAndGallopSprites) &&
+                IsValidArray(mountedSwordAttackSprites) &&
+                IsValidArray(mountedBambooAttackSprites))
             {
                 return;
             }
@@ -428,7 +436,7 @@ namespace TopDownGame.Player
 
             tex.SetPixels(pixels);
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, width, height), new Vector2(0.5f, 0.34f), 96f, 0, SpriteMeshType.FullRect);
+            return CreateSafeSprite(tex, new Rect(0, 0, width, height), new Vector2(0.5f, 0.34f), 96f, SpriteMeshType.FullRect);
         }
 
         private static void DrawHorseLeg(Color[] pixels, int width, int height, Vector2 hip, Vector2 knee, Vector2 hoof, Color legColor)
@@ -473,7 +481,7 @@ namespace TopDownGame.Player
 
             tex.SetPixels(pixels);
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, width, height), new Vector2(0.15f, 0.5f), 64f, 0, SpriteMeshType.FullRect);
+            return CreateSafeSprite(tex, new Rect(0, 0, width, height), new Vector2(0.15f, 0.5f), 64f, SpriteMeshType.FullRect);
         }
 
         private static Sprite BuildSingleBambooSprite()
@@ -498,7 +506,7 @@ namespace TopDownGame.Player
 
             tex.SetPixels(pixels);
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, width, height), new Vector2(0.12f, 0.5f), 48f, 0, SpriteMeshType.FullRect);
+            return CreateSafeSprite(tex, new Rect(0, 0, width, height), new Vector2(0.12f, 0.5f), 48f, SpriteMeshType.FullRect);
         }
 
         private static Sprite BuildBambooBundleSprite()
@@ -521,7 +529,7 @@ namespace TopDownGame.Player
 
             tex.SetPixels(pixels);
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, width, height), new Vector2(0.12f, 0.5f), 48f, 0, SpriteMeshType.FullRect);
+            return CreateSafeSprite(tex, new Rect(0, 0, width, height), new Vector2(0.12f, 0.5f), 48f, SpriteMeshType.FullRect);
         }
 
         private static Sprite BuildSlashArcSprite()
@@ -559,7 +567,7 @@ namespace TopDownGame.Player
 
             tex.SetPixels(pixels);
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.28f, 0.5f), 48f, 0, SpriteMeshType.FullRect);
+            return CreateSafeSprite(tex, new Rect(0, 0, size, size), new Vector2(0.28f, 0.5f), 48f, SpriteMeshType.FullRect);
         }
 
         private static Sprite BuildFlameSprite()
@@ -572,7 +580,7 @@ namespace TopDownGame.Player
             DrawCircle(pixels, size, size, 24, 18, 9f, FlameCore);
             tex.SetPixels(pixels);
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.4f), 64f, 0, SpriteMeshType.FullRect);
+            return CreateSafeSprite(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.4f), 64f, SpriteMeshType.FullRect);
         }
 
         private static Sprite BuildBambooLeafSprite()
@@ -585,7 +593,7 @@ namespace TopDownGame.Player
             DrawThickLine(pixels, width, height, new Vector2(8, 8), new Vector2(24, 8), 1.8f, BambooGold);
             tex.SetPixels(pixels);
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, width, height), new Vector2(0.5f, 0.5f), 64f, 0, SpriteMeshType.FullRect);
+            return CreateSafeSprite(tex, new Rect(0, 0, width, height), new Vector2(0.5f, 0.5f), 64f, SpriteMeshType.FullRect);
         }
 
         private static Sprite BuildShockwaveRingSprite()
@@ -611,7 +619,7 @@ namespace TopDownGame.Player
 
             tex.SetPixels(pixels);
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 48f, 0, SpriteMeshType.FullRect);
+            return CreateSafeSprite(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 48f, SpriteMeshType.FullRect);
         }
 
         private static Sprite BuildShrineStatueSprite()
@@ -643,7 +651,7 @@ namespace TopDownGame.Player
 
             tex.SetPixels(pixels);
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, width, height), new Vector2(0.5f, 0.2f), 96f, 0, SpriteMeshType.FullRect);
+            return CreateSafeSprite(tex, new Rect(0, 0, width, height), new Vector2(0.5f, 0.2f), 96f, SpriteMeshType.FullRect);
         }
 
         private static Sprite BuildSkillIcon(int slotIndex)
@@ -709,7 +717,7 @@ namespace TopDownGame.Player
 
             tex.SetPixels(pixels);
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 96f, 0, SpriteMeshType.FullRect);
+            return CreateSafeSprite(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 96f, SpriteMeshType.FullRect);
         }
 
         private static Texture2D CreateBlankTexture(int width, int height, string name)
@@ -718,9 +726,17 @@ namespace TopDownGame.Player
             {
                 name = name,
                 filterMode = FilterMode.Bilinear,
-                wrapMode = TextureWrapMode.Clamp
+                wrapMode = TextureWrapMode.Clamp,
+                hideFlags = HideFlags.DontSave
             };
             return tex;
+        }
+
+        private static Sprite CreateSafeSprite(Texture2D tex, Rect rect, Vector2 pivot, float pixelsPerUnit, SpriteMeshType meshType = SpriteMeshType.FullRect)
+        {
+            Sprite sp = Sprite.Create(tex, rect, pivot, pixelsPerUnit, 0, meshType);
+            sp.hideFlags = HideFlags.DontSave;
+            return sp;
         }
 
         private static void DrawCircle(Color[] pixels, int width, int height, int cx, int cy, float radius, Color color)

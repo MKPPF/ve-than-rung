@@ -52,31 +52,43 @@ namespace TopDownGame.Maps
             elapsed += Time.deltaTime;
             for (int i = 0; i < lights.Length; i++)
             {
+                if (lights[i] == null) continue;
                 Color color = lights[i].color;
                 color.a = 0.11f + Mathf.Sin(elapsed * 2.4f + i * 1.7f) * 0.025f;
                 lights[i].color = color;
             }
-            Color portalColor = portalGlow.color;
-            portalColor.a = 0.045f + Mathf.Sin(elapsed * 1.3f) * 0.01f;
-            portalGlow.color = portalColor;
-            for (int i = 0; i < motes.Length; i++)
+            if (portalGlow != null)
             {
-                float phase = elapsed * 0.24f + i * 2.399f;
-                motes[i].transform.localPosition = new Vector3(
-                    -8f + (i * 3.17f % 18f) + Mathf.Sin(phase) * 0.3f,
-                    -2.7f + (i * 1.93f % 5.4f) + Mathf.Cos(phase * 0.8f) * 0.22f);
-                Color color = motes[i].color;
-                color.a = 0.08f + Mathf.Pow(Mathf.Max(0, Mathf.Sin(phase)), 3) * 0.45f;
-                motes[i].color = color;
+                Color portalColor = portalGlow.color;
+                portalColor.a = 0.045f + Mathf.Sin(elapsed * 1.3f) * 0.01f;
+                portalGlow.color = portalColor;
             }
-            for (int i = 0; i < smoke.Length; i++)
+            if (motes != null)
             {
-                float t = Mathf.Repeat(elapsed * 0.16f + i / 5f, 1);
-                smoke[i].transform.position = chimneyPosition + new Vector3(t * 0.7f, t * 1.2f);
-                smoke[i].transform.localScale = Vector3.one * Mathf.Lerp(0.4f, 1f, t);
-                Color color = smoke[i].color;
-                color.a = Mathf.Sin(t * Mathf.PI) * 0.14f;
-                smoke[i].color = color;
+                for (int i = 0; i < motes.Length; i++)
+                {
+                    if (motes[i] == null) continue;
+                    float phase = elapsed * 0.24f + i * 2.399f;
+                    motes[i].transform.localPosition = new Vector3(
+                        -8f + (i * 3.17f % 18f) + Mathf.Sin(phase) * 0.3f,
+                        -2.7f + (i * 1.93f % 5.4f) + Mathf.Cos(phase * 0.8f) * 0.22f);
+                    Color color = motes[i].color;
+                    color.a = 0.08f + Mathf.Pow(Mathf.Max(0, Mathf.Sin(phase)), 3) * 0.45f;
+                    motes[i].color = color;
+                }
+            }
+            if (smoke != null)
+            {
+                for (int i = 0; i < smoke.Length; i++)
+                {
+                    if (smoke[i] == null) continue;
+                    float t = Mathf.Repeat(elapsed * 0.16f + i / 5f, 1);
+                    smoke[i].transform.position = chimneyPosition + new Vector3(t * 0.7f, t * 1.2f);
+                    smoke[i].transform.localScale = Vector3.one * Mathf.Lerp(0.4f, 1f, t);
+                    Color color = smoke[i].color;
+                    color.a = Mathf.Sin(t * Mathf.PI) * 0.14f;
+                    smoke[i].color = color;
+                }
             }
         }
     }

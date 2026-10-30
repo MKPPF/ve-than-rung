@@ -8,6 +8,8 @@ namespace TopDownGame.EditorTools
     /// <summary>
     /// Recovers from Unity or the Test Runner leaving the editor on its temporary
     /// untitled scene, without replacing any real scene the developer was editing.
+    /// Configures PlayMode to always boot from MainMenu so clicking Play in the Editor
+    /// runs the game through the loading splash screen into the main menu.
     /// </summary>
     [InitializeOnLoad]
     public static class TopDownEditorStartup
@@ -18,11 +20,23 @@ namespace TopDownGame.EditorTools
 
         static TopDownEditorStartup()
         {
+            ConfigurePlayModeStartScene();
             EditorApplication.delayCall += EnsureProjectSceneIsOpen;
+        }
+
+        public static void ConfigurePlayModeStartScene()
+        {
+            SceneAsset mainScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(MainMenuScenePath);
+            if (mainScene != null && EditorSceneManager.playModeStartScene != mainScene)
+            {
+                EditorSceneManager.playModeStartScene = mainScene;
+            }
         }
 
         private static void EnsureProjectSceneIsOpen()
         {
+            ConfigurePlayModeStartScene();
+
             if (SessionState.GetBool(SessionCheckKey, false))
             {
                 return;

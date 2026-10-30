@@ -141,8 +141,8 @@ namespace TopDownGame.Player
                         thanhGiongHero = GetComponent<ThanhGiongHeroController>();
                     }
 
-                    float effectiveAutoRange = thanhGiongHero != null && thanhGiongHero.IsThanhGiongActive
-                        ? Mathf.Max(attackRange, thanhGiongHero.IronSwordRange)
+                    float effectiveAutoRange = thanhGiongHero != null && thanhGiongHero.IsCustomHeroActive
+                        ? Mathf.Max(attackRange, thanhGiongHero.CustomNormalAttackRange)
                         : attackRange;
                     if (targetDistance <= effectiveAutoRange)
                     {
@@ -297,13 +297,15 @@ namespace TopDownGame.Player
             {
                 thanhGiongHero = GetComponent<ThanhGiongHeroController>();
             }
-            bool useIronSword = thanhGiongHero != null && thanhGiongHero.IsThanhGiongActive;
-            if (useIronSword)
+            bool useCustomHeroAttack = thanhGiongHero != null && thanhGiongHero.IsCustomHeroActive;
+            if (useCustomHeroAttack)
             {
-                thanhGiongHero.NotifyIronSwordAttack(lockedAttackDirection, animationTime);
+                thanhGiongHero.NotifyCustomNormalAttack(lockedAttackDirection, animationTime);
             }
-            characterAnimator?.PlayAttack(lockedAttackDirection,
-                animationTime);
+            else
+            {
+                characterAnimator?.PlayAttack(lockedAttackDirection, animationTime);
+            }
             float impactTime = Time.time + impactDelay;
             while (Time.time < impactTime)
             {
@@ -317,17 +319,17 @@ namespace TopDownGame.Player
             }
 
             damagedTargets.Clear();
-            float effectiveRange = useIronSword
-                ? Mathf.Max(attackRange, thanhGiongHero.IronSwordRange)
+            float effectiveRange = useCustomHeroAttack
+                ? Mathf.Max(attackRange, thanhGiongHero.CustomNormalAttackRange)
                 : attackRange;
-            float effectiveArc = useIronSword
-                ? Mathf.Max(attackArc, thanhGiongHero.IronSwordArc)
+            float effectiveArc = useCustomHeroAttack
+                ? Mathf.Max(attackArc, thanhGiongHero.CustomNormalAttackArc)
                 : attackArc;
-            float damageMultiplier = useIronSword
-                ? thanhGiongHero.IronSwordDamageMultiplier
+            float damageMultiplier = useCustomHeroAttack
+                ? thanhGiongHero.CustomNormalAttackDamageMultiplier
                 : 1f;
-            float effectiveKnockback = useIronSword
-                ? Mathf.Max(knockback, thanhGiongHero.IronSwordKnockback)
+            float effectiveKnockback = useCustomHeroAttack
+                ? Mathf.Max(knockback, thanhGiongHero.CustomNormalAttackKnockback)
                 : knockback;
 
             Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, effectiveRange, enemyLayers);

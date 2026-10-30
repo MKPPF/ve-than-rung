@@ -181,6 +181,7 @@ namespace TopDownGame.UI
                 progress.SaveProgress();
             }
 
+            MainMenuController.SkipSplashOnce = true;
             Resume();
             SceneManager.LoadScene("MainMenu");
         }
@@ -192,12 +193,15 @@ namespace TopDownGame.UI
             PlayerHealth health = player != null ? player.GetComponent<PlayerHealth>() : null;
             ThanhGiongHeroController thanhGiong = player != null ? player.GetComponent<ThanhGiongHeroController>() : null;
 
-            bool isGiong = thanhGiong != null && thanhGiong.IsThanhGiongActive;
+            HeroCharacterId activeHero = thanhGiong != null ? thanhGiong.CurrentHero : HeroCharacterId.ForestWarrior;
             if (heroText != null)
             {
-                heroText.text = isGiong
-                    ? "Anh hùng: <color=#F5D259>Thánh Gióng (Phù Đổng)</color>"
-                    : "Anh hùng: <color=#94B8FF>Chiến Binh Rừng</color>";
+                heroText.text = activeHero switch
+                {
+                    HeroCharacterId.ThanhGiong => "Anh hùng: <color=#F5D259>Thánh Gióng (Phù Đổng)</color>",
+                    HeroCharacterId.SonTinh => "Anh hùng: <color=#6EE7A8>Sơn Tinh (Tản Viên Sơn Thánh)</color>",
+                    _ => "Anh hùng: <color=#94B8FF>Chiến Binh Rừng</color>"
+                };
             }
 
             string activeSceneName = SceneManager.GetActiveScene().name;

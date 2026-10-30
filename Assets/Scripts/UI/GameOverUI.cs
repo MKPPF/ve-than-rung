@@ -89,7 +89,11 @@ namespace TopDownGame.UI
 
         public void ReturnToLobby() => LeaveFor("Lobby");
 
-        public void ReturnToMenu() => LeaveFor("MainMenu");
+        public void ReturnToMenu()
+        {
+            MainMenuController.SkipSplashOnce = true;
+            LeaveFor("MainMenu");
+        }
 
         private void LeaveFor(string scene)
         {

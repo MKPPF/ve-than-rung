@@ -45,6 +45,7 @@ namespace TopDownGame.Save
         public Vector3 safeRespawnPosition;
         public bool hasSafeRespawn;
         public bool tutorialInitialized, tutorialCompleted;
+        public int selectedHero = 0;
         [NonSerialized] public bool needsMigration;
 
         public static bool TryDeserialize(string json, out ProgressSnapshot snapshot)

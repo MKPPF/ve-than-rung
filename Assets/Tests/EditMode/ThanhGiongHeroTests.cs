@@ -13,6 +13,14 @@ namespace TopDownGame.Tests.EditMode
     public sealed class ThanhGiongHeroTests
     {
         [Test]
+        public void AllHeroesAreUnlockedDuringTestingPhase()
+        {
+            Assert.That(ThanhGiongHeroController.IsHeroUnlocked(HeroCharacterId.ForestWarrior), Is.True);
+            Assert.That(ThanhGiongHeroController.IsHeroUnlocked(HeroCharacterId.ThanhGiong), Is.True);
+            Assert.That(ThanhGiongHeroController.IsHeroUnlocked(HeroCharacterId.SonTinh), Is.True);
+        }
+
+        [Test]
         public void ThanhGiongVisualFactoryGeneratesMountedHeroWeaponsAndSkillIcons()
         {
             for (int stride = 0; stride < 4; stride++)
@@ -34,7 +42,36 @@ namespace TopDownGame.Tests.EditMode
         }
 
         [Test]
-        public void PlayerPrefabAndLobbySceneIncludeThanhGiongHeroSelectionSystem()
+        public void SonTinhVisualFactoryGeneratesAllPosesBoulderMountainsAndSkillIcons()
+        {
+            foreach (SonTinhPose pose in System.Enum.GetValues(typeof(SonTinhPose)))
+            {
+                for (int stride = 0; stride < 4; stride++)
+                {
+                    Sprite sp = SonTinhVisualFactory.GetHeroSprite(stride, pose);
+                    Assert.That(sp, Is.Not.Null, $"Pose {pose} frame {stride}");
+                }
+            }
+
+            Assert.That(SonTinhVisualFactory.GetGiantBoulderSprite(), Is.Not.Null);
+            for (int v = 0; v < 3; v++)
+            {
+                Assert.That(SonTinhVisualFactory.GetMountainPeakSprite(v), Is.Not.Null, "Mountain variant " + v);
+            }
+            Assert.That(SonTinhVisualFactory.GetEarthFissureSprite(), Is.Not.Null);
+            Assert.That(SonTinhVisualFactory.GetRockShardSprite(), Is.Not.Null);
+            Assert.That(SonTinhVisualFactory.GetShockwaveRingSprite(), Is.Not.Null);
+            Assert.That(SonTinhVisualFactory.GetHeroPortraitSprite(), Is.Not.Null);
+
+            for (int slot = 0; slot < 4; slot++)
+            {
+                Sprite icon = SonTinhVisualFactory.GetSkillIcon(slot);
+                Assert.That(icon, Is.Not.Null, "Son Tinh Skill Slot " + slot);
+            }
+        }
+
+        [Test]
+        public void PlayerPrefabAndLobbySceneIncludeThanhGiongAndSonTinhHeroSystem()
         {
             GameObject playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
                 "Assets/Prefabs/Player/Player.prefab");
@@ -42,7 +79,7 @@ namespace TopDownGame.Tests.EditMode
             ThanhGiongHeroController hero = playerPrefab.GetComponent<ThanhGiongHeroController>();
             Assert.That(hero, Is.Not.Null);
 
-            string[] expectedNames =
+            string[] expectedThanhGiongNames =
             {
                 "Kiếm Sắt Chiến Mã",
                 "Tre Ngà Quật Địch",
@@ -53,7 +90,22 @@ namespace TopDownGame.Tests.EditMode
             {
                 SkillData skill = hero.GetThanhGiongSkillData(i);
                 Assert.That(skill, Is.Not.Null);
-                Assert.That(skill.DisplayName, Is.EqualTo(expectedNames[i]));
+                Assert.That(skill.DisplayName, Is.EqualTo(expectedThanhGiongNames[i]));
+                Assert.That(skill.Icon, Is.Not.Null);
+            }
+
+            string[] expectedSonTinhNames =
+            {
+                "Ném Đại Thạch",
+                "Dâng Núi Trấn Địch",
+                "Đấm Đất Dựng Núi",
+                "Bát Phương Quần Sơn"
+            };
+            for (int i = 0; i < 4; i++)
+            {
+                SkillData skill = hero.GetSonTinhSkillData(i);
+                Assert.That(skill, Is.Not.Null);
+                Assert.That(skill.DisplayName, Is.EqualTo(expectedSonTinhNames[i]));
                 Assert.That(skill.Icon, Is.Not.Null);
             }
 

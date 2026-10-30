@@ -80,50 +80,65 @@ namespace TopDownGame.Maps
 
         private void Update()
         {
-            if(flames==null) return;
-            elapsed+=Time.deltaTime;
-            for(int i=0;i<flames.Length;i++)
+            if (flames == null || cores == null || firePositions == null || firePositions.Length == 0) return;
+            elapsed += Time.deltaTime;
+            for (int i = 0; i < flames.Length; i++)
             {
-                int station=i/3;
-                int tongue=i%3;
-                float flicker=0.8f+Mathf.Sin(elapsed*8.5f+i*2.5f)*0.13f+Mathf.Sin(elapsed*14+i)*0.07f;
-                float height=(station==0 ? 0.36f : 0.42f)*flicker*(tongue==1 ? 1 : 0.62f);
-                Vector2 location=firePositions[station]+new Vector2((tongue-1)*0.095f,-0.07f);
-                flames[i].transform.localPosition=location;
-                flames[i].transform.localScale=new Vector3(0.18f,height,1);
-                flames[i].transform.localEulerAngles=new Vector3(0,0,Mathf.Sin(elapsed*5+i)*9);
-                flames[i].color=new Color(1,0.41f,0.08f,intensity*0.5f);
-                cores[i].transform.localPosition=location;
-                cores[i].transform.localScale=new Vector3(0.095f,height*0.65f,1);
-                cores[i].transform.localEulerAngles=flames[i].transform.localEulerAngles;
-                cores[i].color=new Color(1,0.78f,0.29f,intensity*0.48f);
+                if (flames[i] == null || cores[i] == null) continue;
+                int station = Mathf.Min(i / 3, firePositions.Length - 1);
+                int tongue = i % 3;
+                float flicker = 0.8f + Mathf.Sin(elapsed * 8.5f + i * 2.5f) * 0.13f + Mathf.Sin(elapsed * 14 + i) * 0.07f;
+                float height = (station == 0 ? 0.36f : 0.42f) * flicker * (tongue == 1 ? 1 : 0.62f);
+                Vector2 location = firePositions[station] + new Vector2((tongue - 1) * 0.095f, -0.07f);
+                flames[i].transform.localPosition = location;
+                flames[i].transform.localScale = new Vector3(0.18f, height, 1);
+                flames[i].transform.localEulerAngles = new Vector3(0, 0, Mathf.Sin(elapsed * 5 + i) * 9);
+                flames[i].color = new Color(1, 0.41f, 0.08f, intensity * 0.5f);
+                cores[i].transform.localPosition = location;
+                cores[i].transform.localScale = new Vector3(0.095f, height * 0.65f, 1);
+                cores[i].transform.localEulerAngles = flames[i].transform.localEulerAngles;
+                cores[i].color = new Color(1, 0.78f, 0.29f, intensity * 0.48f);
             }
-            for(int i=0;i<embers.Length;i++)
+            if (embers != null)
             {
-                int station=i/14;
-                float t=Mathf.Repeat(elapsed*(0.35f+(i%4)*0.06f)+i*0.618034f,1);
-                float side=Mathf.Sin(i*5.4f)*0.23f;
-                Vector2 position=firePositions[station]+new Vector2(side+Mathf.Sin(t*4+i)*t*0.16f,t*1.25f);
-                embers[i].transform.localPosition=position;
-                embers[i].transform.localScale=new Vector3(0.017f+(i%3)*0.006f,0.03f+(i%3)*0.008f,1);
-                embers[i].color=Color.Lerp(new Color(1,0.83f,0.3f),new Color(1,0.24f,0.03f),t);
-                Color color=embers[i].color;
-                color.a=Mathf.Sin(t*Mathf.PI)*intensity;
-                embers[i].color=color;
+                for (int i = 0; i < embers.Length; i++)
+                {
+                    if (embers[i] == null) continue;
+                    int station = Mathf.Min(i / 14, firePositions.Length - 1);
+                    float t = Mathf.Repeat(elapsed * (0.35f + (i % 4) * 0.06f) + i * 0.618034f, 1);
+                    float side = Mathf.Sin(i * 5.4f) * 0.23f;
+                    Vector2 position = firePositions[station] + new Vector2(side + Mathf.Sin(t * 4 + i) * t * 0.16f, t * 1.25f);
+                    embers[i].transform.localPosition = position;
+                    embers[i].transform.localScale = new Vector3(0.017f + (i % 3) * 0.006f, 0.03f + (i % 3) * 0.008f, 1);
+                    embers[i].color = Color.Lerp(new Color(1, 0.83f, 0.3f), new Color(1, 0.24f, 0.03f), t);
+                    Color color = embers[i].color;
+                    color.a = Mathf.Sin(t * Mathf.PI) * intensity;
+                    embers[i].color = color;
+                }
             }
-            for(int i=0;i<glows.Length;i++)
+            if (glows != null)
             {
-                glows[i].transform.localPosition=firePositions[i];
-                glows[i].transform.localScale=new Vector3(1.45f,0.9f,1);
-                glows[i].color=new Color(1,0.46f,0.1f,(0.13f+Mathf.Sin(elapsed*5+i)*0.025f)*intensity);
+                for (int i = 0; i < glows.Length; i++)
+                {
+                    if (glows[i] == null || i >= firePositions.Length) continue;
+                    glows[i].transform.localPosition = firePositions[i];
+                    glows[i].transform.localScale = new Vector3(1.45f, 0.9f, 1);
+                    glows[i].color = new Color(1, 0.46f, 0.1f, (0.13f + Mathf.Sin(elapsed * 5 + i) * 0.025f) * intensity);
+                }
             }
-            Vector2 camp=firePositions[firePositions.Length-1];
-            for(int i=0;i<smoke.Length;i++)
+            if (smoke != null)
             {
-                float t=Mathf.Repeat(elapsed*0.2f+i/(float)smoke.Length,1);
-                smoke[i].transform.localPosition=camp+new Vector2(t*0.35f,0.25f+t*1.5f);
-                smoke[i].transform.localScale=Vector3.one*Mathf.Lerp(0.15f,0.65f,t);
-                smoke[i].color=new Color(0.68f,0.63f,0.53f,Mathf.Sin(t*Mathf.PI)*0.11f);
+                Vector2 camp = firePositions[firePositions.Length - 1];
+                for (int i = 0; i < smoke.Length; i++)
+                {
+                    if (smoke[i] == null) continue;
+                    float t = Mathf.Repeat(elapsed * 0.2f + i / (float)smoke.Length, 1);
+                    smoke[i].transform.localPosition = camp + new Vector2(t * 0.35f, 0.25f + t * 1.5f);
+                    smoke[i].transform.localScale = Vector3.one * Mathf.Lerp(0.15f, 0.65f, t);
+                    Color color = smoke[i].color;
+                    color.a = Mathf.Sin(t * Mathf.PI) * 0.25f * intensity;
+                    smoke[i].color = color;
+                }
             }
         }
 

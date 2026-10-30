@@ -1440,13 +1440,24 @@ namespace TopDownGame.Player
                 visualObject.transform.SetParent(transform, false);
                 visualTransform = visualObject.transform;
                 visualRenderer = visualObject.AddComponent<SpriteRenderer>();
-                visualRenderer.sprite = rootRenderer.sprite;
                 visualRenderer.color = rootRenderer.color;
                 visualRenderer.sharedMaterial = rootRenderer.sharedMaterial;
                 visualRenderer.sortingLayerID = rootRenderer.sortingLayerID;
                 visualRenderer.sortingOrder = rootRenderer.sortingOrder;
                 visualRenderer.flipX = rootRenderer.flipX;
+            }
+
+            if (rootRenderer != null)
+            {
                 rootRenderer.enabled = false;
+            }
+
+            Sprite initialCustomSprite = ThanhGiongHeroController.GetInitialSavedHeroSprite();
+            if (visualRenderer != null && initialCustomSprite != null)
+            {
+                visualRenderer.sprite = initialCustomSprite;
+                visualRenderer.color = Color.white;
+                visualRenderer.enabled = true;
             }
 
             if (visualTransform != null)

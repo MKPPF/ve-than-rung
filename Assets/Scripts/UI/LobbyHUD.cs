@@ -32,10 +32,26 @@ namespace TopDownGame.UI
             rect.anchorMin = Vector2.zero;
             rect.anchorMax = Vector2.one;
             rect.offsetMin = rect.offsetMax = Vector2.zero;
-            Transform card = FantasyEquipmentUI.Frame(rect, "LocationCard", 22, 22, 340, 122,
+
+            // Nút Menu / Tạm dừng ký hiệu mp3 (❚❚) ở góc trên cùng bên trái màn hình
+            Transform pauseFrame = FantasyEquipmentUI.Frame(rect, "TopLeftPauseButton", 22, 22, 56, 56, FantasyEquipmentUI.Ink);
+            Button pauseBtn = pauseFrame.gameObject.AddComponent<Button>();
+            Image pauseFace = pauseFrame.Find("Inset").GetComponent<Image>();
+            pauseFrame.GetComponent<Image>().raycastTarget = true;
+            pauseBtn.targetGraphic = pauseFace;
+            EquipmentPanelLayout.StyleButton(pauseBtn);
+            pauseBtn.onClick.AddListener(() =>
+            {
+                PauseMenu pauseMenu = Object.FindAnyObjectByType<PauseMenu>();
+                if (pauseMenu != null) pauseMenu.Toggle();
+            });
+            TMP_Text pauseIcon = FantasyEquipmentUI.Text(pauseFrame, "PauseSymbol", "❚❚", 0, 6, 56, 44, 26, FantasyEquipmentUI.Gold, TextAlignmentOptions.Center);
+            pauseIcon.fontStyle = FontStyles.Bold;
+
+            Transform card = FantasyEquipmentUI.Frame(rect, "LocationCard", 86, 22, 320, 122,
                 new Color(0.08f,0.12f,0.13f,0.94f));
-            FantasyEquipmentUI.Text(card, "Location", "TRẠM NGHỈ TÁN RỪNG", 16, 12, 308, 32, 24, FantasyEquipmentUI.Gold).enableAutoSizing = false;
-            resources = FantasyEquipmentUI.Text(card, "Resources", "", 16, 49, 308, 62, 22);
+            FantasyEquipmentUI.Text(card, "Location", "TRẠM NGHỈ TÁN RỪNG", 16, 12, 288, 32, 24, FantasyEquipmentUI.Gold).enableAutoSizing = false;
+            resources = FantasyEquipmentUI.Text(card, "Resources", "", 16, 49, 288, 62, 22);
             resources.enableAutoSizing = false;
             var promptRect = FantasyEquipmentUI.Rect(rect, "Prompt", 0,0,700,76);
             promptRect.anchorMin = promptRect.anchorMax = promptRect.pivot = new Vector2(0.5f,0);

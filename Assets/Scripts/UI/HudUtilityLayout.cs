@@ -225,30 +225,40 @@ namespace TopDownGame.UI
                 if (lobby.Find("Prompt") is RectTransform prompt) prompt.localScale = Vector3.one * scale;
             }
             var dodge = canvas.transform.Find("DodgeCard") as RectTransform;
-            if (dodge == null) return;
-            dodge.localScale = Vector3.one * scale;
-            dodge.sizeDelta = new Vector2(300, 78);
-            dodge.anchoredPosition = new Vector2(22, lobby != null ? -22 - 134 * scale : -310);
-            Resize(dodge, "Brass", 296, 74);
-            Resize(dodge, "Inset", 292, 70);
-            Resize(dodge, "Highlight", 290, 1);
-            foreach (string name in DodgeTextNames)
+            if (dodge != null)
             {
-                TMP_Text text = dodge.Find(name)?.GetComponent<TMP_Text>();
-                if (text == null) continue;
-                text.rectTransform.anchoredPosition = new Vector2(12, name == "DodgeKey" ? -4 : -32);
-                text.rectTransform.sizeDelta = new Vector2(276, 28);
-                text.enableAutoSizing = false;
-                text.fontSize = 22;
-            }
-            foreach (string name in DodgeBarNames)
-                if (dodge.Find(name) is RectTransform bar)
+                dodge.localScale = Vector3.one * scale;
+                dodge.sizeDelta = new Vector2(300, 78);
+                dodge.anchoredPosition = new Vector2(22, lobby != null ? -22 - 134 * scale : -310);
+                Resize(dodge, "Brass", 296, 74);
+                Resize(dodge, "Inset", 292, 70);
+                Resize(dodge, "Highlight", 290, 1);
+                foreach (string name in DodgeTextNames)
                 {
-                    bar.anchoredPosition = new Vector2(12, -66);
-                    bar.sizeDelta = new Vector2(276, 4);
+                    TMP_Text text = dodge.Find(name)?.GetComponent<TMP_Text>();
+                    if (text == null) continue;
+                    text.rectTransform.anchoredPosition = new Vector2(12, name == "DodgeKey" ? -4 : -32);
+                    text.rectTransform.sizeDelta = new Vector2(276, 28);
+                    text.enableAutoSizing = false;
+                    text.fontSize = 22;
                 }
+                foreach (string name in DodgeBarNames)
+                    if (dodge.Find(name) is RectTransform bar)
+                    {
+                        bar.anchoredPosition = new Vector2(12, -66);
+                        bar.sizeDelta = new Vector2(276, 4);
+                    }
+            }
             if (canvas.transform.Find("CombatHUDRoot/ControlHints") is RectTransform controlsRect)
-                controlsRect.anchoredPosition = new Vector2(22, -310 - 78 * scale - 16);
+            {
+                float dodgeBottom = dodge != null ? (lobby != null ? -22 - 134 * scale - 78 * scale : -310 - 78 * scale) : -310;
+                float topY = dodgeBottom - 16;
+                controlsRect.anchoredPosition = new Vector2(22, topY);
+                if (canvas.transform.Find("CombatHUDRoot/HUDPauseCard") is RectTransform pauseRect)
+                {
+                    pauseRect.anchoredPosition = new Vector2(22, topY - controlsRect.sizeDelta.y - 14);
+                }
+            }
         }
 
         private void StyleButton(RectTransform rect)

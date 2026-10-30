@@ -107,29 +107,37 @@ namespace TopDownGame.Maps
 
         private void Update()
         {
-            if (!IsReady) return;
-            elapsed+=Time.deltaTime*flowSpeed;
-            streamMaterial.SetFloat(FlowTime,elapsed);
-            fallMaterial.SetFloat(FlowTime,elapsed);
-            for (int i=0;i<foam.Length;i++)
+            if (!IsReady || streamMaterial == null || fallMaterial == null || streamCenters == null || streamCenters.Length < 2) return;
+            elapsed += Time.deltaTime * flowSpeed;
+            streamMaterial.SetFloat(FlowTime, elapsed);
+            fallMaterial.SetFloat(FlowTime, elapsed);
+            if (foam != null)
             {
-                float t=Mathf.Repeat(elapsed*0.23f+i*0.618034f,1);
-                float progress=t*(streamCenters.Length-1);
-                int segment=Mathf.Min(Mathf.FloorToInt(progress),streamCenters.Length-2);
-                Vector2 center=Vector2.Lerp(streamCenters[segment],streamCenters[segment+1],progress-segment);
-                float side=Mathf.Sin(i*8.1f)*0.45f;
-                center.x+=side*Mathf.Lerp(HalfWidths[segment],HalfWidths[segment+1],progress-segment);
-                foam[i].transform.localPosition=center;
-                foam[i].transform.localScale=new Vector3(0.10f+0.08f*Mathf.Sin(i*1.5f),0.022f,1);
-                foam[i].color=new Color(0.72f,0.96f,1f,Mathf.Sin(t*Mathf.PI)*0.35f);
+                for (int i = 0; i < foam.Length; i++)
+                {
+                    if (foam[i] == null) continue;
+                    float t = Mathf.Repeat(elapsed * 0.23f + i * 0.618034f, 1);
+                    float progress = t * (streamCenters.Length - 1);
+                    int segment = Mathf.Min(Mathf.FloorToInt(progress), streamCenters.Length - 2);
+                    Vector2 center = Vector2.Lerp(streamCenters[segment], streamCenters[segment + 1], progress - segment);
+                    float side = Mathf.Sin(i * 8.1f) * 0.45f;
+                    center.x += side * Mathf.Lerp(HalfWidths[segment], HalfWidths[segment + 1], progress - segment);
+                    foam[i].transform.localPosition = center;
+                    foam[i].transform.localScale = new Vector3(0.10f + 0.08f * Mathf.Sin(i * 1.5f), 0.022f, 1);
+                    foam[i].color = new Color(0.72f, 0.96f, 1f, Mathf.Sin(t * Mathf.PI) * 0.35f);
+                }
             }
-            for (int i=0;i<spray.Length;i++)
+            if (spray != null && spray.Length > 0)
             {
-                float t=Mathf.Repeat(elapsed*0.82f+i/(float)spray.Length,1);
-                float side=Mathf.Sin(i*2.4f);
-                spray[i].transform.localPosition=waterfallBottom+new Vector2(side*t*0.28f,Mathf.Sin(t*Mathf.PI)*0.2f-t*0.16f);
-                spray[i].transform.localScale=Vector3.one*(0.018f+0.014f*(i%3));
-                spray[i].color=new Color(0.8f,0.96f,1f,Mathf.Sin(t*Mathf.PI)*0.35f);
+                for (int i = 0; i < spray.Length; i++)
+                {
+                    if (spray[i] == null) continue;
+                    float t = Mathf.Repeat(elapsed * 0.82f + i / (float)spray.Length, 1);
+                    float side = Mathf.Sin(i * 2.4f);
+                    spray[i].transform.localPosition = waterfallBottom + new Vector2(side * t * 0.28f, Mathf.Sin(t * Mathf.PI) * 0.2f - t * 0.16f);
+                    spray[i].transform.localScale = Vector3.one * (0.018f + 0.014f * (i % 3));
+                    spray[i].color = new Color(0.8f, 0.96f, 1f, Mathf.Sin(t * Mathf.PI) * 0.35f);
+                }
             }
         }
 

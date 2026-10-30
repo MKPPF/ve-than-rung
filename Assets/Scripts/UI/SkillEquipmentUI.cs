@@ -58,6 +58,7 @@ namespace TopDownGame.UI
 
         private void OnEnable()
         {
+            EnsurePanel();
             if (launcherButton != null) launcherButton.gameObject.SetActive(true);
             Subscribe();
             RefreshOwned();
@@ -206,7 +207,9 @@ namespace TopDownGame.UI
 
         private void RefreshText()
         {
-            if (content == null || inventory == null) return;
+            if (inventory == null) return;
+            EnsurePanel();
+            if (content == null || panel == null || slotButtons == null || slotButtons.Length == 0 || slotButtons[0] == null) return;
             NormalizeSelection();
             string selectedId = owned.Count > 0 ? owned[selectedSkill] : string.Empty;
             SkillData data = skillManager != null
@@ -216,29 +219,54 @@ namespace TopDownGame.UI
             bool atMaximum = data != null && level >= data.MaxLevel;
             int cost = level > 0 ? SkillInventory.UpgradeGoldCost(level) : 0;
 
-            heading.text=data!=null?data.DisplayName:"CHƯA CÓ KỸ NĂNG";
-            balance.text=(stats!=null?stats.Gold.ToString("N0"):"0")+" VÀNG";
-            selectedIcon.sprite=data!=null?data.Icon:null;selectedIcon.enabled=selectedIcon.sprite!=null;
-            content.text=data!=null
-                ? "CẤP "+level+" / "+data.MaxLevel+"\n\n"+data.Description+"\n\n"+UpgradeEffectLabel(data.Id)+
-                  "\n\nMana cơ bản: "+data.ManaCost.ToString("0.#")+"\nHồi chiêu cơ bản: "+data.Cooldown.ToString("0.#")+" giây"
-                : "Nhận kỹ năng từ phần thưởng và rương kỹ năng.\n\nCác kỹ năng đã học sẽ xuất hiện ở danh sách bên trái.";
+            if (heading != null) heading.text=data!=null?data.DisplayName:"CHƯA CÓ KỸ NĂNG";
+            if (balance != null) balance.text=(stats!=null?stats.Gold.ToString("N0"):"0")+" VÀNG";
+            if (selectedIcon != null)
+            {
+                selectedIcon.sprite=data!=null?data.Icon:null;
+                selectedIcon.enabled=selectedIcon.sprite!=null;
+            }
+            if (content != null)
+            {
+                content.text=data!=null
+                    ? "CẤP "+level+" / "+data.MaxLevel+"\n\n"+data.Description+"\n\n"+UpgradeEffectLabel(data.Id)+
+                      "\n\nMana cơ bản: "+data.ManaCost.ToString("0.#")+"\nHồi chiêu cơ bản: "+data.Cooldown.ToString("0.#")+" giây"
+                    : "Nhận kỹ năng từ phần thưởng và rương kỹ năng.\n\nCác kỹ năng đã học sẽ xuất hiện ở danh sách bên trái.";
+            }
             bool duplicate=false;
             for(int i=0;i<slotButtons.Length;i++)
             {
+                if (slotButtons[i] == null) continue;
                 var slot=inventory.Slots[i];
                 var slotData=skillManager!=null?skillManager.GetSkillData(slot.skillId):null;
-                slotButtons[i].GetComponentInChildren<TMP_Text>().text=slot.key+"  ["+(i+1)+"]\n"+
-                    (slot.IsEmpty?"Ô TRỐNG":(slotData!=null?slotData.DisplayName:slot.skillId)+"  •  Cấp "+slot.level);
-                slotIcons[i].sprite=slotData!=null?slotData.Icon:null;
-                slotIcons[i].enabled=slotIcons[i].sprite!=null;
-                slotButtons[i].transform.Find("Brass").GetComponent<Image>().color=i==selectedSlot?F.Gold:F.Edge;
+                TMP_Text btnText = slotButtons[i].GetComponentInChildren<TMP_Text>();
+                if (btnText != null)
+                {
+                    btnText.text=slot.key+"  ["+(i+1)+"]\n"+
+                        (slot.IsEmpty?"Ô TRỐNG":(slotData!=null?slotData.DisplayName:slot.skillId)+"  •  Cấp "+slot.level);
+                }
+                if (slotIcons != null && i < slotIcons.Length && slotIcons[i] != null)
+                {
+                    slotIcons[i].sprite=slotData!=null?slotData.Icon:null;
+                    slotIcons[i].enabled=slotIcons[i].sprite!=null;
+                }
+                Transform brass = slotButtons[i].transform.Find("Brass");
+                if (brass != null)
+                {
+                    brass.GetComponent<Image>().color=i==selectedSlot?F.Gold:F.Edge;
+                }
                 if(!slot.IsEmpty && slot.skillId==selectedId && i!=selectedSlot)duplicate=true;
             }
-            equipButton.interactable=data!=null && !duplicate && inventory.Slots[selectedSlot].skillId!=selectedId;
-            removeButton.interactable=!inventory.Slots[selectedSlot].IsEmpty;
+            if (equipButton != null) equipButton.interactable=data!=null && !duplicate && inventory.Slots[selectedSlot].skillId!=selectedId;
+            if (removeButton != null) removeButton.interactable=!inventory.Slots[selectedSlot].IsEmpty;
             for(int i=0;i<skillButtons.Count;i++)
-                skillButtons[i].transform.Find("Brass").GetComponent<Image>().color=i==selectedSkill?F.Gold:F.Edge;
+            {
+                if (skillButtons[i] != null)
+                {
+                    Transform b = skillButtons[i].transform.Find("Brass");
+                    if (b != null) b.GetComponent<Image>().color=i==selectedSkill?F.Gold:F.Edge;
+                }
+            }
             if (upgradeLabel != null)
             {
                 upgradeLabel.text = data == null ? "CHƯA CÓ KỸ NĂNG" : atMaximum
