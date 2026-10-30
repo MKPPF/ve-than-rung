@@ -75,6 +75,13 @@ namespace TopDownGame.Save
         private ProgressLoadStatus loadStatus;
 
         public string CurrentMap => currentMap;
+        public void SetCurrentMap(string mapName)
+        {
+            if (!string.IsNullOrWhiteSpace(mapName))
+            {
+                currentMap = mapName;
+            }
+        }
         public float CurrentHealth => currentHealth;
         public float MaxHealth => maxHealth;
         public float CurrentMana => currentMana;

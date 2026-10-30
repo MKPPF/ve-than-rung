@@ -40,6 +40,7 @@ namespace TopDownGame.Player
         private float nextAutoTargetScanTime;
         private float lastMovementTime;
         private PlayerDodge dodge;
+        private ThanhGiongHeroController thanhGiongHero;
 
         public Vector2 AimDirection { get; private set; } = Vector2.right;
         public bool AutoAttackEnabled => autoAttackEnabled;
@@ -57,6 +58,7 @@ namespace TopDownGame.Player
             characterAnimator = GetComponent<PlayerCharacterAnimator>();
             skillManager = GetComponent<SkillManager>();
             dodge = GetComponent<PlayerDodge>();
+            thanhGiongHero = GetComponent<ThanhGiongHeroController>();
             mainCamera = Camera.main;
         }
 
@@ -134,7 +136,15 @@ namespace TopDownGame.Player
                         return;
                     }
 
-                    if (targetDistance <= attackRange)
+                    if (thanhGiongHero == null)
+                    {
+                        thanhGiongHero = GetComponent<ThanhGiongHeroController>();
+                    }
+
+                    float effectiveAutoRange = thanhGiongHero != null && thanhGiongHero.IsThanhGiongActive
+                        ? Mathf.Max(attackRange, thanhGiongHero.IronSwordRange)
+                        : attackRange;
+                    if (targetDistance <= effectiveAutoRange)
                     {
                         StartCoroutine(AttackRoutine(targetDirection, true));
                     }
@@ -283,6 +293,15 @@ namespace TopDownGame.Player
             {
                 movement?.LockMovement(animationTime);
             }
+            if (thanhGiongHero == null)
+            {
+                thanhGiongHero = GetComponent<ThanhGiongHeroController>();
+            }
+            bool useIronSword = thanhGiongHero != null && thanhGiongHero.IsThanhGiongActive;
+            if (useIronSword)
+            {
+                thanhGiongHero.NotifyIronSwordAttack(lockedAttackDirection, animationTime);
+            }
             characterAnimator?.PlayAttack(lockedAttackDirection,
                 animationTime);
             float impactTime = Time.time + impactDelay;
@@ -298,15 +317,28 @@ namespace TopDownGame.Player
             }
 
             damagedTargets.Clear();
-            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, attackRange, enemyLayers);
-            float damage = stats.RollDamage(1f, out bool critical);
+            float effectiveRange = useIronSword
+                ? Mathf.Max(attackRange, thanhGiongHero.IronSwordRange)
+                : attackRange;
+            float effectiveArc = useIronSword
+                ? Mathf.Max(attackArc, thanhGiongHero.IronSwordArc)
+                : attackArc;
+            float damageMultiplier = useIronSword
+                ? thanhGiongHero.IronSwordDamageMultiplier
+                : 1f;
+            float effectiveKnockback = useIronSword
+                ? Mathf.Max(knockback, thanhGiongHero.IronSwordKnockback)
+                : knockback;
+
+            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, effectiveRange, enemyLayers);
+            float damage = stats.RollDamage(damageMultiplier, out bool critical);
 
             foreach (Collider2D hit in hits)
             {
                 Vector2 direction = (Vector2)hit.transform.position - (Vector2)transform.position;
                 if (direction.sqrMagnitude <= 0.001f ||
                     Vector2.Angle(lockedAttackDirection, direction) >
-                    attackArc * 0.5f)
+                    effectiveArc * 0.5f)
                 {
                     continue;
                 }
@@ -320,7 +352,7 @@ namespace TopDownGame.Player
                 }
 
                 damageable.TakeDamage(new DamageInfo(damage, gameObject,
-                    hit.ClosestPoint(transform.position), direction, knockback, critical));
+                    hit.ClosestPoint(transform.position), direction, effectiveKnockback, critical));
             }
 
             float cooldownEnd = Time.time + Mathf.Max(0f,

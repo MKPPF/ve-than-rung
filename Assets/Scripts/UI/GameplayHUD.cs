@@ -55,6 +55,7 @@ namespace TopDownGame.UI
         private void Start()
         {
             PlayerAutomationUI.Ensure(gameObject);
+            HeroSelectionUI.Ensure(GetComponentInParent<Canvas>());
             if (GetComponent<PotentialUpgradeUI>() == null)
             {
                 gameObject.AddComponent<PotentialUpgradeUI>();
@@ -338,7 +339,20 @@ namespace TopDownGame.UI
             goldText = Label(card, "Gold", "", 16, 236, 368, 28, 21);
 
             Transform hints = FantasyEquipmentUI.Frame(root, "ControlHints", 22, 390, 400, 96, FantasyEquipmentUI.Ink);
-            controlsText = Label(hints, "Controls", "WASD / Chuột trái: Di chuyển\nJ / Chuột phải: Đánh  •  E: Tương tác\nI: Túi  •  K: Kỹ năng  •  Esc: Tạm dừng", 14, 8, 372, 80, 20);
+            controlsText = Label(hints, "Controls", "WASD / Chuột trái: Di chuyển\nJ / Chuột phải: Đánh  •  E: Tương tác\nI: Túi  •  K: Kỹ năng  •  H: Nhân vật  •  Esc: Tạm dừng", 14, 8, 372, 80, 20);
+
+            Transform pauseCard = FantasyEquipmentUI.Frame(root, "HUDPauseCard", 22, 496, 400, 48, FantasyEquipmentUI.Ink);
+            Button pauseButton = FantasyEquipmentUI.Button(pauseCard, "HUDPauseButton", "⏸️ TẠM DỪNG & LƯU TIẾN TRÌNH", 4, 4, 392, 40, () =>
+            {
+                PauseMenu pause = Object.FindAnyObjectByType<PauseMenu>();
+                if (pause != null) pause.Toggle();
+            });
+            TMP_Text pauseBtnText = pauseButton.GetComponentInChildren<TMP_Text>();
+            if (pauseBtnText != null)
+            {
+                pauseBtnText.fontSize = 17f;
+                pauseBtnText.color = FantasyEquipmentUI.Gold;
+            }
             Transform dodgeCard = canvas.transform.Find("DodgeCard");
             if (dodgeCard != null) ((RectTransform)dodgeCard).anchoredPosition = new Vector2(22,-310);
 

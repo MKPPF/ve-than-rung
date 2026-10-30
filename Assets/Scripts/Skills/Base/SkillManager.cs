@@ -20,9 +20,11 @@ namespace TopDownGame.Skills
         private PlayerCharacterAnimator characterAnimator;
         private PlayerHealth health;
         private PlayerCombat combat;
+        private ThanhGiongHeroController thanhGiongHero;
         private int nextAutoSkillSlot;
         private SkillCastController castController;
-        public bool IsCasting => castController != null && castController.IsCasting;
+        public bool IsCasting => (castController != null && castController.IsCasting) ||
+            (thanhGiongHero != null && thanhGiongHero.IsExecutingSkill);
         public const float CastWindup = 0.12f;
 
         public SkillCooldown Cooldowns => cooldown;
@@ -39,6 +41,7 @@ namespace TopDownGame.Skills
             characterAnimator = GetComponent<PlayerCharacterAnimator>();
             health = GetComponent<PlayerHealth>();
             combat = GetComponent<PlayerCombat>();
+            thanhGiongHero = GetComponent<ThanhGiongHeroController>();
 
             foreach (SkillBase component in GetComponents<SkillBase>())
             {
@@ -174,6 +177,15 @@ namespace TopDownGame.Skills
 
         public float GetCooldownRemaining(int slotIndex)
         {
+            if (thanhGiongHero == null)
+            {
+                thanhGiongHero = GetComponent<ThanhGiongHeroController>();
+            }
+            if (thanhGiongHero != null && thanhGiongHero.IsThanhGiongActive)
+            {
+                return thanhGiongHero.GetSlotCooldownRemaining(slotIndex);
+            }
+
             if (inventory == null || slotIndex < 0 || slotIndex >= inventory.Slots.Count ||
                 inventory.Slots[slotIndex].IsEmpty)
             {
@@ -185,6 +197,23 @@ namespace TopDownGame.Skills
 
         public float GetCooldownDuration(int slotIndex)
         {
+            if (thanhGiongHero == null)
+            {
+                thanhGiongHero = GetComponent<ThanhGiongHeroController>();
+            }
+            if (thanhGiongHero != null && thanhGiongHero.IsThanhGiongActive)
+            {
+                float tracked = thanhGiongHero.GetSlotCooldownDuration(slotIndex);
+                if (tracked > 0f)
+                {
+                    return tracked;
+                }
+                SkillData tgData = thanhGiongHero.GetThanhGiongSkillData(slotIndex);
+                return tgData != null
+                    ? EffectiveCooldown(tgData, thanhGiongHero.GetEffectiveSkillLevel(slotIndex))
+                    : 0f;
+            }
+
             SkillData data = GetSkillData(slotIndex);
             return data != null ? EffectiveCooldown(data,
                 inventory.Slots[slotIndex].level) : 0f;
@@ -207,6 +236,15 @@ namespace TopDownGame.Skills
 
         public SkillData GetSkillData(int slotIndex)
         {
+            if (thanhGiongHero == null)
+            {
+                thanhGiongHero = GetComponent<ThanhGiongHeroController>();
+            }
+            if (thanhGiongHero != null && thanhGiongHero.IsThanhGiongActive)
+            {
+                return thanhGiongHero.GetThanhGiongSkillData(slotIndex);
+            }
+
             if (inventory == null || skillDatabase == null || slotIndex < 0 ||
                 slotIndex >= inventory.Slots.Count || inventory.Slots[slotIndex].IsEmpty)
             {
@@ -249,6 +287,15 @@ namespace TopDownGame.Skills
                 interaction.HasTarget)
             {
                 return false;
+            }
+
+            if (thanhGiongHero == null)
+            {
+                thanhGiongHero = GetComponent<ThanhGiongHeroController>();
+            }
+            if (thanhGiongHero != null && thanhGiongHero.IsThanhGiongActive)
+            {
+                return thanhGiongHero.TryCastThanhGiongSkill(slotIndex, targetPosition, ~0);
             }
 
             SkillSlot slot = inventory.Slots[slotIndex];

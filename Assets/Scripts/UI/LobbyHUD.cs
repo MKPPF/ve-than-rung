@@ -19,6 +19,7 @@ namespace TopDownGame.UI
         private IEnumerator Start()
         {
             PlayerAutomationUI.Ensure(gameObject);
+            HeroSelectionUI.Ensure(GetComponentInParent<Canvas>());
             GameObject player = GameObject.FindWithTag("Player");
             stats = player != null ? player.GetComponent<PlayerStats>() : null;
             interaction = player != null ? player.GetComponent<PlayerInteraction>() : null;
@@ -58,7 +59,7 @@ namespace TopDownGame.UI
                     " vàng\nTinh hoa: " + (GameProgressManager.Instance != null ? GameProgressManager.Instance.HunterEssence : 0);
             }
             prompt.text = interaction != null && interaction.HasTarget ? interaction.CurrentPrompt :
-                "WASD / Chuột trái: di chuyển\nSPACE: né    •    E: tương tác";
+                "WASD / Chuột trái: di chuyển\nSPACE: né    •    E: tương tác    •    H: Nhân vật";
         }
 
         private void OnDestroy()

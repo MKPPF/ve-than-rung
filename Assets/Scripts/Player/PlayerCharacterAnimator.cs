@@ -276,6 +276,12 @@ namespace TopDownGame.Player
                 return;
             }
 
+            ThanhGiongHeroController thanhGiong = GetComponent<ThanhGiongHeroController>();
+            if (thanhGiong != null && thanhGiong.IsThanhGiongActive)
+            {
+                return;
+            }
+
             if(magicProfile!=null && (dying || Time.time>=castEndTime || Time.time<hitEndTime)) CancelMagicPose();
             if(swordProfile!=null)
             {

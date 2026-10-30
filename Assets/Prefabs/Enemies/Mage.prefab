@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &5735805849040965198
+--- !u!1 &6404238928164137605
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,16 +8,16 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1542247750815363725}
-  - component: {fileID: 8975069054405753761}
-  - component: {fileID: 7669347785833927223}
-  - component: {fileID: 8313297602021212262}
-  - component: {fileID: 981453551397709728}
-  - component: {fileID: 1432258275423879866}
-  - component: {fileID: 6823706042885158447}
-  - component: {fileID: 76853265071378409}
-  - component: {fileID: 7490057130440929241}
-  - component: {fileID: 2775756142603314047}
+  - component: {fileID: 3270282589524739885}
+  - component: {fileID: 7247803765165549194}
+  - component: {fileID: 484126888702714883}
+  - component: {fileID: 6157808075092102083}
+  - component: {fileID: 2836660313079191634}
+  - component: {fileID: 8602147244623909355}
+  - component: {fileID: 883214771804605685}
+  - component: {fileID: 4422535195761932442}
+  - component: {fileID: 3762671227152580316}
+  - component: {fileID: 1215102771104615073}
   m_Layer: 9
   m_Name: Mage
   m_TagString: Untagged
@@ -25,13 +25,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1542247750815363725
+--- !u!4 &3270282589524739885
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5735805849040965198}
+  m_GameObject: {fileID: 6404238928164137605}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -40,14 +40,14 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &8975069054405753761
+--- !u!212 &7247803765165549194
 SpriteRenderer:
   serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5735805849040965198}
+  m_GameObject: {fileID: 6404238928164137605}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -100,13 +100,13 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
---- !u!58 &7669347785833927223
+--- !u!58 &484126888702714883
 CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5735805849040965198}
+  m_GameObject: {fileID: 6404238928164137605}
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
@@ -136,14 +136,14 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.48
---- !u!50 &8313297602021212262
+--- !u!50 &6157808075092102083
 Rigidbody2D:
   serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5735805849040965198}
+  m_GameObject: {fileID: 6404238928164137605}
   m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
@@ -163,13 +163,13 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!114 &981453551397709728
+--- !u!114 &2836660313079191634
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5735805849040965198}
+  m_GameObject: {fileID: 6404238928164137605}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b7e89500dbf6b1049b23f80b0debd069, type: 3}
@@ -188,13 +188,13 @@ MonoBehaviour:
   obstacleAvoidanceStrength: 0.85
   surfaceSkin: 0.035
   maxSlideIterations: 2
---- !u!114 &1432258275423879866
+--- !u!114 &8602147244623909355
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5735805849040965198}
+  m_GameObject: {fileID: 6404238928164137605}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ddc4483082bb85b4d88e38b2b6268d50, type: 3}
@@ -211,13 +211,13 @@ MonoBehaviour:
   articulatedPixelsPerUnit: 320
   hitDuration: 0.2
   deathDuration: 0.48
---- !u!114 &6823706042885158447
+--- !u!114 &883214771804605685
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5735805849040965198}
+  m_GameObject: {fileID: 6404238928164137605}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: def397dfc9c64074d95d82c896432069, type: 3}
@@ -225,13 +225,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.Enemies.EnemyHealth
   damagePopupPrefab: {fileID: 0}
   deathDelay: 0.15
---- !u!114 &76853265071378409
+--- !u!114 &4422535195761932442
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5735805849040965198}
+  m_GameObject: {fileID: 6404238928164137605}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3595e8ae450fdf04da9e98251d2f5f4c, type: 3}
@@ -239,13 +239,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: TopDownGame.Runtime::TopDownGame.UI.EnemyHealthBar
   size: {x: 1.15, y: 0.12}
   offset: {x: 0, y: 0.95, z: 0}
---- !u!114 &7490057130440929241
+--- !u!114 &3762671227152580316
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5735805849040965198}
+  m_GameObject: {fileID: 6404238928164137605}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0429d010208eb5e459218c02add47737, type: 3}
@@ -270,13 +270,13 @@ MonoBehaviour:
   greaterRuneWindupMultiplier: 1.25
   greaterRuneRadiusMultiplier: 1.38
   greaterRuneDamageMultiplier: 1.35
---- !u!114 &2775756142603314047
+--- !u!114 &1215102771104615073
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5735805849040965198}
+  m_GameObject: {fileID: 6404238928164137605}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 389716df3cab24d458149640530e65c6, type: 3}

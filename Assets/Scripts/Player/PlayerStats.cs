@@ -157,6 +157,8 @@ namespace TopDownGame.Player
             ManaChanged?.Invoke(currentMana, MaxMana);
         }
 
+        public void RestoreFullMana() => RestoreMana(MaxMana);
+
         public float RollDamage(float multiplier, out bool critical)
         {
             critical = UnityEngine.Random.value < CriticalChance;

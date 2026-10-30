@@ -46,6 +46,7 @@ namespace TopDownGame.UI
 
         public void ConfigureWindow(Transform window, bool compact, TMP_Text balance, TMP_Text status)
         {
+            if (window == null) return;
             SetDesignBounds(new Vector2(compact ? 1440 : 1920, 1080));
             var frame = (RectTransform)window;
             frame.anchoredPosition = new Vector2(compact ? 292 : 104, -80);
@@ -53,18 +54,27 @@ namespace TopDownGame.UI
             SetLayer(window, "Brass", compact ? 1332 : 1708, compact ? 956 : 916);
             SetLayer(window, "Inset", compact ? 1328 : 1704, compact ? 952 : 912);
             SetLayer(window, "Highlight", compact ? 1326 : 1702, 1);
-            var shadow = (RectTransform)window.parent.Find("WindowShadow");
-            shadow.anchoredPosition = new Vector2(compact ? 282 : 94, -76);
-            shadow.sizeDelta = new Vector2(compact ? 1360 : 1736, compact ? 978 : 938);
+            var shadow = window.parent != null ? (RectTransform)window.parent.Find("WindowShadow") : null;
+            if (shadow != null)
+            {
+                shadow.anchoredPosition = new Vector2(compact ? 282 : 94, -76);
+                shadow.sizeDelta = new Vector2(compact ? 1360 : 1736, compact ? 978 : 938);
+            }
             SetHorizontal(window.Find("Header"), 6, compact ? 1324 : 1700);
             SetHorizontal(window.Find("Title"), 32, compact ? 650 : 950);
             SetHorizontal(window.Find("Eyebrow"), 34, compact ? 750 : 1050);
             SetHorizontal(window.Find("Close"), compact ? 1250 : 1626, 54);
-            SetHorizontal(balance.transform, compact ? 814 : 1190, 392);
-            var statusRect = (RectTransform)status.transform;
-            statusRect.anchoredPosition = new Vector2(compact ? 32 : 720, compact ? -910 : -874);
-            statusRect.sizeDelta = new Vector2(compact ? 1272 : 960, 26);
-            status.alignment = compact ? TextAlignmentOptions.MidlineLeft : TextAlignmentOptions.Right;
+            if (balance != null)
+            {
+                SetHorizontal(balance.transform, compact ? 814 : 1190, 392);
+            }
+            if (status != null)
+            {
+                var statusRect = (RectTransform)status.transform;
+                statusRect.anchoredPosition = new Vector2(compact ? 32 : 720, compact ? -910 : -874);
+                statusRect.sizeDelta = new Vector2(compact ? 1272 : 960, 26);
+                status.alignment = compact ? TextAlignmentOptions.MidlineLeft : TextAlignmentOptions.Right;
+            }
             foreach (Transform child in window)
             {
                 if (child.name == "Divider") SetHorizontal(child, 28, compact ? 1280 : 1656);
@@ -79,12 +89,16 @@ namespace TopDownGame.UI
 
         private static void SetLayer(Transform window, string name, float width, float height)
         {
-            var rect = (RectTransform)window.Find(name);
+            if (window == null) return;
+            Transform child = window.Find(name);
+            if (child == null) return;
+            var rect = (RectTransform)child;
             rect.sizeDelta = new Vector2(width, height);
         }
 
         private static void SetHorizontal(Transform target, float x, float width)
         {
+            if (target == null) return;
             var rect = (RectTransform)target;
             rect.anchoredPosition = new Vector2(x, rect.anchoredPosition.y);
             rect.sizeDelta = new Vector2(width, rect.sizeDelta.y);

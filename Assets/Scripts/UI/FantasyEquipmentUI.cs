@@ -16,6 +16,7 @@ namespace TopDownGame.UI
         public static readonly Color TextColor = Hex("EEE7D8");
         public static readonly Color Muted = Hex("ABA69E");
         public static readonly Color Green = Hex("82C5A1");
+        public static readonly Color Accent = Hex("40C7A8");
 
         public static Color Hex(string value)
         {

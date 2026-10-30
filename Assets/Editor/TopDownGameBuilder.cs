@@ -1041,6 +1041,7 @@ namespace TopDownGame.EditorTools
             Set(combat, "stationarySpeedThreshold", 0.08f);
             PlayerInteraction interaction = player.AddComponent<PlayerInteraction>();
             Set(interaction, "worldDoubleClickEnabled", true);
+            player.AddComponent<ThanhGiongHeroController>();
             SkillInventory inventory = player.AddComponent<SkillInventory>();
             SkillManager manager = player.AddComponent<SkillManager>();
             SetArray(manager, "skillDatabase", skills);
@@ -1474,6 +1475,27 @@ namespace TopDownGame.EditorTools
                 player.transform.position, portalObject.transform.position,
                 storageObject.transform.position, "Map01", "RƯƠNG ĐỒ");
             CreateLobbyStationLabel(portalObject.transform, "PortalLabel", "TRUYỀN TỐNG TRẬN", new Color(0.6f, 1f, 0.85f), 1.55f);
+
+            HeroSelectionUI heroSelectionUI = canvas.GetComponentInChildren<HeroSelectionUI>(true);
+            GameObject heroShrine = new GameObject("HeroSelectionStation");
+            heroShrine.transform.position = new Vector3(-4.8f, -1.45f, 0f);
+            SpriteRenderer shrineRenderer = heroShrine.AddComponent<SpriteRenderer>();
+            shrineRenderer.sprite = GeneratedPropSprite("AncientForestShrineV1") ?? BuiltinSprite();
+            shrineRenderer.color = new Color(1f, 0.88f, 0.45f, 1f);
+            shrineRenderer.sortingOrder = 11;
+            float shrineScale = 1.25f / Mathf.Max(0.01f, shrineRenderer.sprite.bounds.size.y);
+            heroShrine.transform.localScale = Vector3.one * shrineScale;
+            CircleCollider2D shrineCollider = heroShrine.AddComponent<CircleCollider2D>();
+            shrineCollider.isTrigger = true;
+            shrineCollider.radius = 0.65f / shrineScale;
+            HeroSelectionStation stationComponent = heroShrine.AddComponent<HeroSelectionStation>();
+            Set(stationComponent, "selectionUI", heroSelectionUI);
+            GameObject shrineLabel = CreateWorldLabel("HeroShrineLabel",
+                "ĐÀI THÁNH GIÓNG\nE / NHẤP ĐÚP  •  PHÍM H",
+                heroShrine.transform.position + new Vector3(0f, 1.15f, 0f),
+                new Color(1f, 0.86f, 0.28f), 0.032f);
+            shrineLabel.transform.SetParent(heroShrine.transform, true);
+
             canvas.gameObject.AddComponent<LobbyWelcomeUI>();
             GameObject tutorialObject = new GameObject("FirstEntryTutorial", typeof(RectTransform));
             tutorialObject.transform.SetParent(canvas.transform, false);
@@ -3881,6 +3903,7 @@ namespace TopDownGame.EditorTools
             hudObject.AddComponent<SkillEquipmentUI>();
             hudObject.AddComponent<PotentialUpgradeUI>();
             hudObject.AddComponent<EquipmentEnhancementUI>();
+            hudObject.AddComponent<HeroSelectionUI>();
             GameObject pauseObject = new GameObject("PauseMenu");
             pauseObject.transform.SetParent(canvasObject.transform, false);
             PauseMenu pauseMenu = pauseObject.AddComponent<PauseMenu>();
