@@ -131,5 +131,96 @@ namespace TopDownGame.Tests.EditMode
                 }
             }
         }
+
+        [Test]
+        public void ForestWarriorVisualFactoryProvidesPortraitAndSkillIcons()
+        {
+            Sprite portrait = ForestWarriorVisualFactory.GetHeroPortraitSprite();
+            Assert.That(portrait, Is.Not.Null, "Forest Warrior portrait sprite must not be null.");
+            Assert.That(ThanhGiongHeroController.IsCustomHeroSprite(portrait), Is.False,
+                "Forest Warrior portrait sprite must never be Thanh Giong or Son Tinh.");
+
+            for (int slot = 0; slot < 4; slot++)
+            {
+                Sprite icon = ForestWarriorVisualFactory.GetSkillIcon(slot);
+                Assert.That(icon, Is.Not.Null, "Forest Warrior skill icon at slot " + slot + " must not be null.");
+            }
+        }
+
+        [Test]
+        public void SkillEquipmentUIDisplaysCorrectFourSkillsForEachHero()
+        {
+            GameObject player = new GameObject("TestPlayer");
+            GameObject canvasObj = new GameObject("TestCanvas");
+            Canvas canvas = canvasObj.AddComponent<Canvas>();
+            GameObject hud = new GameObject("HUD");
+            hud.transform.SetParent(canvas.transform, false);
+
+            try
+            {
+                player.tag = "Player";
+                PlayerStats stats = player.AddComponent<PlayerStats>();
+                stats.AddGold(1000);
+                SkillInventory inventory = player.AddComponent<SkillInventory>();
+                SkillManager manager = player.AddComponent<SkillManager>();
+
+                string[] guids = AssetDatabase.FindAssets("t:SkillData", new[] { "Assets/ScriptableObjects/Skills" });
+                SkillData[] allSkills = guids.Select(g => AssetDatabase.LoadAssetAtPath<SkillData>(AssetDatabase.GUIDToAssetPath(g))).ToArray();
+                typeof(SkillManager).GetField("skillDatabase", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                    ?.SetValue(manager, allSkills);
+
+                ThanhGiongHeroController heroController = player.AddComponent<ThanhGiongHeroController>();
+                SkillEquipmentUI ui = hud.AddComponent<SkillEquipmentUI>();
+
+                var method = typeof(SkillEquipmentUI).GetMethod("ResolveSkillData",
+                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                Assert.That(method, Is.Not.Null);
+
+                // 1. Forest Warrior
+                heroController.SelectHero(HeroCharacterId.ForestWarrior, false);
+                ui.Open();
+                Assert.That(ui.IsOpen, Is.True);
+
+                SkillData fwQ = (SkillData)method.Invoke(ui, new object[] { "Fireball", 0 });
+                Assert.That(fwQ, Is.Not.Null);
+                Assert.That(fwQ.DisplayName, Is.EqualTo("Cầu Lửa"));
+                ui.Close();
+
+                // 2. Thanh Giong
+                heroController.SelectHero(HeroCharacterId.ThanhGiong, false);
+                ui.Open();
+                SkillData tgQ = (SkillData)method.Invoke(ui, new object[] { "ThanhGiong_0", 0 });
+                SkillData tgE = (SkillData)method.Invoke(ui, new object[] { "ThanhGiong_1", 1 });
+                SkillData tgR = (SkillData)method.Invoke(ui, new object[] { "ThanhGiong_2", 2 });
+                SkillData tgF = (SkillData)method.Invoke(ui, new object[] { "ThanhGiong_3", 3 });
+
+                Assert.That(tgQ, Is.Not.Null);
+                Assert.That(tgQ.DisplayName, Is.EqualTo("Kiếm Sắt Chiến Mã"));
+                Assert.That(tgE.DisplayName, Is.EqualTo("Tre Ngà Quật Địch"));
+                Assert.That(tgR.DisplayName, Is.EqualTo("Thần Mã Quật Tre 360°"));
+                Assert.That(tgF.DisplayName, Is.EqualTo("Thiết Mã Càn Lướt"));
+                ui.Close();
+
+                // 3. Son Tinh
+                heroController.SelectHero(HeroCharacterId.SonTinh, false);
+                ui.Open();
+                SkillData stQ = (SkillData)method.Invoke(ui, new object[] { "SonTinh_0", 0 });
+                SkillData stE = (SkillData)method.Invoke(ui, new object[] { "SonTinh_1", 1 });
+                SkillData stR = (SkillData)method.Invoke(ui, new object[] { "SonTinh_2", 2 });
+                SkillData stF = (SkillData)method.Invoke(ui, new object[] { "SonTinh_3", 3 });
+
+                Assert.That(stQ, Is.Not.Null);
+                Assert.That(stQ.DisplayName, Is.EqualTo("Ném Đại Thạch"));
+                Assert.That(stE.DisplayName, Is.EqualTo("Dâng Núi Trấn Địch"));
+                Assert.That(stR.DisplayName, Is.EqualTo("Đấm Đất Dựng Núi"));
+                Assert.That(stF.DisplayName, Is.EqualTo("Bát Phương Quần Sơn"));
+                ui.Close();
+            }
+            finally
+            {
+                Object.DestroyImmediate(player);
+                Object.DestroyImmediate(canvasObj);
+            }
+        }
     }
 }

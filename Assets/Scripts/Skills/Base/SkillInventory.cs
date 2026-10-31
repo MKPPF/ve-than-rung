@@ -34,6 +34,29 @@ namespace TopDownGame.Skills
                 };
             }
 
+            string[] defaultSkills = { "Fireball", "IceDash", "SwordSpin", "LightningStrike" };
+            string[] defaultKeys = { "Q", "E", "R", "F" };
+            bool allEmpty = true;
+            for (int i = 0; i < slots.Length; i++)
+            {
+                if (slots[i] != null && !slots[i].IsEmpty)
+                {
+                    allEmpty = false;
+                    break;
+                }
+            }
+
+            if (allEmpty)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    slots[i].key = defaultKeys[i];
+                    slots[i].skillId = defaultSkills[i];
+                    slots[i].level = 1;
+                    levels[defaultSkills[i]] = 1;
+                }
+            }
+
             foreach (SkillSlot slot in slots)
             {
                 if (slot != null && !slot.IsEmpty)
@@ -41,6 +64,34 @@ namespace TopDownGame.Skills
                     levels[slot.skillId] = Mathf.Max(1, slot.level);
                 }
             }
+        }
+
+        public void EnsureDefaultSlots()
+        {
+            string[] defaultSkills = { "Fireball", "IceDash", "SwordSpin", "LightningStrike" };
+            string[] defaultKeys = { "Q", "E", "R", "F" };
+            for (int i = 0; i < 4; i++)
+            {
+                if (i < slots.Length)
+                {
+                    if (string.IsNullOrWhiteSpace(slots[i].key))
+                    {
+                        slots[i].key = defaultKeys[i];
+                    }
+
+                    if (slots[i].IsEmpty)
+                    {
+                        slots[i].skillId = defaultSkills[i];
+                        slots[i].level = Mathf.Max(1, GetLevel(defaultSkills[i]));
+                    }
+
+                    if (!levels.ContainsKey(slots[i].skillId))
+                    {
+                        levels[slots[i].skillId] = Mathf.Max(1, slots[i].level);
+                    }
+                }
+            }
+            Changed?.Invoke();
         }
 
         public int GetLevel(string skillId)

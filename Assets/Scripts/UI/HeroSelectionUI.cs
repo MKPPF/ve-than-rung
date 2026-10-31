@@ -33,10 +33,10 @@ namespace TopDownGame.UI
 
         private static readonly string[] ForestWarriorSlotLabels =
         {
-            "Q: Kỹ Năng Ô 1",
-            "E: Kỹ Năng Ô 2",
-            "R: Kỹ Năng Ô 3",
-            "F: Kỹ Năng Ô 4"
+            "Q: Cầu Lửa",
+            "E: Lướt Băng",
+            "R: Kiếm Luân",
+            "F: Thiên Lôi"
         };
 
         private GameObject panel;
@@ -244,14 +244,13 @@ namespace TopDownGame.UI
                 "Ngựa Sắt • Kiếm Sắt • Tre Ngà",
                 "Vượt Map03 & mở BossMap01");
 
-            if (forestCardButton != null)
-            {
-                forestCardButton.transform.Find("Brass").GetComponent<Image>().color =
-                    previewHero == HeroCharacterId.ForestWarrior ? F.Gold : F.Edge;
-                TMP_Text state = forestCardButton.transform.Find("State").GetComponent<TMP_Text>();
-                state.text = activeHero == HeroCharacterId.ForestWarrior ? "ĐANG DÙNG" : "NHẤN ĐỂ CHỌN";
-                state.color = activeHero == HeroCharacterId.ForestWarrior ? F.Gold : F.Green;
-            }
+            UpdateHeroCard(
+                forestCardButton,
+                HeroCharacterId.ForestWarrior,
+                activeHero,
+                ForestWarriorVisualFactory.GetHeroPortraitSprite(),
+                "Kiếm Pháp • Kỹ Năng Tự Do",
+                "Nhân vật mặc định");
 
             bool isPreviewUnlocked = ThanhGiongHeroController.IsHeroUnlocked(previewHero);
 
@@ -325,25 +324,23 @@ namespace TopDownGame.UI
             }
             else
             {
-                GameObject player = GameObject.FindGameObjectWithTag("Player");
-                Sprite fallback = player != null && player.GetComponent<SpriteRenderer>() != null
-                    ? player.GetComponent<SpriteRenderer>().sprite
-                    : ThanhGiongVisualFactory.GetHeroPortraitSprite();
-                heroPortrait.sprite = fallback;
-                heroPortrait.enabled = heroPortrait.sprite != null;
+                Sprite fwPortrait = ForestWarriorVisualFactory.GetHeroPortraitSprite();
+                heroPortrait.sprite = fwPortrait;
+                heroPortrait.enabled = fwPortrait != null;
                 heroPortrait.color = Color.white;
                 heroHeading.text = "CHIẾN BINH RỪNG (MẶC ĐỊNH)";
                 heroSubheading.text = "Kiếm Pháp Cơ Bản  •  Kỹ Năng Nguyên Tố Tự Do";
                 movesDescription.text =
                     "<b>• Đánh thường [Chuột phải / J]:</b> Chém cận chiến cơ bản.\n" +
-                    "<b>• Kỹ năng [Q / E / R / F]:</b> Sử dụng các kỹ năng nguyên tố đã trang bị trong bảng Kỹ Năng [K].\n\n" +
+                    "<b>• Kỹ năng [Q / E / R / F]:</b> Sử dụng 4 kỹ năng nguyên tố đã trang bị trong bảng Kỹ Năng [K].\n\n" +
                     "Nhân vật cơ bản với khả năng tùy biến trang bị và học 9 kỹ năng nguyên tố khác nhau trong suốt hành trình.";
 
                 for (int i = 0; i < 4; i++)
                 {
                     if (skillPreviewIcons[i] != null)
                     {
-                        skillPreviewIcons[i].enabled = false;
+                        skillPreviewIcons[i].sprite = ForestWarriorVisualFactory.GetSkillIcon(i);
+                        skillPreviewIcons[i].enabled = skillPreviewIcons[i].sprite != null;
                     }
 
                     if (skillPreviewLabels[i] != null)
@@ -489,10 +486,10 @@ namespace TopDownGame.UI
                     PreviewHero(HeroCharacterId.ForestWarrior);
                     SelectHeroImmediate(HeroCharacterId.ForestWarrior);
                 });
-            F.Icon(forestCardButton.transform, "Icon", ThanhGiongVisualFactory.GetSkillIcon(0), 14f, 22f, 78f, 78f);
-            F.Text(forestCardButton.transform, "Name", "CHIẾN BINH RỪNG", 108f, 16f, 216f, 32f, 22f, F.TextColor);
-            F.Text(forestCardButton.transform, "Desc", "Nhân vật mặc định", 108f, 50f, 216f, 28f, 16f, F.Muted);
-            F.Text(forestCardButton.transform, "State", "", 108f, 82f, 216f, 26f, 17f, F.Gold);
+            F.Icon(forestCardButton.transform, "Icon", ForestWarriorVisualFactory.GetHeroPortraitSprite(), 12f, 18f, 92f, 92f);
+            F.Text(forestCardButton.transform, "Name", "CHIẾN BINH RỪNG", 114f, 14f, 210f, 34f, 24f, F.Gold);
+            F.Text(forestCardButton.transform, "Desc", "Kiếm Pháp • Kỹ Năng Tự Do", 114f, 50f, 210f, 30f, 16f, F.TextColor);
+            F.Text(forestCardButton.transform, "State", "ĐANG DÙNG", 114f, 86f, 210f, 28f, 17f, F.Green);
 
             TMP_Text testModeNote = F.Text(listFrame, "TestModeHint",
                 "Chế độ thử nghiệm: Đã mở khóa toàn bộ anh hùng để kiểm tra chiêu thức trước khi bật khóa theo tiến trình Map.",

@@ -198,8 +198,13 @@ namespace TopDownGame.Save
             equipmentEnhancements.Clear();
             items.Clear();
             ownedSkills.Clear();
+            string[] defaultHeroSkills = { "Fireball", "IceDash", "SwordSpin", "LightningStrike" };
+            for (int i = 0; i < defaultHeroSkills.Length; i++)
+            {
+                ownedSkills.Add(new SkillProgress { skillId = defaultHeroSkills[i], level = 1 });
+            }
             defeatedBosses.Clear();
-            equippedSkills = new string[4];
+            equippedSkills = new string[] { "Fireball", "IceDash", "SwordSpin", "LightningStrike" };
             equippedWeaponId = string.Empty;
             equippedHelmetId = string.Empty;
             equippedArmorId = string.Empty;
@@ -754,6 +759,15 @@ namespace TopDownGame.Save
             if (equippedSkills == null || equippedSkills.Length != 4)
             {
                 Array.Resize(ref equippedSkills, 4);
+            }
+
+            string[] defaultHeroSkills = { "Fireball", "IceDash", "SwordSpin", "LightningStrike" };
+            for (int i = 0; i < 4; i++)
+            {
+                if (string.IsNullOrWhiteSpace(equippedSkills[i]))
+                {
+                    equippedSkills[i] = defaultHeroSkills[i];
+                }
             }
         }
 

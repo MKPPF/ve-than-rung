@@ -29,6 +29,8 @@ namespace TopDownGame.Player
         [SerializeField] private Sprite[] hitFrames;
         [SerializeField] private Sprite[] deathFrames;
 
+        public Sprite IdleSprite => idleSprite;
+
         [Header("Direction")]
         [SerializeField, Min(0.01f)] private float walkStartSpeed = 0.08f;
         [SerializeField, Min(0.01f)] private float walkStopSpeed = 0.04f;
@@ -150,9 +152,16 @@ namespace TopDownGame.Player
         {
             lastPresentedPosition = transform.position;
             ResolveVisualRenderer();
-            if (visualRenderer != null && idleSprite == null)
+            if (idleSprite == null || ThanhGiongHeroController.IsCustomHeroSprite(idleSprite))
             {
-                idleSprite = visualRenderer.sprite;
+                if (visualRenderer != null && !ThanhGiongHeroController.IsCustomHeroSprite(visualRenderer.sprite))
+                {
+                    idleSprite = visualRenderer.sprite;
+                }
+                else
+                {
+                    idleSprite = ForestWarriorVisualFactory.GetHeroPortraitSprite();
+                }
             }
 
             if (visualRenderer != null)
@@ -167,6 +176,19 @@ namespace TopDownGame.Player
                 return;
             }
 
+            ShowFirstAvailableIdle();
+        }
+
+        public void ResetToIdle()
+        {
+            settling = false;
+            lastWalkFrames = null;
+            hasPresentedWalk = false;
+            ResolveVisualRenderer();
+            if (idleSprite == null || ThanhGiongHeroController.IsCustomHeroSprite(idleSprite))
+            {
+                idleSprite = ForestWarriorVisualFactory.GetHeroPortraitSprite();
+            }
             ShowFirstAvailableIdle();
         }
 

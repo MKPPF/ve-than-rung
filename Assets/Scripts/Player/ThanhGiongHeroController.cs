@@ -189,27 +189,65 @@ namespace TopDownGame.Player
             }
         }
 
-        private void Start()
+        public static bool IsCustomHeroSprite(Sprite sprite)
         {
+            if (sprite == null || sprite.texture == null)
+            {
+                return false;
+            }
+
+            string texName = sprite.texture.name;
+            return texName.IndexOf("ThanhGiong", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   texName.IndexOf("SonTinh", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        private void EnsureDefaultSpriteCaptured()
+        {
+            if (capturedDefaultSprite && defaultSpriteSnapshot != null && !IsCustomHeroSprite(defaultSpriteSnapshot))
+            {
+                return;
+            }
+
             ResolveVisualRenderer();
-            if (visualRenderer != null && !capturedDefaultSprite)
+            if (defaultSpriteSnapshot != null && !IsCustomHeroSprite(defaultSpriteSnapshot))
+            {
+                capturedDefaultSprite = true;
+                return;
+            }
+
+            if (characterAnimator != null && characterAnimator.IdleSprite != null &&
+                !IsCustomHeroSprite(characterAnimator.IdleSprite))
+            {
+                defaultSpriteSnapshot = characterAnimator.IdleSprite;
+                capturedDefaultSprite = true;
+                return;
+            }
+
+            Sprite fw = ForestWarriorVisualFactory.GetHeroPortraitSprite();
+            if (fw != null && !IsCustomHeroSprite(fw))
+            {
+                defaultSpriteSnapshot = fw;
+                capturedDefaultSprite = true;
+                return;
+            }
+
+            if (visualRenderer != null && !IsCustomHeroSprite(visualRenderer.sprite))
             {
                 defaultSpriteSnapshot = visualRenderer.sprite;
                 capturedDefaultSprite = true;
             }
+        }
 
+        private void Start()
+        {
+            EnsureDefaultSpriteCaptured();
             ApplyHeroVisual(currentHero);
         }
 
         public void SelectHero(HeroCharacterId hero, bool savePreference = true)
         {
             EnsureSkillDefinitions();
-            ResolveVisualRenderer();
-            if (visualRenderer != null && !capturedDefaultSprite)
-            {
-                defaultSpriteSnapshot = visualRenderer.sprite;
-                capturedDefaultSprite = true;
-            }
+            EnsureDefaultSpriteCaptured();
 
             HeroCharacterId previous = currentHero;
             currentHero = hero;
@@ -259,14 +297,17 @@ namespace TopDownGame.Player
             }
             else
             {
+                EnsureDefaultSpriteCaptured();
+                Sprite fwSprite = defaultSpriteSnapshot ?? ForestWarriorVisualFactory.GetHeroPortraitSprite();
+                if (fwSprite != null)
+                {
+                    AssignHeroSprite(fwSprite);
+                }
+
                 if (characterAnimator != null)
                 {
                     characterAnimator.enabled = true;
-                }
-
-                if (defaultSpriteSnapshot != null)
-                {
-                    visualRenderer.sprite = defaultSpriteSnapshot;
+                    characterAnimator.ResetToIdle();
                 }
 
                 visualRenderer.enabled = true;
@@ -435,18 +476,53 @@ namespace TopDownGame.Player
             return slotCooldownDurations[slotIndex];
         }
 
-        public int GetEffectiveSkillLevel(int slotIndex)
+        public int GetHeroSkillLevel(HeroCharacterId hero, int slotIndex)
         {
-            if (skillInventory != null && slotIndex >= 0 && slotIndex < skillInventory.Slots.Count)
+            if (slotIndex < 0 || slotIndex >= 4) return 1;
+            string key = hero switch
             {
-                int slotLevel = skillInventory.Slots[slotIndex].level;
-                if (slotLevel > 0)
-                {
-                    return slotLevel;
-                }
+                HeroCharacterId.ThanhGiong => "TG_Skill_" + slotIndex,
+                HeroCharacterId.SonTinh => "ST_Skill_" + slotIndex,
+                _ => null
+            };
+            if (key != null && skillInventory != null && skillInventory.Owns(key))
+            {
+                return skillInventory.GetLevel(key);
+            }
+
+            if (skillInventory != null && slotIndex < skillInventory.Slots.Count)
+            {
+                int lvl = skillInventory.Slots[slotIndex].level;
+                if (lvl > 0) return lvl;
             }
 
             return 1;
+        }
+
+        public void UpgradeHeroSkill(HeroCharacterId hero, int slotIndex)
+        {
+            if (slotIndex < 0 || slotIndex >= 4) return;
+            string key = hero switch
+            {
+                HeroCharacterId.ThanhGiong => "TG_Skill_" + slotIndex,
+                HeroCharacterId.SonTinh => "ST_Skill_" + slotIndex,
+                _ => null
+            };
+            int currentLevel = GetHeroSkillLevel(hero, slotIndex);
+            int nextLevel = Mathf.Min(5, currentLevel + 1);
+            if (key != null && skillInventory != null)
+            {
+                skillInventory.AddOrUpgrade(key, 5);
+            }
+            if (skillInventory != null && slotIndex < skillInventory.Slots.Count)
+            {
+                skillInventory.Slots[slotIndex].level = nextLevel;
+            }
+        }
+
+        public int GetEffectiveSkillLevel(int slotIndex)
+        {
+            return GetHeroSkillLevel(currentHero, slotIndex);
         }
 
         public bool TryCastActiveHeroSkill(int slotIndex, Vector2? targetPosition, LayerMask enemyLayers)
@@ -1311,7 +1387,7 @@ namespace TopDownGame.Player
             isExecutingSkill = false;
         }
 
-        private void EnsureSkillDefinitions()
+        public void EnsureSkillDefinitions()
         {
             if (thanhGiongSkills == null || thanhGiongSkills.Length != 4 || thanhGiongSkills[0] == null)
             {
