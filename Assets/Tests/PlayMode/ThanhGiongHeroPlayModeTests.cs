@@ -55,6 +55,11 @@ namespace TopDownGame.Tests.PlayMode
                 Object.Destroy(vfx.gameObject);
             }
 
+            foreach (AnDuongVuongVfx vfx in Object.FindObjectsByType<AnDuongVuongVfx>())
+            {
+                Object.Destroy(vfx.gameObject);
+            }
+
             yield return null;
         }
 
@@ -234,6 +239,87 @@ namespace TopDownGame.Tests.PlayMode
             Assert.That(surroundSouth.CurrentHealth, Is.LessThan(sBefore), "Skill 4 (F) must hit South enemy.");
             Assert.That(surroundEast.CurrentHealth, Is.LessThan(eBefore), "Skill 4 (F) must hit East enemy.");
             Assert.That(surroundWest.CurrentHealth, Is.LessThan(wBefore), "Skill 4 (F) must hit West enemy.");
+        }
+
+        [UnityTest]
+        public IEnumerator AnDuongVuongExecutesNormalAttackAndAllFourNoThanSkills()
+        {
+            SetupTestPlayer("AnDuongVuongTestPlayer", out SpriteRenderer sr, out Rigidbody2D rb,
+                out PlayerStats stats, out PlayerCombat combat, out SkillManager skillManager, out ThanhGiongHeroController hero);
+
+            yield return null;
+
+            hero.SelectHero(HeroCharacterId.AnDuongVuong, false);
+            Assert.That(hero.IsAnDuongVuongActive, Is.True);
+            Assert.That(skillManager.GetSkillData(0).DisplayName, Is.EqualTo("Nhất Tiễn Thấu Giáp"));
+            Assert.That(skillManager.GetSkillData(1).DisplayName, Is.EqualTo("Tam Tiễn Tề Phát"));
+            Assert.That(skillManager.GetSkillData(2).DisplayName, Is.EqualTo("Hô Thiên Giáng Tiễn"));
+            Assert.That(skillManager.GetSkillData(3).DisplayName, Is.EqualTo("Thiên Tru Thần Tiễn"));
+
+            yield return null;
+            Assert.That(sr.sprite, Is.Not.Null);
+            Assert.That(sr.sprite.texture.name, Does.Contain("AnDuongVuong_Hero"));
+
+            // 1. Normal Attack: Bronze Arrow from No Than Lien Chau
+            EnemyHealth rangedTarget = SpawnDummyEnemy(new Vector2(404.0f, 400f), 2000f);
+            float hpBefore = rangedTarget.CurrentHealth;
+            MethodInfo attackRoutine = typeof(PlayerCombat).GetMethod("AttackRoutine",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            yield return player.GetComponent<MonoBehaviour>().StartCoroutine(
+                (IEnumerator)attackRoutine.Invoke(combat, new object[] { Vector2.right, false }));
+            Assert.That(rangedTarget.CurrentHealth, Is.LessThan(hpBefore),
+                "An Duong Vuong normal arrow attack must damage enemies at long range.");
+            Object.Destroy(rangedTarget.gameObject);
+
+            // 2. Skill 1 (Q - Slot 0): Nhat Tien Thau Giap (Single Piercing Bronze Arrow)
+            rb.position = new Vector2(400f, 400f);
+            player.transform.position = new Vector3(400f, 400f, 0f);
+            stats.RestoreFullMana();
+            EnemyHealth singleArrowTarget = SpawnDummyEnemy(new Vector2(405.5f, 400f), 2000f);
+            hpBefore = singleArrowTarget.CurrentHealth;
+            Assert.That(hero.TryCastAnDuongVuongSkill(0, new Vector2(405.5f, 400f), ~0), Is.True);
+            yield return new WaitForSeconds(0.40f);
+            Assert.That(singleArrowTarget.CurrentHealth, Is.LessThan(hpBefore),
+                "Skill 1 (Q - Nhat Tien Thau Giap) must shoot 1 piercing arrow and damage target enemy.");
+            Object.Destroy(singleArrowTarget.gameObject);
+
+            // 3. Skill 2 (E - Slot 1): Tam Tien Te Phat (3 Arrows Spread in 3 Directions)
+            rb.position = new Vector2(400f, 400f);
+            player.transform.position = new Vector3(400f, 400f, 0f);
+            stats.RestoreFullMana();
+            EnemyHealth tripleArrowTarget = SpawnDummyEnemy(new Vector2(404.5f, 401.5f), 2000f);
+            hpBefore = tripleArrowTarget.CurrentHealth;
+            Assert.That(hero.TryCastAnDuongVuongSkill(1, new Vector2(404.5f, 401.5f), ~0), Is.True);
+            yield return new WaitForSeconds(0.40f);
+            Assert.That(tripleArrowTarget.CurrentHealth, Is.LessThan(hpBefore),
+                "Skill 2 (E - Tam Tien Te Phat) must shoot 3 spread arrows and damage enemies in the forward cone.");
+            Object.Destroy(tripleArrowTarget.gameObject);
+
+            // 4. Skill 3 (R - Slot 2): Ho Thien Giang Tien (Frontal Arrow Rain)
+            rb.position = new Vector2(400f, 400f);
+            player.transform.position = new Vector3(400f, 400f, 0f);
+            stats.RestoreFullMana();
+            EnemyHealth rainTarget = SpawnDummyEnemy(new Vector2(404.0f, 400f), 2000f);
+            hpBefore = rainTarget.CurrentHealth;
+            Assert.That(hero.TryCastAnDuongVuongSkill(2, new Vector2(404.0f, 400f), ~0), Is.True);
+            yield return new WaitForSeconds(0.70f);
+            Assert.That(rainTarget.CurrentHealth, Is.LessThan(hpBefore),
+                "Skill 3 (R - Ho Thien Giang Tien) must call arrow rain down on frontal enemy area.");
+            Object.Destroy(rainTarget.gameObject);
+
+            // 5. Skill 4 (F - Slot 3): Thien Tru Than Tien (Long-Range Celestial Strike, longer cooldown)
+            rb.position = new Vector2(400f, 400f);
+            player.transform.position = new Vector3(400f, 400f, 0f);
+            stats.RestoreFullMana();
+            EnemyHealth longRangeTarget = SpawnDummyEnemy(new Vector2(408.0f, 400f), 2000f);
+            hpBefore = longRangeTarget.CurrentHealth;
+            Assert.That(hero.GetAnDuongVuongSkillData(3).Cooldown, Is.GreaterThan(10f),
+                "Skill 4 (F) must have a longer cooldown as requested.");
+            Assert.That(hero.TryCastAnDuongVuongSkill(3, new Vector2(408.0f, 400f), ~0), Is.True);
+            yield return new WaitForSeconds(0.85f);
+            Assert.That(longRangeTarget.CurrentHealth, Is.LessThan(hpBefore),
+                "Skill 4 (F - Thien Tru Than Tien) must bombard distant enemy from afar.");
+            Object.Destroy(longRangeTarget.gameObject);
         }
 
         private void SetupTestPlayer(string name, out SpriteRenderer sr, out Rigidbody2D rb,

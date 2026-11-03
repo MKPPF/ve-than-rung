@@ -138,7 +138,7 @@ namespace TopDownGame.UI
                 0, 720, 1920, 36, 20, FantasyEquipmentUI.Muted, TextAlignmentOptions.Center);
 
             // Press Any Key Prompt (hidden initially until loading finishes)
-            splashPromptText = FantasyEquipmentUI.Text(surface, "PressPrompt", "✦ NHẤN NÚT BẤT KỲ HAY DÙNG CHUỘT ĐỂ TIẾP TỤC ✦",
+            splashPromptText = FantasyEquipmentUI.Text(surface, "PressPrompt", "* NHẤN NÚT BẤT KỲ HOẶC NHẤP CHUỘT ĐỂ TIẾP TỤC *",
                 0, 690, 1920, 50, 26, FantasyEquipmentUI.Gold, TextAlignmentOptions.Center);
             splashPromptText.gameObject.SetActive(false);
 

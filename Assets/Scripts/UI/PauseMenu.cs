@@ -76,7 +76,7 @@ namespace TopDownGame.UI
             combatStatsText = FantasyEquipmentUI.Text(statsCard, "CombatStat", "Chỉ số chiến đấu: --", 26, 182, 648, 28, 17,
                 FantasyEquipmentUI.TextColor);
 
-            FantasyEquipmentUI.Text(statsCard, "SaveNotice", "💾 Tự động ghi nhớ tiến trình (Vàng, Cấp, Đồ, Kỹ năng) khi thoát",
+            FantasyEquipmentUI.Text(statsCard, "SaveNotice", "Tự động ghi nhớ tiến trình (Vàng, Cấp, Đồ, Kỹ năng) khi thoát",
                 20, 228, 660, 26, 15, FantasyEquipmentUI.Green, TextAlignmentOptions.Center);
 
             FantasyEquipmentUI.Line(frame, 40, 398, 700);
@@ -198,6 +198,7 @@ namespace TopDownGame.UI
             {
                 heroText.text = activeHero switch
                 {
+                    HeroCharacterId.AnDuongVuong => "Anh hùng: <color=#F59E0B>An Dương Vương (Nỏ Thần Cổ Loa)</color>",
                     HeroCharacterId.ThanhGiong => "Anh hùng: <color=#F5D259>Thánh Gióng (Phù Đổng)</color>",
                     HeroCharacterId.SonTinh => "Anh hùng: <color=#6EE7A8>Sơn Tinh (Tản Viên Sơn Thánh)</color>",
                     _ => "Anh hùng: <color=#94B8FF>Chiến Binh Rừng</color>"
@@ -227,7 +228,7 @@ namespace TopDownGame.UI
 
             if (goldText != null && stats != null)
             {
-                goldText.text = "Vàng sở hữu: <color=#FFD700>" + stats.Gold.ToString("N0") + " 🪙</color>";
+                goldText.text = "Vàng sở hữu: <color=#FFD700>" + stats.Gold.ToString("N0") + " vàng</color>";
             }
 
             if (vitalsText != null)

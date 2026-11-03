@@ -66,32 +66,51 @@ namespace TopDownGame.Skills
             }
         }
 
+        private bool isEnsuringDefaults;
+
         public void EnsureDefaultSlots()
         {
-            string[] defaultSkills = { "Fireball", "IceDash", "SwordSpin", "LightningStrike" };
-            string[] defaultKeys = { "Q", "E", "R", "F" };
-            for (int i = 0; i < 4; i++)
+            if (isEnsuringDefaults) return;
+            isEnsuringDefaults = true;
+            try
             {
-                if (i < slots.Length)
+                string[] defaultSkills = { "Fireball", "IceDash", "SwordSpin", "LightningStrike" };
+                string[] defaultKeys = { "Q", "E", "R", "F" };
+                bool changed = false;
+                for (int i = 0; i < 4; i++)
                 {
-                    if (string.IsNullOrWhiteSpace(slots[i].key))
+                    if (i < slots.Length)
                     {
-                        slots[i].key = defaultKeys[i];
-                    }
+                        if (string.IsNullOrWhiteSpace(slots[i].key))
+                        {
+                            slots[i].key = defaultKeys[i];
+                            changed = true;
+                        }
 
-                    if (slots[i].IsEmpty)
-                    {
-                        slots[i].skillId = defaultSkills[i];
-                        slots[i].level = Mathf.Max(1, GetLevel(defaultSkills[i]));
-                    }
+                        if (slots[i].IsEmpty)
+                        {
+                            slots[i].skillId = defaultSkills[i];
+                            slots[i].level = Mathf.Max(1, GetLevel(defaultSkills[i]));
+                            changed = true;
+                        }
 
-                    if (!levels.ContainsKey(slots[i].skillId))
-                    {
-                        levels[slots[i].skillId] = Mathf.Max(1, slots[i].level);
+                        if (!levels.ContainsKey(slots[i].skillId))
+                        {
+                            levels[slots[i].skillId] = Mathf.Max(1, slots[i].level);
+                            changed = true;
+                        }
                     }
                 }
+
+                if (changed)
+                {
+                    Changed?.Invoke();
+                }
             }
-            Changed?.Invoke();
+            finally
+            {
+                isEnsuringDefaults = false;
+            }
         }
 
         public int GetLevel(string skillId)

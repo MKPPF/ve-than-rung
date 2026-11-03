@@ -15,9 +15,10 @@ namespace TopDownGame.Player
         [SerializeField] private HeroSelectionUI selectionUI;
 
         public string InteractionPrompt =>
-            (ThanhGiongHeroController.IsHeroUnlocked(HeroCharacterId.ThanhGiong) ||
+            (ThanhGiongHeroController.IsHeroUnlocked(HeroCharacterId.AnDuongVuong) ||
+             ThanhGiongHeroController.IsHeroUnlocked(HeroCharacterId.ThanhGiong) ||
              ThanhGiongHeroController.IsHeroUnlocked(HeroCharacterId.SonTinh))
-                ? "E / Nhấp đúp - Đài Anh Hùng (Chọn Chiến Binh / Thánh Gióng / Sơn Tinh)"
+                ? "E / Nhấp đúp - Đài Anh Hùng (Chọn An Dương Vương / Sơn Tinh / Thánh Gióng)"
                 : "E / Nhấp đúp - Đài Anh Hùng (Xem điều kiện mở khóa Anh Hùng)";
         public string Prompt => InteractionPrompt;
         public bool CanInteract => true;

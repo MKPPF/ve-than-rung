@@ -15,7 +15,8 @@ namespace TopDownGame.Player
     {
         ForestWarrior = 0,
         ThanhGiong = 1,
-        SonTinh = 2
+        SonTinh = 2,
+        AnDuongVuong = 3
     }
 
     /// <summary>
@@ -24,6 +25,8 @@ namespace TopDownGame.Player
     /// - ThanhGiong (Iron Horse, Iron Sword, and Ivory Bamboo 5-move kit)
     /// - SonTinh (Mountain God with Overhead Giant Boulder, Skyward-Palm Mountain Eruption,
     ///   Ground-Slam Cascading Ridges, and 360-degree Surrounding Mountain Fortress)
+    /// - AnDuongVuong (Au Lac King wielding No Than Lien Chau with single bronze arrow piercing,
+    ///   tri-directional spread arrows, frontal skyward arrow rain, and celestial long-range orbital skyfall)
     /// </summary>
     [DefaultExecutionOrder(120)]
     public sealed class ThanhGiongHeroController : MonoBehaviour
@@ -51,6 +54,12 @@ namespace TopDownGame.Player
         [SerializeField, Min(0.5f)] private float sonTinhPunchDamageMultiplier = 1.3f;
         [SerializeField, Min(0f)] private float sonTinhPunchKnockback = 4.8f;
 
+        [Header("An Duong Vuong — No Than Lien Chau Normal Attack")]
+        [SerializeField, Min(0.5f)] private float anDuongVuongAttackRange = 5.4f;
+        [SerializeField, Range(20f, 180f)] private float anDuongVuongAttackArc = 45f;
+        [SerializeField, Min(0.5f)] private float anDuongVuongDamageMultiplier = 1.25f;
+        [SerializeField, Min(0f)] private float anDuongVuongKnockback = 4.2f;
+
         private PlayerMovement movement;
         private PlayerCharacterAnimator characterAnimator;
         private PlayerStats stats;
@@ -63,18 +72,22 @@ namespace TopDownGame.Player
 
         private SkillData[] thanhGiongSkills;
         private SkillData[] sonTinhSkills;
+        private SkillData[] anDuongVuongSkills;
         private readonly float[] slotCooldownEndTimes = new float[4];
         private readonly float[] slotCooldownDurations = new float[4];
         private float swordPoseUntil;
         private float bambooPoseUntil;
         private SonTinhPose activeSonTinhPose = SonTinhPose.Locomotion;
         private float sonTinhPoseUntil;
+        private AnDuongVuongPose activeAnDuongVuongPose = AnDuongVuongPose.Locomotion;
+        private float anDuongVuongPoseUntil;
         private float strideTimer;
         private bool isExecutingSkill;
 
         public HeroCharacterId CurrentHero => currentHero;
         public bool IsThanhGiongActive => currentHero == HeroCharacterId.ThanhGiong;
         public bool IsSonTinhActive => currentHero == HeroCharacterId.SonTinh;
+        public bool IsAnDuongVuongActive => currentHero == HeroCharacterId.AnDuongVuong;
         public bool IsCustomHeroActive => currentHero != HeroCharacterId.ForestWarrior;
         public bool IsExecutingSkill => isExecutingSkill;
 
@@ -83,10 +96,18 @@ namespace TopDownGame.Player
         public float IronSwordDamageMultiplier => ironSwordDamageMultiplier;
         public float IronSwordKnockback => ironSwordKnockback;
 
-        public float CustomNormalAttackRange => IsSonTinhActive ? sonTinhPunchRange : ironSwordRange;
-        public float CustomNormalAttackArc => IsSonTinhActive ? sonTinhPunchArc : ironSwordArc;
-        public float CustomNormalAttackDamageMultiplier => IsSonTinhActive ? sonTinhPunchDamageMultiplier : ironSwordDamageMultiplier;
-        public float CustomNormalAttackKnockback => IsSonTinhActive ? sonTinhPunchKnockback : ironSwordKnockback;
+        public float CustomNormalAttackRange => IsAnDuongVuongActive
+            ? anDuongVuongAttackRange
+            : (IsSonTinhActive ? sonTinhPunchRange : ironSwordRange);
+        public float CustomNormalAttackArc => IsAnDuongVuongActive
+            ? anDuongVuongAttackArc
+            : (IsSonTinhActive ? sonTinhPunchArc : ironSwordArc);
+        public float CustomNormalAttackDamageMultiplier => IsAnDuongVuongActive
+            ? anDuongVuongDamageMultiplier
+            : (IsSonTinhActive ? sonTinhPunchDamageMultiplier : ironSwordDamageMultiplier);
+        public float CustomNormalAttackKnockback => IsAnDuongVuongActive
+            ? anDuongVuongKnockback
+            : (IsSonTinhActive ? sonTinhPunchKnockback : ironSwordKnockback);
 
         public event Action<HeroCharacterId> HeroChanged;
 
@@ -143,6 +164,13 @@ namespace TopDownGame.Player
                        progress.IsRegionUnlocked("RiftMap01");
             }
 
+            if (hero == HeroCharacterId.AnDuongVuong)
+            {
+                return progress.IsRegionUnlocked("CaveMap01") ||
+                       progress.IsRegionUnlocked("RiftMap01") ||
+                       progress.IsBossDefeated("ForestGuardian");
+            }
+
             return false;
         }
 
@@ -169,6 +197,7 @@ namespace TopDownGame.Player
             {
                 HeroCharacterId.ThanhGiong => ThanhGiongVisualFactory.GetMountedHeroSprite(0, false, false),
                 HeroCharacterId.SonTinh => SonTinhVisualFactory.GetHeroSprite(0, SonTinhPose.Locomotion),
+                HeroCharacterId.AnDuongVuong => AnDuongVuongVisualFactory.GetHeroSprite(0, AnDuongVuongPose.Locomotion),
                 _ => null
             };
         }
@@ -198,7 +227,8 @@ namespace TopDownGame.Player
 
             string texName = sprite.texture.name;
             return texName.IndexOf("ThanhGiong", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                   texName.IndexOf("SonTinh", StringComparison.OrdinalIgnoreCase) >= 0;
+                   texName.IndexOf("SonTinh", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   texName.IndexOf("AnDuongVuong", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private void EnsureDefaultSpriteCaptured()
@@ -259,6 +289,8 @@ namespace TopDownGame.Player
                 bambooPoseUntil = 0f;
                 sonTinhPoseUntil = 0f;
                 activeSonTinhPose = SonTinhPose.Locomotion;
+                anDuongVuongPoseUntil = 0f;
+                activeAnDuongVuongPose = AnDuongVuongPose.Locomotion;
             }
 
             if (savePreference)
@@ -283,16 +315,20 @@ namespace TopDownGame.Player
                 return;
             }
 
-            if (hero == HeroCharacterId.ThanhGiong || hero == HeroCharacterId.SonTinh)
+            if (hero == HeroCharacterId.ThanhGiong || hero == HeroCharacterId.SonTinh || hero == HeroCharacterId.AnDuongVuong)
             {
                 if (characterAnimator != null)
                 {
                     characterAnimator.enabled = false;
                 }
 
-                Sprite sp = hero == HeroCharacterId.ThanhGiong
-                    ? ThanhGiongVisualFactory.GetMountedHeroSprite(0, false, false)
-                    : SonTinhVisualFactory.GetHeroSprite(0, SonTinhPose.Locomotion);
+                Sprite sp = hero switch
+                {
+                    HeroCharacterId.ThanhGiong => ThanhGiongVisualFactory.GetMountedHeroSprite(0, false, false),
+                    HeroCharacterId.SonTinh => SonTinhVisualFactory.GetHeroSprite(0, SonTinhPose.Locomotion),
+                    HeroCharacterId.AnDuongVuong => AnDuongVuongVisualFactory.GetHeroSprite(0, AnDuongVuongPose.Locomotion),
+                    _ => null
+                };
                 AssignHeroSprite(sp);
             }
             else
@@ -392,11 +428,30 @@ namespace TopDownGame.Player
                     visualRenderer.flipX = faceDir.x < 0f;
                 }
             }
+            else if (IsAnDuongVuongActive)
+            {
+                bool inActionPose = Time.time < anDuongVuongPoseUntil;
+                AnDuongVuongPose pose = inActionPose ? activeAnDuongVuongPose : AnDuongVuongPose.Locomotion;
+                Sprite currentAdvSprite = AnDuongVuongVisualFactory.GetHeroSprite(strideFrame, pose);
+                AssignHeroSprite(currentAdvSprite);
+
+                Vector2 faceDir = combat != null && (inActionPose || isExecutingSkill)
+                    ? combat.AimDirection
+                    : (movement != null && movement.CurrentVelocity.sqrMagnitude > 0.01f ? movement.CurrentVelocity : Vector2.right);
+                if (Mathf.Abs(faceDir.x) > 0.05f)
+                {
+                    visualRenderer.flipX = faceDir.x < 0f;
+                }
+            }
         }
 
         public void NotifyCustomNormalAttack(Vector2 direction, float duration)
         {
-            if (IsSonTinhActive)
+            if (IsAnDuongVuongActive)
+            {
+                NotifyAnDuongVuongAttack(direction, duration);
+            }
+            else if (IsSonTinhActive)
             {
                 NotifySonTinhRockAttack(direction, duration);
             }
@@ -419,8 +474,20 @@ namespace TopDownGame.Player
             SonTinhVfx.SpawnNormalRockStrike(transform, direction, sonTinhPunchRange);
         }
 
+        public void NotifyAnDuongVuongAttack(Vector2 direction, float duration)
+        {
+            activeAnDuongVuongPose = AnDuongVuongPose.ShootSingle;
+            anDuongVuongPoseUntil = Time.time + Mathf.Max(0.22f, duration);
+            AnDuongVuongVfx.SpawnNormalArrow(transform, direction, anDuongVuongAttackRange);
+        }
+
         public SkillData GetActiveHeroSkillData(int slotIndex)
         {
+            if (IsAnDuongVuongActive)
+            {
+                return GetAnDuongVuongSkillData(slotIndex);
+            }
+
             if (IsSonTinhActive)
             {
                 return GetSonTinhSkillData(slotIndex);
@@ -456,6 +523,17 @@ namespace TopDownGame.Player
             return sonTinhSkills[slotIndex];
         }
 
+        public SkillData GetAnDuongVuongSkillData(int slotIndex)
+        {
+            EnsureSkillDefinitions();
+            if (slotIndex < 0 || anDuongVuongSkills == null || slotIndex >= anDuongVuongSkills.Length)
+            {
+                return null;
+            }
+
+            return anDuongVuongSkills[slotIndex];
+        }
+
         public float GetSlotCooldownRemaining(int slotIndex)
         {
             if (slotIndex < 0 || slotIndex >= slotCooldownEndTimes.Length)
@@ -483,6 +561,7 @@ namespace TopDownGame.Player
             {
                 HeroCharacterId.ThanhGiong => "TG_Skill_" + slotIndex,
                 HeroCharacterId.SonTinh => "ST_Skill_" + slotIndex,
+                HeroCharacterId.AnDuongVuong => "ADV_Skill_" + slotIndex,
                 _ => null
             };
             if (key != null && skillInventory != null && skillInventory.Owns(key))
@@ -506,6 +585,7 @@ namespace TopDownGame.Player
             {
                 HeroCharacterId.ThanhGiong => "TG_Skill_" + slotIndex,
                 HeroCharacterId.SonTinh => "ST_Skill_" + slotIndex,
+                HeroCharacterId.AnDuongVuong => "ADV_Skill_" + slotIndex,
                 _ => null
             };
             int currentLevel = GetHeroSkillLevel(hero, slotIndex);
@@ -527,6 +607,11 @@ namespace TopDownGame.Player
 
         public bool TryCastActiveHeroSkill(int slotIndex, Vector2? targetPosition, LayerMask enemyLayers)
         {
+            if (IsAnDuongVuongActive)
+            {
+                return TryCastAnDuongVuongSkill(slotIndex, targetPosition, enemyLayers);
+            }
+
             if (IsSonTinhActive)
             {
                 return TryCastSonTinhSkill(slotIndex, targetPosition, enemyLayers);
@@ -538,6 +623,37 @@ namespace TopDownGame.Player
             }
 
             return false;
+        }
+
+        public bool TryCastAnDuongVuongSkill(int slotIndex, Vector2? targetPosition, LayerMask enemyLayers)
+        {
+            if (!IsAnDuongVuongActive || isExecutingSkill || slotIndex < 0 || slotIndex >= 4)
+            {
+                return false;
+            }
+
+            if (!BeginCustomSkillCast(anDuongVuongSkills, slotIndex, targetPosition, out Vector2 aim, out int skillLevel))
+            {
+                return false;
+            }
+
+            switch (slotIndex)
+            {
+                case 0:
+                    StartCoroutine(AnDuongVuongSkill1SingleArrowRoutine(aim, targetPosition, skillLevel, enemyLayers));
+                    break;
+                case 1:
+                    StartCoroutine(AnDuongVuongSkill2TripleArrowRoutine(aim, targetPosition, skillLevel, enemyLayers));
+                    break;
+                case 2:
+                    StartCoroutine(AnDuongVuongSkill3FrontalArrowRainRoutine(aim, targetPosition, skillLevel, enemyLayers));
+                    break;
+                case 3:
+                    StartCoroutine(AnDuongVuongSkill4LongRangeSkyfallRoutine(aim, targetPosition, skillLevel, enemyLayers));
+                    break;
+            }
+
+            return true;
         }
 
         public bool TryCastThanhGiongSkill(int slotIndex, Vector2? targetPosition, LayerMask enemyLayers)
@@ -657,6 +773,240 @@ namespace TopDownGame.Player
 
             combat?.SetAimDirection(aim);
             return true;
+        }
+
+        // =====================================================================
+        // AN DUONG VUONG — 4 SIGNATURE NO THAN LIEN CHAU SKILLS
+        // =====================================================================
+
+        /// <summary>
+        /// Skill 1 (Q): Nhat Tien Thau Giap — Shoots 1 high-speed piercing bronze arrow at the enemy
+        /// ("Bắn 1 mũi tên vào kẻ địch"). Fast, piercing damage with knockback.
+        /// </summary>
+        private IEnumerator AnDuongVuongSkill1SingleArrowRoutine(Vector2 aim, Vector2? targetPosition, int level, LayerMask enemyLayers)
+        {
+            isExecutingSkill = true;
+            activeAnDuongVuongPose = AnDuongVuongPose.ShootSingle;
+            anDuongVuongPoseUntil = Time.time + 0.32f;
+            movement?.LockMovement(0.12f);
+
+            float range = 8.2f * (1f + (level - 1) * 0.06f);
+            Vector2 origin = transform.position;
+            Vector2 dir = aim.sqrMagnitude > 0.001f ? aim.normalized : Vector2.right;
+
+            if (targetPosition.HasValue)
+            {
+                Vector2 toTarget = targetPosition.Value - origin;
+                if (toTarget.sqrMagnitude > 0.001f)
+                {
+                    dir = toTarget.normalized;
+                    combat?.SetAimDirection(dir);
+                }
+            }
+
+            const float flightDuration = 0.16f;
+            AnDuongVuongVfx.SpawnSkill1SingleArrow(origin, dir, range, flightDuration);
+
+            yield return new WaitForSeconds(flightDuration * 0.6f);
+
+            float baseDamage = 72f * (1f + (level - 1) * 0.2f);
+            float bonusDamage = stats != null ? stats.BaseDamage * 1.0f : 0f;
+            bool critical = stats != null && UnityEngine.Random.value < stats.CriticalChance;
+            float totalDamage = (baseDamage + bonusDamage) * (critical ? 1.5f : 1f);
+
+            Vector2 boxCenter = origin + dir * (range * 0.5f);
+            float angleDeg = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            HashSet<int> hitIds = new HashSet<int>();
+            Collider2D[] hits = Physics2D.OverlapBoxAll(boxCenter, new Vector2(range, 1.4f), angleDeg, enemyLayers);
+
+            foreach (Collider2D hit in hits)
+            {
+                TryApplySkillDamage(hit, origin, dir, totalDamage, 5.5f, critical, hitIds, 0.25f, 1.2f);
+            }
+
+            yield return new WaitForSeconds(0.12f);
+            isExecutingSkill = false;
+        }
+
+        /// <summary>
+        /// Skill 2 (E): Tam Tien Te Phat — Shoots 3 bronze arrows spreading out in 3 directions
+        /// ("Bắn 3 mũi tên chỉa ra 3 hướng của kẻ địch").
+        /// </summary>
+        private IEnumerator AnDuongVuongSkill2TripleArrowRoutine(Vector2 aim, Vector2? targetPosition, int level, LayerMask enemyLayers)
+        {
+            isExecutingSkill = true;
+            activeAnDuongVuongPose = AnDuongVuongPose.ShootTriple;
+            anDuongVuongPoseUntil = Time.time + 0.36f;
+            movement?.LockMovement(0.14f);
+
+            float range = 7.8f * (1f + (level - 1) * 0.06f);
+            Vector2 origin = transform.position;
+            Vector2 dir = aim.sqrMagnitude > 0.001f ? aim.normalized : Vector2.right;
+
+            if (targetPosition.HasValue)
+            {
+                Vector2 toTarget = targetPosition.Value - origin;
+                if (toTarget.sqrMagnitude > 0.001f)
+                {
+                    dir = toTarget.normalized;
+                    combat?.SetAimDirection(dir);
+                }
+            }
+
+            const float spreadDeg = 26f;
+            const float flightDuration = 0.18f;
+            AnDuongVuongVfx.SpawnSkill2TripleArrows(origin, dir, spreadDeg, range, flightDuration);
+
+            yield return new WaitForSeconds(flightDuration * 0.6f);
+
+            float baseDamage = 50f * (1f + (level - 1) * 0.2f);
+            float bonusDamage = stats != null ? stats.BaseDamage * 0.75f : 0f;
+            bool critical = stats != null && UnityEngine.Random.value < stats.CriticalChance;
+            float totalDamage = (baseDamage + bonusDamage) * (critical ? 1.5f : 1f);
+
+            float[] angles = { -spreadDeg, 0f, spreadDeg };
+            HashSet<int> hitIds = new HashSet<int>();
+
+            for (int i = 0; i < 3; i++)
+            {
+                Vector2 aDir = Quaternion.Euler(0f, 0f, angles[i]) * dir;
+                Vector2 center = origin + aDir * (range * 0.5f);
+                float aDeg = Mathf.Atan2(aDir.y, aDir.x) * Mathf.Rad2Deg;
+                Collider2D[] hits = Physics2D.OverlapBoxAll(center, new Vector2(range, 1.2f), aDeg, enemyLayers);
+                foreach (Collider2D hit in hits)
+                {
+                    TryApplySkillDamage(hit, origin, aDir, totalDamage, 4.5f, critical, hitIds, 0.20f, 1.0f);
+                }
+            }
+
+            yield return new WaitForSeconds(0.12f);
+            isExecutingSkill = false;
+        }
+
+        /// <summary>
+        /// Skill 3 (R): Ho Thien Giang Tien — Calls upon the heavens to rain bronze arrows down on enemies in front
+        /// ("hô trời chỉa mũi tên xuống kẻ địch trước mặt"). Continuous arrow barrage and slow in frontal zone.
+        /// </summary>
+        private IEnumerator AnDuongVuongSkill3FrontalArrowRainRoutine(Vector2 aim, Vector2? targetPosition, int level, LayerMask enemyLayers)
+        {
+            isExecutingSkill = true;
+            activeAnDuongVuongPose = AnDuongVuongPose.CallHeavens;
+            anDuongVuongPoseUntil = Time.time + 0.52f;
+            movement?.LockMovement(0.22f);
+
+            float searchRange = 5.8f * (1f + (level - 1) * 0.06f);
+            float zoneRadius = 2.75f * (1f + (level - 1) * 0.05f);
+            Vector2 origin = transform.position;
+            Vector2 dir = aim.sqrMagnitude > 0.001f ? aim.normalized : Vector2.right;
+
+            Vector2 zoneCenter = origin + dir * 4.2f;
+            if (targetPosition.HasValue)
+            {
+                Vector2 delta = targetPosition.Value - origin;
+                float dist = Mathf.Clamp(delta.magnitude, 2.0f, searchRange);
+                zoneCenter = origin + (delta.sqrMagnitude > 0.001f ? delta.normalized : dir) * dist;
+            }
+            else
+            {
+                // Check if enemies exist ahead to center arrow rain on them
+                Collider2D[] nearbyEnemies = Physics2D.OverlapCircleAll(origin + dir * 3.5f, zoneRadius, enemyLayers);
+                foreach (Collider2D enemy in nearbyEnemies)
+                {
+                    if (enemy != null && !enemy.CompareTag("Player"))
+                    {
+                        zoneCenter = enemy.transform.position;
+                        break;
+                    }
+                }
+            }
+
+            combat?.SetAimDirection((zoneCenter - origin).normalized);
+
+            const float duration = 1.25f;
+            AnDuongVuongVfx.SpawnSkill3FrontalArrowRain(transform, zoneCenter, zoneRadius, duration);
+
+            const int waveCount = 5;
+            float waveInterval = duration / waveCount;
+            float perWaveDamage = (28f * (1f + (level - 1) * 0.2f)) + (stats != null ? stats.BaseDamage * 0.32f : 0f);
+
+            for (int w = 0; w < waveCount; w++)
+            {
+                yield return new WaitForSeconds(waveInterval);
+                bool critical = stats != null && UnityEngine.Random.value < stats.CriticalChance;
+                HashSet<int> waveHits = new HashSet<int>();
+                DamageEnemiesAroundPointRadially(zoneCenter, zoneRadius, perWaveDamage * (critical ? 1.5f : 1f),
+                    3.8f, critical, enemyLayers, waveHits, 0.40f, 2.0f);
+            }
+
+            yield return new WaitForSeconds(0.12f);
+            isExecutingSkill = false;
+        }
+
+        /// <summary>
+        /// Skill 4 (F): Thien Tru Than Tien — Celestial orbital arrow strike from afar with a longer cooldown
+        /// ("chiêu chỉa mũi tên xuống kẻ địch từ xa nhưng hồi chiêu lâu hơn").
+        /// </summary>
+        private IEnumerator AnDuongVuongSkill4LongRangeSkyfallRoutine(Vector2 aim, Vector2? targetPosition, int level, LayerMask enemyLayers)
+        {
+            isExecutingSkill = true;
+            activeAnDuongVuongPose = AnDuongVuongPose.CallHeavens;
+            anDuongVuongPoseUntil = Time.time + 0.65f;
+            movement?.LockMovement(0.26f);
+
+            float maxRange = 11.5f * (1f + (level - 1) * 0.05f);
+            float blastRadius = 3.5f * (1f + (level - 1) * 0.05f);
+            Vector2 origin = transform.position;
+            Vector2 dir = aim.sqrMagnitude > 0.001f ? aim.normalized : Vector2.right;
+
+            Vector2 targetPoint;
+            if (targetPosition.HasValue)
+            {
+                Vector2 delta = targetPosition.Value - origin;
+                float dist = Mathf.Min(delta.magnitude, maxRange);
+                targetPoint = origin + (delta.sqrMagnitude > 0.001f ? delta.normalized : dir) * dist;
+            }
+            else
+            {
+                // Auto-target distant enemy cluster up to maxRange
+                targetPoint = origin + dir * Mathf.Min(8.5f, maxRange);
+                Collider2D[] allEnemies = Physics2D.OverlapCircleAll(origin, maxRange, enemyLayers);
+                float bestDist = 0f;
+                foreach (Collider2D enemy in allEnemies)
+                {
+                    if (enemy != null && !enemy.CompareTag("Player"))
+                    {
+                        Vector2 ePos = enemy.transform.position;
+                        Vector2 toE = ePos - origin;
+                        if (Vector2.Dot(dir, toE.normalized) > 0.2f && toE.magnitude > bestDist)
+                        {
+                            bestDist = toE.magnitude;
+                            targetPoint = ePos;
+                        }
+                    }
+                }
+            }
+
+            combat?.SetAimDirection((targetPoint - origin).normalized);
+
+            const float duration = 1.45f;
+            AnDuongVuongVfx.SpawnSkill4LongRangeSkyfall(transform, targetPoint, blastRadius, duration);
+
+            // Phase 1: Pre-barrage arrow storm (0.35s in)
+            yield return new WaitForSeconds(0.35f);
+            float preDamage = (55f * (1f + (level - 1) * 0.2f)) + (stats != null ? stats.BaseDamage * 0.5f : 0f);
+            HashSet<int> preHits = new HashSet<int>();
+            DamageEnemiesAroundPointRadially(targetPoint, blastRadius, preDamage, 4.0f, false, enemyLayers, preHits, 0.45f, 2.5f);
+
+            // Phase 2: Colossal Divine Arrow Crash (0.52s in)
+            yield return new WaitForSeconds(0.20f);
+            float burstDamage = (155f * (1f + (level - 1) * 0.2f)) + (stats != null ? stats.BaseDamage * 1.25f : 0f);
+            bool critical = stats != null && UnityEngine.Random.value < stats.CriticalChance;
+            HashSet<int> burstHits = new HashSet<int>();
+            DamageEnemiesAroundPointRadially(targetPoint, blastRadius, burstDamage * (critical ? 1.5f : 1f),
+                7.8f, critical, enemyLayers, burstHits, 0.50f, 3.2f);
+
+            yield return new WaitForSeconds(0.20f);
+            isExecutingSkill = false;
         }
 
         // =====================================================================
@@ -1464,6 +1814,45 @@ namespace TopDownGame.Player
                         SonTinhVisualFactory.GetSkillIcon(3),
                         114f, 28f, 5.6f, 3.85f,
                         new Color(1f, 0.84f, 0.28f, 1f))
+                };
+            }
+
+            if (anDuongVuongSkills == null || anDuongVuongSkills.Length != 4 || anDuongVuongSkills[0] == null)
+            {
+                anDuongVuongSkills = new[]
+                {
+                    CreateRuntimeSkillData(
+                        "AnDuongVuong",
+                        SkillId.Fireball,
+                        "Nhất Tiễn Thấu Giáp",
+                        "Giương Nỏ Thần Liên Châu bắn 1 mũi tên đồng Cổ Loa xuyên phá cực mạnh về phía kẻ địch.",
+                        AnDuongVuongVisualFactory.GetSkillIcon(0),
+                        72f, 14f, 2.2f, 8.2f,
+                        new Color(1f, 0.72f, 0.20f, 1f)),
+                    CreateRuntimeSkillData(
+                        "AnDuongVuong",
+                        SkillId.IceDash,
+                        "Tam Tiễn Tề Phát",
+                        "Kích hoạt nỏ thần đồng loạt bắn 3 mũi tên chỉa ra 3 hướng tỏa rộng quét sạch đội hình địch.",
+                        AnDuongVuongVisualFactory.GetSkillIcon(1),
+                        50f, 20f, 3.8f, 7.8f,
+                        new Color(0.35f, 0.90f, 0.65f, 1f)),
+                    CreateRuntimeSkillData(
+                        "AnDuongVuong",
+                        SkillId.SwordSpin,
+                        "Hô Thiên Giáng Tiễn",
+                        "Hô trời chỉa nỏ thần triệu gọi cơn mưa bão tên Cổ Loa dội thẳng xuống đầu kẻ địch phía trước mặt.",
+                        AnDuongVuongVisualFactory.GetSkillIcon(2),
+                        130f, 26f, 5.6f, 5.5f,
+                        new Color(0.30f, 0.85f, 1.00f, 1f)),
+                    CreateRuntimeSkillData(
+                        "AnDuongVuong",
+                        SkillId.LightningStrike,
+                        "Thiên Tru Thần Tiễn",
+                        "Khóa mục tiêu từ xa, hô thiên giáng một đại trận bão tên kim sắc thần uy trút xuống hủy diệt kẻ địch, hồi chiêu lâu hơn.",
+                        AnDuongVuongVisualFactory.GetSkillIcon(3),
+                        210f, 36f, 14.0f, 11.5f,
+                        new Color(1f, 0.38f, 0.15f, 1f))
                 };
             }
         }

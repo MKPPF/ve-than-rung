@@ -15,6 +15,14 @@ namespace TopDownGame.UI
     /// </summary>
     public sealed class HeroSelectionUI : MonoBehaviour
     {
+        private static readonly string[] AnDuongVuongSlotLabels =
+        {
+            "Q: Nhất Tiễn Thấu Giáp",
+            "E: Tam Tiễn Tề Phát",
+            "R: Hô Thiên Giáng Tiễn",
+            "F: Thiên Tru Thần Tiễn"
+        };
+
         private static readonly string[] SonTinhSlotLabels =
         {
             "Q: Ném Đại Thạch",
@@ -41,7 +49,8 @@ namespace TopDownGame.UI
 
         private GameObject panel;
         private ThanhGiongHeroController heroController;
-        private HeroCharacterId previewHero = HeroCharacterId.SonTinh;
+        private HeroCharacterId previewHero = HeroCharacterId.AnDuongVuong;
+        private Button anDuongVuongCardButton;
         private Button sonTinhCardButton;
         private Button thanhGiongCardButton;
         private Button forestCardButton;
@@ -185,6 +194,7 @@ namespace TopDownGame.UI
 
             string statusMsg = hero switch
             {
+                HeroCharacterId.AnDuongVuong => "Đã hóa thân thành AN DƯƠNG VƯƠNG! Giương Nỏ Thần Liên Châu bắn Q (1 Tên), E (3 Tên 3 Hướng), R (Mưa Tên Trước Mặt), F (Bão Tên Tầm Xa).",
                 HeroCharacterId.SonTinh => "Đã hóa thân thành SƠN TINH! Dùng Chuột phải/J và Q (Ném Đá), E (Dâng Núi), R (Dãy Núi Tiến), F (Núi Vây Quanh).",
                 HeroCharacterId.ThanhGiong => "Đã hóa thân thành THÁNH GIÓNG! Sử dụng Chuột phải/J và Q, E, R, F để thi triển 5 tuyệt kỹ.",
                 _ => "Đã chuyển về Chiến Binh Rừng (Mặc định)."
@@ -229,6 +239,14 @@ namespace TopDownGame.UI
                 : HeroCharacterId.ForestWarrior;
 
             UpdateHeroCard(
+                anDuongVuongCardButton,
+                HeroCharacterId.AnDuongVuong,
+                activeHero,
+                AnDuongVuongVisualFactory.GetHeroPortraitSprite(),
+                "Nỏ Thần • Nhất Tiễn • Tam Tiễn • Hô Thiên",
+                "Mở khóa tại Cổ Loa / Thử nghiệm");
+
+            UpdateHeroCard(
                 sonTinhCardButton,
                 HeroCharacterId.SonTinh,
                 activeHero,
@@ -254,7 +272,41 @@ namespace TopDownGame.UI
 
             bool isPreviewUnlocked = ThanhGiongHeroController.IsHeroUnlocked(previewHero);
 
-            if (previewHero == HeroCharacterId.SonTinh)
+            if (previewHero == HeroCharacterId.AnDuongVuong)
+            {
+                Sprite advPortrait = AnDuongVuongVisualFactory.GetHeroPortraitSprite();
+                heroPortrait.sprite = advPortrait;
+                heroPortrait.enabled = advPortrait != null;
+                heroPortrait.color = isPreviewUnlocked ? Color.white : new Color(0.7f, 0.7f, 0.7f, 0.85f);
+                heroHeading.text = isPreviewUnlocked
+                    ? "AN DƯƠNG VƯƠNG — NỎ THẦN LIÊN CHÂU"
+                    : "[KHÓA] AN DƯƠNG VƯƠNG (CHƯA MỞ KHÓA)";
+                heroSubheading.text = isPreviewUnlocked
+                    ? "Mũ Lông Chim Cổ Loa  •  Linh Quang Thần Nỏ  •  Mũi Tên Đồng Ba Cạnh"
+                    : "Vượt qua các Map chiến đấu để mở khóa Đức Vua An Dương Vương";
+
+                movesDescription.text =
+                    "<b>• Bắn thường [Chuột phải / J]:</b> Giương <b>Nỏ Thần Liên Châu</b> bắn mũi tên đồng Cổ Loa tầm xa (5.4m) công phá kẻ địch.\n" +
+                    "<b>• Chiêu 1 [Phím Q] — Nhất Tiễn Thấu Giáp:</b> Bắn <b>1 mũi tên đồng</b> xuyên phá cực mạnh với tốc độ cao vào kẻ địch.\n" +
+                    "<b>• Chiêu 2 [Phím E] — Tam Tiễn Tề Phát:</b> Bắn <b>3 mũi tên chỉa ra 3 hướng</b> tỏa rộng quét sạch đội hình kẻ địch trước mặt.\n" +
+                    "<b>• Chiêu 3 [Phím R] — Hô Thiên Giáng Tiễn:</b> <b>Hô trời</b> chỉa nỏ gọi <b>mưa bão tên</b> giáng xuống kẻ địch trước mặt gây sát thương liên hoàn và làm chậm.\n" +
+                    "<b>• Chiêu 4 [Phím F] — Thiên Tru Thần Tiễn:</b> Khóa mục tiêu chỉa <b>mũi tên dội xuống kẻ địch từ xa</b> với uy lực hủy diệt nhưng <b>hồi chiêu lâu hơn</b>.";
+
+                for (int i = 0; i < 4; i++)
+                {
+                    if (skillPreviewIcons[i] != null)
+                    {
+                        skillPreviewIcons[i].sprite = AnDuongVuongVisualFactory.GetSkillIcon(i);
+                        skillPreviewIcons[i].enabled = true;
+                    }
+
+                    if (skillPreviewLabels[i] != null)
+                    {
+                        skillPreviewLabels[i].text = AnDuongVuongSlotLabels[i];
+                    }
+                }
+            }
+            else if (previewHero == HeroCharacterId.SonTinh)
             {
                 Sprite stPortrait = SonTinhVisualFactory.GetHeroPortraitSprite();
                 heroPortrait.sprite = stPortrait;
@@ -262,7 +314,7 @@ namespace TopDownGame.UI
                 heroPortrait.color = isPreviewUnlocked ? Color.white : new Color(0.7f, 0.7f, 0.7f, 0.85f);
                 heroHeading.text = isPreviewUnlocked
                     ? "SƠN TINH — TẢN VIÊN SƠN THÁNH"
-                    : "🔒 SƠN TINH (CHƯA MỞ KHÓA)";
+                    : "[KHÓA] SƠN TINH (CHƯA MỞ KHÓA)";
                 heroSubheading.text = isPreviewUnlocked
                     ? "Mũ Lông Chim  •  Áo Choàng Đỏ Hồng  •  Thần Lực Dời Non Dựng Núi"
                     : "Vượt qua các Map chiến đấu để mở khóa Tản Viên Sơn Thánh";
@@ -296,7 +348,7 @@ namespace TopDownGame.UI
                 heroPortrait.color = isPreviewUnlocked ? Color.white : new Color(0.7f, 0.7f, 0.7f, 0.85f);
                 heroHeading.text = isPreviewUnlocked
                     ? "THÁNH GIÓNG — PHÙ ĐỔNG THIÊN VƯƠNG"
-                    : "🔒 THÁNH GIÓNG (CHƯA MỞ KHÓA)";
+                    : "[KHÓA] THÁNH GIÓNG (CHƯA MỞ KHÓA)";
                 heroSubheading.text = isPreviewUnlocked
                     ? "Giáp Vàng  •  Ngựa Sắt Phun Lửa  •  Kiếm Sắt & Bụi Tre Ngà"
                     : "Cần vượt qua các Map và diện kiến Boss Vệ Thần Rừng";
@@ -360,7 +412,7 @@ namespace TopDownGame.UI
             {
                 if (!isPreviewUnlocked)
                 {
-                    confirmLabel.text = "🔒 CHƯA MỞ KHÓA — CẦN VƯỢT QUA CÁC MAP";
+                    confirmLabel.text = "[CHƯA MỞ KHÓA] — CẦN VƯỢT QUA CÁC MAP";
                 }
                 else if (alreadyActive)
                 {
@@ -370,6 +422,7 @@ namespace TopDownGame.UI
                 {
                     confirmLabel.text = previewHero switch
                     {
+                        HeroCharacterId.AnDuongVuong => "CHỌN AN DƯƠNG VƯƠNG",
                         HeroCharacterId.SonTinh => "CHỌN NHÂN VẬT SƠN TINH",
                         HeroCharacterId.ThanhGiong => "CHỌN NHÂN VẬT THÁNH GIÓNG",
                         _ => "CHUYỂN VỀ CHIẾN BINH RỪNG"
@@ -394,7 +447,7 @@ namespace TopDownGame.UI
             TMP_Text descText = cardButton.transform.Find("Desc")?.GetComponent<TMP_Text>();
             if (!unlocked)
             {
-                stateText.text = "🔒 CHƯA MỞ KHÓA";
+                stateText.text = "[CHƯA MỞ KHÓA]";
                 stateText.color = F.Muted;
                 if (descText != null)
                 {
@@ -449,51 +502,62 @@ namespace TopDownGame.UI
             rect.offsetMin = rect.offsetMax = Vector2.zero;
 
             Transform window = F.Window(EquipmentPanelLayout.CreateSurface(panel),
-                "ĐÀI ANH HÙNG", "CHỌN NHÂN VẬT  /  THÁNH GIÓNG  •  SƠN TINH", Close);
+                "ĐÀI ANH HÙNG", "CHỌN NHÂN VẬT  /  AN DƯƠNG VƯƠNG  •  SƠN TINH  •  THÁNH GIÓNG", Close);
             TMP_Text hints = window.Find("KeyHints").GetComponent<TMP_Text>();
             hints.text = "CHUỘT / ENTER  Chọn nhân vật   •   Q / E / R / F  4 Chiêu thức   •   H / ESC  Đóng";
             hints.rectTransform.sizeDelta = new Vector2(1272f, 26f);
             closeButton = window.Find("Close").GetComponent<Button>();
 
             Transform listFrame = F.Frame(window, "HeroList", 24f, 122f, 380f, 724f, F.Panel);
-            F.Text(listFrame, "Heading", "DANH SÁCH NHÂN VẬT", 24f, 18f, 332f, 36f, 24f, F.Gold);
+            F.Text(listFrame, "Heading", "DANH SÁCH NHÂN VẬT", 24f, 16f, 332f, 32f, 22f, F.Gold);
 
-            sonTinhCardButton = F.Button(listFrame, "SelectSonTinhCard", "", 22f, 72f, 336f, 132f,
+            anDuongVuongCardButton = F.Button(listFrame, "SelectAnDuongVuongCard", "", 22f, 54f, 336f, 104f,
+                () =>
+                {
+                    PreviewHero(HeroCharacterId.AnDuongVuong);
+                    SelectHeroImmediate(HeroCharacterId.AnDuongVuong);
+                });
+            F.Icon(anDuongVuongCardButton.transform, "Icon", AnDuongVuongVisualFactory.GetHeroPortraitSprite(), 10f, 12f, 80f, 80f);
+            F.Text(anDuongVuongCardButton.transform, "Name", "AN DƯƠNG VƯƠNG", 102f, 10f, 224f, 30f, 21f, F.Gold);
+            F.Text(anDuongVuongCardButton.transform, "Desc", "Nỏ Thần • Nhất Tiễn • Tam Tiễn", 102f, 40f, 224f, 26f, 14f, F.TextColor);
+            F.Text(anDuongVuongCardButton.transform, "State", "NHẤN ĐỂ CHỌN", 102f, 68f, 224f, 24f, 15f, F.Green);
+
+            sonTinhCardButton = F.Button(listFrame, "SelectSonTinhCard", "", 22f, 166f, 336f, 104f,
                 () =>
                 {
                     PreviewHero(HeroCharacterId.SonTinh);
                     SelectHeroImmediate(HeroCharacterId.SonTinh);
                 });
-            F.Icon(sonTinhCardButton.transform, "Icon", SonTinhVisualFactory.GetHeroPortraitSprite(), 12f, 18f, 92f, 92f);
-            F.Text(sonTinhCardButton.transform, "Name", "SƠN TINH", 114f, 14f, 210f, 34f, 24f, F.Gold);
-            F.Text(sonTinhCardButton.transform, "Desc", "Đại Thạch • Dâng Núi • Quần Sơn", 114f, 50f, 210f, 30f, 16f, F.TextColor);
-            F.Text(sonTinhCardButton.transform, "State", "NHẤN ĐỂ CHỌN", 114f, 86f, 210f, 28f, 17f, F.Green);
+            F.Icon(sonTinhCardButton.transform, "Icon", SonTinhVisualFactory.GetHeroPortraitSprite(), 10f, 12f, 80f, 80f);
+            F.Text(sonTinhCardButton.transform, "Name", "SƠN TINH", 102f, 10f, 224f, 30f, 21f, F.Gold);
+            F.Text(sonTinhCardButton.transform, "Desc", "Đại Thạch • Dâng Núi • Quần Sơn", 102f, 40f, 224f, 26f, 14f, F.TextColor);
+            F.Text(sonTinhCardButton.transform, "State", "NHẤN ĐỂ CHỌN", 102f, 68f, 224f, 24f, 15f, F.Green);
 
-            thanhGiongCardButton = F.Button(listFrame, "SelectThanhGiongCard", "", 22f, 222f, 336f, 132f,
+            thanhGiongCardButton = F.Button(listFrame, "SelectThanhGiongCard", "", 22f, 278f, 336f, 104f,
                 () =>
                 {
                     PreviewHero(HeroCharacterId.ThanhGiong);
                     SelectHeroImmediate(HeroCharacterId.ThanhGiong);
                 });
-            F.Icon(thanhGiongCardButton.transform, "Icon", ThanhGiongVisualFactory.GetHeroPortraitSprite(), 12f, 18f, 92f, 92f);
-            F.Text(thanhGiongCardButton.transform, "Name", "THÁNH GIÓNG", 114f, 14f, 210f, 34f, 24f, F.Gold);
-            F.Text(thanhGiongCardButton.transform, "Desc", "Ngựa Sắt • Kiếm Sắt • Tre Ngà", 114f, 50f, 210f, 30f, 16f, F.TextColor);
-            F.Text(thanhGiongCardButton.transform, "State", "NHẤN ĐỂ CHỌN", 114f, 86f, 210f, 28f, 17f, F.Green);
+            F.Icon(thanhGiongCardButton.transform, "Icon", ThanhGiongVisualFactory.GetHeroPortraitSprite(), 10f, 12f, 80f, 80f);
+            F.Text(thanhGiongCardButton.transform, "Name", "THÁNH GIÓNG", 102f, 10f, 224f, 30f, 21f, F.Gold);
+            F.Text(thanhGiongCardButton.transform, "Desc", "Ngựa Sắt • Kiếm Sắt • Tre Ngà", 102f, 40f, 224f, 26f, 14f, F.TextColor);
+            F.Text(thanhGiongCardButton.transform, "State", "NHẤN ĐỂ CHỌN", 102f, 68f, 224f, 24f, 15f, F.Green);
 
-            forestCardButton = F.Button(listFrame, "SelectForestWarriorCard", "", 22f, 372f, 336f, 124f,
+            forestCardButton = F.Button(listFrame, "SelectForestWarriorCard", "", 22f, 390f, 336f, 104f,
                 () =>
                 {
                     PreviewHero(HeroCharacterId.ForestWarrior);
                     SelectHeroImmediate(HeroCharacterId.ForestWarrior);
                 });
-            F.Icon(forestCardButton.transform, "Icon", ForestWarriorVisualFactory.GetHeroPortraitSprite(), 12f, 18f, 92f, 92f);
-            F.Text(forestCardButton.transform, "Name", "CHIẾN BINH RỪNG", 114f, 14f, 210f, 34f, 24f, F.Gold);
-            F.Text(forestCardButton.transform, "Desc", "Kiếm Pháp • Kỹ Năng Tự Do", 114f, 50f, 210f, 30f, 16f, F.TextColor);
-            F.Text(forestCardButton.transform, "State", "ĐANG DÙNG", 114f, 86f, 210f, 28f, 17f, F.Green);
+            F.Icon(forestCardButton.transform, "Icon", ForestWarriorVisualFactory.GetHeroPortraitSprite(), 10f, 12f, 80f, 80f);
+            F.Text(forestCardButton.transform, "Name", "CHIẾN BINH RỪNG", 102f, 10f, 224f, 30f, 21f, F.Gold);
+            F.Text(forestCardButton.transform, "Desc", "Kiếm Pháp • Kỹ Năng Tự Do", 102f, 40f, 224f, 26f, 14f, F.TextColor);
+            F.Text(forestCardButton.transform, "State", "ĐANG DÙNG", 102f, 68f, 224f, 24f, 15f, F.Green);
 
             TMP_Text testModeNote = F.Text(listFrame, "TestModeHint",
                 "Chế độ thử nghiệm: Đã mở khóa toàn bộ anh hùng để kiểm tra chiêu thức trước khi bật khóa theo tiến trình Map.",
-                24f, 520f, 332f, 140f, 16f, F.Muted);
+                24f, 506f, 332f, 160f, 15f, F.Muted);
             testModeNote.alignment = TextAlignmentOptions.TopLeft;
 
             Transform detailFrame = F.Frame(window, "HeroDetails", 424f, 122f, 888f, 724f, F.Panel);

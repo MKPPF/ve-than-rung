@@ -45,7 +45,7 @@ namespace TopDownGame.UI
                 PauseMenu pauseMenu = Object.FindAnyObjectByType<PauseMenu>();
                 if (pauseMenu != null) pauseMenu.Toggle();
             });
-            TMP_Text pauseIcon = FantasyEquipmentUI.Text(pauseFrame, "PauseSymbol", "❚❚", 0, 6, 56, 44, 26, FantasyEquipmentUI.Gold, TextAlignmentOptions.Center);
+            TMP_Text pauseIcon = FantasyEquipmentUI.Text(pauseFrame, "PauseSymbol", "||", 0, 6, 56, 44, 26, FantasyEquipmentUI.Gold, TextAlignmentOptions.Center);
             pauseIcon.fontStyle = FontStyles.Bold;
 
             Transform card = FantasyEquipmentUI.Frame(rect, "LocationCard", 86, 22, 320, 122,

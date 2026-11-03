@@ -197,13 +197,20 @@ namespace TopDownGame.UI
                 return heroController?.GetSonTinhSkillData(idx);
             }
 
+            if (hero == HeroCharacterId.AnDuongVuong)
+            {
+                heroController?.EnsureSkillDefinitions();
+                int idx = (index >= 0 && index < 4) ? index : ParseIndexFromId(id);
+                return heroController?.GetAnDuongVuongSkillData(idx);
+            }
+
             return skillManager != null ? skillManager.GetSkillData(id) : null;
         }
 
         private int ResolveSkillLevel(string id, int index)
         {
             HeroCharacterId hero = ActiveHero;
-            if (hero == HeroCharacterId.ThanhGiong || hero == HeroCharacterId.SonTinh)
+            if (hero == HeroCharacterId.ThanhGiong || hero == HeroCharacterId.SonTinh || hero == HeroCharacterId.AnDuongVuong)
             {
                 int idx = (index >= 0 && index < 4) ? index : ParseIndexFromId(id);
                 return heroController != null ? heroController.GetEffectiveSkillLevel(idx) : 1;
@@ -242,7 +249,7 @@ namespace TopDownGame.UI
 
             lastUpgradeFrame = Time.frameCount;
 
-            if (hero == HeroCharacterId.ThanhGiong || hero == HeroCharacterId.SonTinh)
+            if (hero == HeroCharacterId.ThanhGiong || hero == HeroCharacterId.SonTinh || hero == HeroCharacterId.AnDuongVuong)
             {
                 heroController?.UpgradeHeroSkill(hero, selectedSkill);
             }
@@ -278,51 +285,69 @@ namespace TopDownGame.UI
             RefreshText();
         }
 
+        private bool isRefreshingOwned;
+
         private void RefreshOwned()
         {
-            ResolvePlayerReferences();
-            string previousId = owned.Count > 0 && selectedSkill >= 0 && selectedSkill < owned.Count ? owned[selectedSkill] : null;
-            owned.Clear();
+            if (isRefreshingOwned) return;
+            isRefreshingOwned = true;
+            try
+            {
+                ResolvePlayerReferences();
+                string previousId = owned.Count > 0 && selectedSkill >= 0 && selectedSkill < owned.Count ? owned[selectedSkill] : null;
+                owned.Clear();
 
-            HeroCharacterId hero = ActiveHero;
-            if (hero == HeroCharacterId.ThanhGiong)
-            {
-                heroController?.EnsureSkillDefinitions();
-                for (int i = 0; i < 4; i++)
+                HeroCharacterId hero = ActiveHero;
+                if (hero == HeroCharacterId.ThanhGiong)
                 {
-                    owned.Add("ThanhGiong_" + i);
-                }
-            }
-            else if (hero == HeroCharacterId.SonTinh)
-            {
-                heroController?.EnsureSkillDefinitions();
-                for (int i = 0; i < 4; i++)
-                {
-                    owned.Add("SonTinh_" + i);
-                }
-            }
-            else
-            {
-                if (inventory != null)
-                {
-                    inventory.EnsureDefaultSlots();
-                    foreach (string id in inventory.OwnedSkills.Keys)
+                    heroController?.EnsureSkillDefinitions();
+                    for (int i = 0; i < 4; i++)
                     {
-                        owned.Add(id);
+                        owned.Add("ThanhGiong_" + i);
                     }
                 }
-                owned.Sort(System.StringComparer.OrdinalIgnoreCase);
-            }
+                else if (hero == HeroCharacterId.SonTinh)
+                {
+                    heroController?.EnsureSkillDefinitions();
+                    for (int i = 0; i < 4; i++)
+                    {
+                        owned.Add("SonTinh_" + i);
+                    }
+                }
+                else if (hero == HeroCharacterId.AnDuongVuong)
+                {
+                    heroController?.EnsureSkillDefinitions();
+                    for (int i = 0; i < 4; i++)
+                    {
+                        owned.Add("AnDuongVuong_" + i);
+                    }
+                }
+                else
+                {
+                    if (inventory != null)
+                    {
+                        foreach (string id in inventory.OwnedSkills.Keys)
+                        {
+                            owned.Add(id);
+                        }
+                    }
+                    owned.Sort(System.StringComparer.OrdinalIgnoreCase);
+                }
 
-            if (previousId != null && owned.Contains(previousId))
-            {
-                selectedSkill = owned.IndexOf(previousId);
+                if (previousId != null && owned.Contains(previousId))
+                {
+                    selectedSkill = owned.IndexOf(previousId);
+                }
+                NormalizeSelection();
+                BuildSkillCards();
+                if (launcherLabel != null)
+                {
+                    launcherLabel.text = "K  KỸ NĂNG  [" + owned.Count + "]";
+                }
             }
-            NormalizeSelection();
-            BuildSkillCards();
-            if (launcherLabel != null)
+            finally
             {
-                launcherLabel.text = "K  KỸ NĂNG  [" + owned.Count + "]";
+                isRefreshingOwned = false;
             }
         }
 
@@ -352,6 +377,7 @@ namespace TopDownGame.UI
             {
                 windowSubtitle.text = hero switch
                 {
+                    HeroCharacterId.AnDuongVuong => "AN DƯƠNG VƯƠNG  •  BỘ 4 THẦN TIỄN CỔ LOA",
                     HeroCharacterId.ThanhGiong => "THÁNH GIÓNG  •  BỘ 4 TUYỆT KỸ THIÊN VƯƠNG",
                     HeroCharacterId.SonTinh => "SƠN TINH  •  BỘ 4 THẦN LỰC DỜI NON DỰNG NÚI",
                     _ => "CHIẾN BINH RỪNG  •  THƯ VIỆN & TRANG BỊ"
@@ -362,6 +388,7 @@ namespace TopDownGame.UI
             {
                 libraryHeading.text = hero switch
                 {
+                    HeroCharacterId.AnDuongVuong => "KỸ NĂNG AN DƯƠNG VƯƠNG",
                     HeroCharacterId.ThanhGiong => "KỸ NĂNG THÁNH GIÓNG",
                     HeroCharacterId.SonTinh => "KỸ NĂNG SƠN TINH",
                     _ => "KỸ NĂNG ĐÃ HỌC"
@@ -392,7 +419,12 @@ namespace TopDownGame.UI
                 int slotLevel;
                 string keyLabel = i switch { 0 => "Q", 1 => "E", 2 => "R", _ => "F" };
 
-                if (hero == HeroCharacterId.ThanhGiong)
+                if (hero == HeroCharacterId.AnDuongVuong)
+                {
+                    slotData = heroController != null ? heroController.GetAnDuongVuongSkillData(i) : null;
+                    slotLevel = heroController != null ? heroController.GetEffectiveSkillLevel(i) : 1;
+                }
+                else if (hero == HeroCharacterId.ThanhGiong)
                 {
                     slotData = heroController != null ? heroController.GetThanhGiongSkillData(i) : null;
                     slotLevel = heroController != null ? heroController.GetEffectiveSkillLevel(i) : 1;
@@ -433,7 +465,7 @@ namespace TopDownGame.UI
                 }
             }
 
-            if (hero == HeroCharacterId.ThanhGiong || hero == HeroCharacterId.SonTinh)
+            if (hero == HeroCharacterId.ThanhGiong || hero == HeroCharacterId.SonTinh || hero == HeroCharacterId.AnDuongVuong)
             {
                 if (equipButton != null)
                 {

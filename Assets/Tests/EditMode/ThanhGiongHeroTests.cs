@@ -18,6 +18,35 @@ namespace TopDownGame.Tests.EditMode
             Assert.That(ThanhGiongHeroController.IsHeroUnlocked(HeroCharacterId.ForestWarrior), Is.True);
             Assert.That(ThanhGiongHeroController.IsHeroUnlocked(HeroCharacterId.ThanhGiong), Is.True);
             Assert.That(ThanhGiongHeroController.IsHeroUnlocked(HeroCharacterId.SonTinh), Is.True);
+            Assert.That(ThanhGiongHeroController.IsHeroUnlocked(HeroCharacterId.AnDuongVuong), Is.True);
+        }
+
+        [Test]
+        public void AnDuongVuongVisualFactoryGeneratesAllPosesCrossbowArrowsAndSkillIcons()
+        {
+            foreach (AnDuongVuongPose pose in System.Enum.GetValues(typeof(AnDuongVuongPose)))
+            {
+                for (int stride = 0; stride < 4; stride++)
+                {
+                    Sprite sp = AnDuongVuongVisualFactory.GetHeroSprite(stride, pose);
+                    Assert.That(sp, Is.Not.Null, $"Pose {pose} frame {stride}");
+                }
+            }
+
+            Assert.That(AnDuongVuongVisualFactory.GetBronzeArrowSprite(), Is.Not.Null);
+            Assert.That(AnDuongVuongVisualFactory.GetCrossbowSprite(), Is.Not.Null);
+            for (int v = 0; v < 3; v++)
+            {
+                Assert.That(AnDuongVuongVisualFactory.GetArrowRainSprite(v), Is.Not.Null, "Arrow rain variant " + v);
+            }
+            Assert.That(AnDuongVuongVisualFactory.GetDongSonAuraRingSprite(), Is.Not.Null);
+            Assert.That(AnDuongVuongVisualFactory.GetHeroPortraitSprite(), Is.Not.Null);
+
+            for (int slot = 0; slot < 4; slot++)
+            {
+                Sprite icon = AnDuongVuongVisualFactory.GetSkillIcon(slot);
+                Assert.That(icon, Is.Not.Null, "An Duong Vuong Skill Slot " + slot);
+            }
         }
 
         [Test]
@@ -106,6 +135,21 @@ namespace TopDownGame.Tests.EditMode
                 SkillData skill = hero.GetSonTinhSkillData(i);
                 Assert.That(skill, Is.Not.Null);
                 Assert.That(skill.DisplayName, Is.EqualTo(expectedSonTinhNames[i]));
+                Assert.That(skill.Icon, Is.Not.Null);
+            }
+
+            string[] expectedAnDuongVuongNames =
+            {
+                "Nhất Tiễn Thấu Giáp",
+                "Tam Tiễn Tề Phát",
+                "Hô Thiên Giáng Tiễn",
+                "Thiên Tru Thần Tiễn"
+            };
+            for (int i = 0; i < 4; i++)
+            {
+                SkillData skill = hero.GetAnDuongVuongSkillData(i);
+                Assert.That(skill, Is.Not.Null);
+                Assert.That(skill.DisplayName, Is.EqualTo(expectedAnDuongVuongNames[i]));
                 Assert.That(skill.Icon, Is.Not.Null);
             }
 
@@ -214,6 +258,21 @@ namespace TopDownGame.Tests.EditMode
                 Assert.That(stE.DisplayName, Is.EqualTo("Dâng Núi Trấn Địch"));
                 Assert.That(stR.DisplayName, Is.EqualTo("Đấm Đất Dựng Núi"));
                 Assert.That(stF.DisplayName, Is.EqualTo("Bát Phương Quần Sơn"));
+                ui.Close();
+
+                // 4. An Duong Vuong
+                heroController.SelectHero(HeroCharacterId.AnDuongVuong, false);
+                ui.Open();
+                SkillData advQ = (SkillData)method.Invoke(ui, new object[] { "AnDuongVuong_0", 0 });
+                SkillData advE = (SkillData)method.Invoke(ui, new object[] { "AnDuongVuong_1", 1 });
+                SkillData advR = (SkillData)method.Invoke(ui, new object[] { "AnDuongVuong_2", 2 });
+                SkillData advF = (SkillData)method.Invoke(ui, new object[] { "AnDuongVuong_3", 3 });
+
+                Assert.That(advQ, Is.Not.Null);
+                Assert.That(advQ.DisplayName, Is.EqualTo("Nhất Tiễn Thấu Giáp"));
+                Assert.That(advE.DisplayName, Is.EqualTo("Tam Tiễn Tề Phát"));
+                Assert.That(advR.DisplayName, Is.EqualTo("Hô Thiên Giáng Tiễn"));
+                Assert.That(advF.DisplayName, Is.EqualTo("Thiên Tru Thần Tiễn"));
                 ui.Close();
             }
             finally
