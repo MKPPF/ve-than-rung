@@ -270,8 +270,15 @@ namespace TopDownGame.UI
 
         private void BuildPanel()
         {
-            if (panel != null) return;
+            if (panel != null && details != null) return;
+            if (panel != null)
+            {
+                Destroy(panel);
+                panel = null;
+                details = null;
+            }
             Canvas canvas = GetComponentInParent<Canvas>();
+            if (canvas == null) canvas = FindAnyObjectByType<Canvas>();
             if (canvas == null) return;
             launcherButton = F.Button(canvas.transform, "InventoryLauncher", "HÀNH TRANG  [I]", 0, 0, 250, 58, Open);
             RectTransform launchRect = launcherButton.GetComponent<RectTransform>();

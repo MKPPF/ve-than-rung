@@ -2116,8 +2116,8 @@ namespace TopDownGame.EditorTools
             {
                 MazeCorridor corridor = layout.Corridors[i];
                 float halfWidth = corridor.Width * 0.5f;
-                // Overlap cardinal runs at each waypoint so right-angle turns
-                // remain open without adding extra curved navigation cells.
+                // Support cardinal segments as well as arbitrary line segment distance
+                // so curved and angled corridor bends blend smoothly into walkable curves.
                 for (int p = 1; p < corridor.Points.Length; p++)
                 {
                     Vector2 from = corridor.Points[p - 1];
@@ -2136,6 +2136,18 @@ namespace TopDownGame.EditorTools
                         Mathf.Abs(point.x - from.x) <= halfWidth)
                     {
                         return true;
+                    }
+
+                    Vector2 ab = to - from;
+                    float lenSq = ab.sqrMagnitude;
+                    if (lenSq > 0.0001f)
+                    {
+                        float t = Mathf.Clamp01(Vector2.Dot(point - from, ab) / lenSq);
+                        Vector2 closest = from + t * ab;
+                        if ((point - closest).sqrMagnitude <= halfWidth * halfWidth)
+                        {
+                            return true;
+                        }
                     }
                 }
             }

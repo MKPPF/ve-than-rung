@@ -250,40 +250,57 @@ namespace TopDownGame.UI
 
         public void Show(EquipmentData item, EquipmentInventory inventory, bool shop, string price = null)
         {
-            icon.enabled = item != null && item.Icon != null;
-            icon.sprite = item != null ? item.Icon : null;
+            if (icon != null)
+            {
+                icon.enabled = item != null && item.Icon != null;
+                icon.sprite = item != null ? item.Icon : null;
+            }
             if (item == null)
             {
-                name.text = "Chọn một trang bị";
-                rarity.text = stats.text = comparison.text = value.text = state.text = "";
-                description.text = "Chọn ô đồ để xem chỉ số và so sánh.";
-                Action.interactable = false;
-                ActionLabel.text = "CHỌN TRANG BỊ";
+                if (name != null) name.text = "Chọn một trang bị";
+                if (rarity != null) rarity.text = "";
+                if (stats != null) stats.text = "";
+                if (comparison != null) comparison.text = "";
+                if (value != null) value.text = "";
+                if (state != null) state.text = "";
+                if (description != null) description.text = "Chọn ô đồ để xem chỉ số và so sánh.";
+                if (Action != null) Action.interactable = false;
+                if (ActionLabel != null) ActionLabel.text = "CHỌN TRANG BỊ";
                 return;
             }
-            EquipmentData current = inventory.GetEquipped(item.Slot);
+            EquipmentData current = inventory != null ? inventory.GetEquipped(item.Slot) : null;
             bool equipped = current == item;
-            int level = inventory.GetEnhancementLevel(item);
-            int power = inventory.EffectivePowerScore(item);
-            int delta = power - inventory.EffectivePowerScore(current);
-            name.text = item.DisplayName + (level > 0 ? "  +" + level : "");
-            name.color = Color.Lerp(item.RarityColor, FantasyEquipmentUI.TextColor, 0.3f);
-            rarity.text = item.RarityLabel + "  /  " + item.TypeLabel;
-            rarity.color = item.RarityColor;
-            description.text = item.Description;
-            state.text = equipped ? "ĐANG TRANG BỊ" : "SỨC MẠNH  " + power;
-            stats.text = BuildStatRows(item, current, inventory);
-            comparison.text = equipped ? "Trang bị này đang được sử dụng." :
-                "So với " + (current != null ? current.DisplayName : "ô đang trống") +
-                "\n<color=" + (delta >= 0 ? "#82C5A1" : "#EB947F") + ">" +
-                (delta >= 0 ? "+" : "") + delta + " sức mạnh</color>";
-            value.text = shop ? price : "SỨC MẠNH  " + power;
-            ActionLabel.text = shop ? "MUA & TRANG BỊ" : equipped ? "THÁO TRANG BỊ" : "TRANG BỊ";
-            Action.interactable = true;
+            int level = inventory != null ? inventory.GetEnhancementLevel(item) : 0;
+            int power = inventory != null ? inventory.EffectivePowerScore(item) : item.PowerScore;
+            int delta = power - (inventory != null ? inventory.EffectivePowerScore(current) : 0);
+            if (name != null)
+            {
+                name.text = item.DisplayName + (level > 0 ? "  +" + level : "");
+                name.color = Color.Lerp(item.RarityColor, FantasyEquipmentUI.TextColor, 0.3f);
+            }
+            if (rarity != null)
+            {
+                rarity.text = item.RarityLabel + "  /  " + item.TypeLabel;
+                rarity.color = item.RarityColor;
+            }
+            if (description != null) description.text = item.Description ?? string.Empty;
+            if (state != null) state.text = equipped ? "ĐANG TRANG BỊ" : "SỨC MẠNH  " + power;
+            if (stats != null) stats.text = inventory != null ? BuildStatRows(item, current, inventory) : string.Empty;
+            if (comparison != null)
+            {
+                comparison.text = equipped ? "Trang bị này đang được sử dụng." :
+                    "So với " + (current != null ? current.DisplayName : "ô đang trống") +
+                    "\n<color=" + (delta >= 0 ? "#82C5A1" : "#EB947F") + ">" +
+                    (delta >= 0 ? "+" : "") + delta + " sức mạnh</color>";
+            }
+            if (value != null) value.text = shop ? price : "SỨC MẠNH  " + power;
+            if (ActionLabel != null) ActionLabel.text = shop ? "MUA & TRANG BỊ" : equipped ? "THÁO TRANG BỊ" : "TRANG BỊ";
+            if (Action != null) Action.interactable = true;
         }
 
         private static string BuildStatRows(EquipmentData item, EquipmentData current, EquipmentInventory inventory)
         {
+            if (item == null || inventory == null) return string.Empty;
             float multiplier = EquipmentInventory.EnhancementMultiplier(inventory.GetEnhancementLevel(item));
             float currentMultiplier = EquipmentInventory.EnhancementMultiplier(inventory.GetEnhancementLevel(current));
             var text = new System.Text.StringBuilder();

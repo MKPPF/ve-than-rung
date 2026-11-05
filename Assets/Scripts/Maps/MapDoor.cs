@@ -15,6 +15,9 @@ namespace TopDownGame.Maps
         [SerializeField] private Color lockedColor = new Color(0.45f, 0.12f, 0.12f);
         [SerializeField] private Color openColor = new Color(0.15f, 0.8f, 0.35f);
 
+        private PlayerStats cachedPlayerStats;
+        private bool lastReachedState;
+
         public bool IsLocked { get; private set; }
         public MapData DestinationMap => destinationMap;
         public string DestinationScene => nextScene;
@@ -24,13 +27,55 @@ namespace TopDownGame.Maps
             : destinationMap != null && destinationMap.MapId == nextScene && !string.IsNullOrWhiteSpace(destinationMap.DisplayName);
         public bool CanInteract => isActiveAndEnabled && !IsLocked && !SceneTransition.IsLoading &&
             HasValidDestination && Application.CanStreamedLevelBeLoaded(nextScene);
-        public string InteractionPrompt => IsLocked
-            ? "Cổng đang khóa"
-            : !HasValidDestination || !Application.CanStreamedLevelBeLoaded(nextScene) ? "Cổng chưa sẵn sàng"
-            : SceneTransition.IsLoading ? "Đang chuyển vùng..."
-            : "E / Nhấp đúp - Đến " + DestinationName + "\n" +
-                (destinationMap != null ? "Cấp đề nghị: " + destinationMap.RecommendedMinLevel + "-" +
-                    destinationMap.RecommendedMaxLevel + " • " : "") + "Tự động lưu tiến trình";
+
+        public int RequiredLevel => nextScene == "Lobby" ? 1
+            : destinationMap != null ? destinationMap.RecommendedMinLevel
+            : MapData.RecommendedMinimumForScene(nextScene);
+
+        private PlayerStats GetPlayerStats()
+        {
+            if (cachedPlayerStats == null || !cachedPlayerStats.gameObject.activeInHierarchy)
+            {
+                GameObject player = GameObject.FindGameObjectWithTag("Player");
+                cachedPlayerStats = player != null ? player.GetComponent<PlayerStats>() : null;
+            }
+            return cachedPlayerStats;
+        }
+
+        public bool HasReachedRequiredLevel(PlayerStats stats = null)
+        {
+            if (nextScene == "Lobby" || GamePreferences.IsAutomatedTestRun)
+            {
+                return true;
+            }
+            if (stats == null)
+            {
+                stats = GetPlayerStats();
+            }
+            return stats != null && stats.Level >= RequiredLevel;
+        }
+
+        public string InteractionPrompt
+        {
+            get
+            {
+                if (IsLocked) return "Cổng đang khóa";
+                if (!HasValidDestination || !Application.CanStreamedLevelBeLoaded(nextScene)) return "Cổng chưa sẵn sàng";
+                if (SceneTransition.IsLoading) return "Đang chuyển vùng...";
+
+                PlayerStats stats = GetPlayerStats();
+                if (!HasReachedRequiredLevel(stats))
+                {
+                    int currentLvl = stats != null ? stats.Level : 1;
+                    return "Cần đạt Cấp " + RequiredLevel + " để đến " + DestinationName + "\n" +
+                        "(Hiện tại: Cấp " + currentLvl + "/" + RequiredLevel + " • Hãy săn quái để lên cấp)";
+                }
+
+                return "E / Nhấp đúp - Đến " + DestinationName + "\n" +
+                    (destinationMap != null ? "Cấp đề nghị: " + destinationMap.RecommendedMinLevel + "-" +
+                        destinationMap.RecommendedMaxLevel + " • " : "") + "Tự động lưu tiến trình";
+            }
+        }
 
         private void Awake()
         {
@@ -43,15 +88,34 @@ namespace TopDownGame.Maps
 
         private void Start()
         {
+            lastReachedState = HasReachedRequiredLevel();
             SetLocked(false);
+        }
+
+        private void Update()
+        {
+            bool reached = HasReachedRequiredLevel();
+            if (!lastReachedState && reached && !IsLocked && nextScene != "Lobby")
+            {
+                lastReachedState = true;
+                TopDownGame.UI.GameplayHUD.ShowNotice(
+                    "CỔNG ĐẾN " + DestinationName.ToUpperInvariant() + " ĐÃ MỞ!\n(Đã đạt Cấp " + RequiredLevel + ")",
+                    new Color(0.3f, 1f, 0.45f), 3.5f);
+            }
+            UpdateVisualColor();
         }
 
         public void SetLocked(bool locked)
         {
             IsLocked = locked;
+            UpdateVisualColor();
+        }
+
+        private void UpdateVisualColor()
+        {
             if (visual != null)
             {
-                visual.color = locked ? lockedColor : openColor;
+                visual.color = (IsLocked || !HasReachedRequiredLevel()) ? lockedColor : openColor;
             }
         }
 
@@ -63,6 +127,17 @@ namespace TopDownGame.Maps
             Rigidbody2D body = player.GetComponent<Rigidbody2D>();
             Vector2 position = body != null ? body.position : (Vector2)player.transform.position;
             if (!area.enabled || Vector2.Distance(area.ClosestPoint(position), position) > player.InteractionRadius) return;
+
+            PlayerStats stats = player.GetComponent<PlayerStats>();
+            if (!HasReachedRequiredLevel(stats))
+            {
+                int currentLvl = stats != null ? stats.Level : 1;
+                TopDownGame.UI.GameplayHUD.ShowNotice(
+                    "Cần đạt Cấp " + RequiredLevel + " để mở cổng đến " + DestinationName + "! (Hiện tại: Cấp " + currentLvl + ")",
+                    new Color(1f, 0.45f, 0.45f), 2.5f);
+                return;
+            }
+
             SceneTransition.TryLoadScene(nextScene, player);
         }
     }

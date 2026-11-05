@@ -147,7 +147,11 @@ namespace TopDownGame.Maps
             loadRequested = false;
             dismissed = true;
             GameplayState.ExitModal(this);
-            GetComponent<TeleportDepartureVisual>()?.ResetPresentation();
+            var visual = GetComponent<TeleportDepartureVisual>();
+            if (visual != null)
+            {
+                visual.ResetPresentation();
+            }
         }
 
         public void CancelChoice()

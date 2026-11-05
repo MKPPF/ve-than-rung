@@ -354,13 +354,20 @@ namespace TopDownGame.Player
                 if (rawInput.sqrMagnitude <= 0.001f)
                     rawInput = GestureInputState.Movement;
             }
-            moveDirection = ResolveCardinalInput(rawInput);
 
-            if (moveDirection.sqrMagnitude > 0.001f)
+            // For manual player control, preserve smooth multi-directional movement (including diagonals)
+            // so the character can naturally steer, len and hug curved roads and bends in the maps.
+            if (rawInput.sqrMagnitude > 0.001f)
             {
+                moveDirection = rawInput.sqrMagnitude > 1f ? rawInput.normalized : rawInput;
                 CancelClickMovement();
             }
-            else if (clickToMove && Mouse.current != null &&
+            else
+            {
+                moveDirection = Vector2.zero;
+            }
+
+            if (moveDirection.sqrMagnitude <= 0.001f && clickToMove && Mouse.current != null &&
                 Mouse.current.leftButton.wasPressedThisFrame &&
                 (EventSystem.current == null || !EventSystem.current.IsPointerOverGameObject()))
             {
@@ -530,11 +537,26 @@ namespace TopDownGame.Player
                 }
             }
 
-            // Walking is resolved on exactly one axis. In particular, a round or
-            // angled collider must stop that axis instead of projecting the
-            // character onto its tangent and secretly creating diagonal travel.
-            Vector2 targetPosition = ResolveAxisLockedMovement(previousPosition,
-                locomotionDisplacement);
+            // For click-to-move, keep axis-locked movement on open ground for right-angle test contracts,
+            // with surface sliding fallback when hitting curved or angled obstacles.
+            // For manual player input, use surface sliding so the character smoothly hugs and follows
+            // curved paths, walls, and corners without getting stuck.
+            Vector2 targetPosition;
+            if (hasClickDestination)
+            {
+                targetPosition = ResolveAxisLockedMovement(previousPosition,
+                    locomotionDisplacement);
+                if ((targetPosition - previousPosition).sqrMagnitude < locomotionDisplacement.sqrMagnitude * 0.05f &&
+                    locomotionDisplacement.sqrMagnitude > 0.0001f)
+                {
+                    targetPosition = ResolveSurfaceSliding(previousPosition, locomotionDisplacement);
+                }
+            }
+            else
+            {
+                targetPosition = ResolveSurfaceSliding(previousPosition,
+                    locomotionDisplacement);
+            }
             targetPosition = ResolveSurfaceSliding(targetPosition,
                 impulseVelocity * Time.fixedDeltaTime);
             body.MovePosition(targetPosition);
@@ -1282,7 +1304,7 @@ namespace TopDownGame.Player
 
             Vector2 movementDirection = displacement / distanceRemaining;
             Vector2 targetPosition = startPosition;
-            int iterationsRemaining = maxSlideIterations;
+            int iterationsRemaining = Mathf.Max(3, maxSlideIterations);
 
             while (iterationsRemaining-- > 0 &&
                 distanceRemaining > MovementEpsilon &&

@@ -128,7 +128,15 @@ namespace TopDownGame.UI
                 mapText.text = data != null
                     ? data.DisplayName
                     : UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-                recommendation.text = data != null ? "Cấp đề nghị: " + data.RecommendedLevelLabel.Replace("Lv. ", "") : string.Empty;
+
+                int nextMin = MapManager.Instance.NextRequiredLevel;
+                string goal = "";
+                if (nextMin > 0)
+                {
+                    bool reached = stats != null && stats.Level >= nextMin;
+                    goal = reached ? "  •  Cổng đã mở" : "  •  Mở cổng: Cấp " + nextMin;
+                }
+                recommendation.text = data != null ? "Cấp đề nghị: " + data.RecommendedLevelLabel.Replace("Lv. ", "") + goal : string.Empty;
             }
 
             promptText.text = interaction != null ? interaction.CurrentPrompt : string.Empty;
@@ -306,6 +314,12 @@ namespace TopDownGame.UI
         {
             ShowHuntNotice("TINH ANH XUẤT HIỆN   Cấp " + profile.Level + " " +
                 profile.DisplayName, new Color(1f, 0.64f, 0.15f), 3f);
+        }
+
+        public static void ShowNotice(string message, Color color, float duration = 2.5f)
+        {
+            GameplayHUD hud = Object.FindAnyObjectByType<GameplayHUD>();
+            hud?.ShowHuntNotice(message, color, duration);
         }
 
         private void ShowHuntNotice(string message, Color color, float duration)

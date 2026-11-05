@@ -30,6 +30,22 @@ namespace TopDownGame.Maps
         public MapData Data => mapData;
         public string ObjectiveText => "Mục tiêu: săn quái, nhặt đồ và lên cấp";
 
+        public int NextRequiredLevel
+        {
+            get
+            {
+                if (doors == null || doors.Length == 0) return 0;
+                foreach (MapDoor door in doors)
+                {
+                    if (door != null && door.DestinationScene != "Lobby")
+                    {
+                        return door.RequiredLevel;
+                    }
+                }
+                return 0;
+            }
+        }
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -75,12 +91,19 @@ namespace TopDownGame.Maps
             SetDoorsLocked(false);
             rewardChest?.Unlock();
 
+            string currentSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            if (GameProgressManager.Instance != null)
+            {
+                GameProgressManager.Instance.SetCurrentMap(currentSceneName);
+                GameProgressManager.Instance.UnlockRegion(currentSceneName);
+            }
+
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             Transform safeSpawn = GameObject.Find("PlayerSpawnPoint")?.transform;
             if (player != null)
             {
                 GameProgressManager.Instance?.SetSafeRespawn(
-                    UnityEngine.SceneManagement.SceneManager.GetActiveScene().name,
+                    currentSceneName,
                     safeSpawn != null ? safeSpawn.position : player.transform.position);
             }
 

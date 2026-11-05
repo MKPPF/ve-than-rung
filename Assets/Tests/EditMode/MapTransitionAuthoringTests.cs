@@ -62,5 +62,40 @@ namespace TopDownGame.Tests.EditMode
             }
             finally { EditorSceneManager.ClosePreviewScene(scene); }
         }
+
+        [Test]
+        public void TeleportDepartureVisualAndLobbyPortalDoNotThrowWhenCameraDestroyed()
+        {
+            GameObject camObj = new GameObject("MainCamera");
+            camObj.tag = "MainCamera";
+            Camera cam = camObj.AddComponent<Camera>();
+            TopDownGame.Core.CameraFollow2D follow = camObj.AddComponent<TopDownGame.Core.CameraFollow2D>();
+
+            GameObject portalObj = new GameObject("Portal");
+            portalObj.AddComponent<BoxCollider2D>();
+            LobbyPortal portal = portalObj.AddComponent<LobbyPortal>();
+            TeleportDepartureVisual visual = portalObj.AddComponent<TeleportDepartureVisual>();
+
+            try
+            {
+                follow.BeginCinematicFocus(visual, Vector3.zero, 1.2f);
+                typeof(TeleportDepartureVisual).GetField("cameraFollow", BindingFlags.Instance | BindingFlags.NonPublic)
+                    ?.SetValue(visual, follow);
+                typeof(TeleportDepartureVisual).GetField("presenting", BindingFlags.Instance | BindingFlags.NonPublic)
+                    ?.SetValue(visual, true);
+
+                // Destroy camera object first (simulating scene teardown where camera is destroyed before portal)
+                Object.DestroyImmediate(camObj);
+
+                // Verify that ResetPresentation and OnDisable (CancelDeparture) do not throw MissingReferenceException
+                Assert.DoesNotThrow(() => visual.ResetPresentation());
+                Assert.DoesNotThrow(() => portalObj.SetActive(false));
+            }
+            finally
+            {
+                if (portalObj != null) Object.DestroyImmediate(portalObj);
+                if (camObj != null) Object.DestroyImmediate(camObj);
+            }
+        }
     }
 }

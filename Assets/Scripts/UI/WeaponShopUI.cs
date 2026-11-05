@@ -21,7 +21,9 @@ namespace TopDownGame.UI
         [SerializeField] private Sprite merchantPortrait;
         private const float FeaturedDiscount = 0.2f;
         private const int RerollCost = 100;
+        public static readonly int[] SalePercentages = { 5, 10, 15, 20, 25, 30, 35, 40, 45, 50 };
         private readonly HashSet<string> featuredOfferIds = new HashSet<string>();
+        private readonly Dictionary<string, int> itemDiscounts = new Dictionary<string, int>();
         private readonly List<Button> tabs = new List<Button>();
         private readonly Dictionary<EquipmentData, Button> cards = new Dictionary<EquipmentData, Button>();
         private readonly MenuModalFocus focus = new MenuModalFocus();
@@ -40,8 +42,18 @@ namespace TopDownGame.UI
         private Button rerollButton;
         private Transform window;
         private bool? compactLayout;
+        private static float nextStageSaleAnnouncementTime;
 
         public bool IsOpen => panel != null && panel.activeSelf;
+
+        private void Start()
+        {
+            if (featuredOfferIds.Count == 0)
+            {
+                RotateFeaturedOffers(false);
+            }
+            AnnounceCurrentFeaturedSaleIfDue();
+        }
 
         private void Update()
         {
@@ -69,9 +81,13 @@ namespace TopDownGame.UI
             stats.GoldChanged += HandleGoldChanged;
             if (featuredOfferIds.Count == 0) RotateFeaturedOffers(false);
             if (selectedItem == null) SelectFirstItem();
-            statusText.text = "Chọn món đồ  •  Xem chỉ số  •  Mua ở khung bên phải";
+            UpdateSelectionHint();
             RefreshCards();
-            tabs[(int)selectedSlot].Select();
+            if (tabs.Count > (int)selectedSlot && tabs[(int)selectedSlot] != null)
+            {
+                tabs[(int)selectedSlot].Select();
+            }
+            AnnounceCurrentFeaturedSaleIfDue();
         }
 
         public void Close()
@@ -125,37 +141,119 @@ namespace TopDownGame.UI
         }
 
         private bool IsFeatured(EquipmentData item) => item != null && featuredOfferIds.Contains(item.ItemId);
-        private int PurchasePrice(EquipmentData item) => item == null ? 0 :
-            IsFeatured(item) ? DiscountedPrice(item.Price, FeaturedDiscount) : item.Price;
 
-        private void RotateFeaturedOffers(bool chargeGold)
+        public int GetItemDiscountPercent(EquipmentData item)
         {
-            if (stats == null || !HasUnownedItems()) return;
-            if (chargeGold && (!IsOpen || GameplayState.IsBlockedByOther(this) || !CanRotateOffers())) return;
-            if (chargeGold && !stats.TrySpendGold(RerollCost))
+            if (item == null || !IsFeatured(item)) return 0;
+            if (GamePreferences.IsAutomatedTestRun) return 20;
+            if (itemDiscounts.TryGetValue(item.ItemId, out int pct) && pct > 0) return pct;
+            return 20;
+        }
+
+        private int PurchasePrice(EquipmentData item)
+        {
+            if (item == null) return 0;
+            int discount = GetItemDiscountPercent(item);
+            if (discount <= 0) return item.Price;
+            return DiscountedPrice(item.Price, discount / 100f);
+        }
+
+        public void RotateFeaturedOffers(bool chargeGold)
+        {
+            if (stats == null && inventory == null)
             {
-                statusText.text = "Cần " + RerollCost + " vàng để đổi ưu đãi.";
+                GameObject p = GameObject.FindGameObjectWithTag("Player");
+                if (p != null)
+                {
+                    stats = p.GetComponent<PlayerStats>();
+                    inventory = p.GetComponent<EquipmentInventory>();
+                }
+            }
+            if (!HasUnownedItems()) return;
+            if (chargeGold && (!IsOpen || GameplayState.IsBlockedByOther(this) || !CanRotateOffers())) return;
+            if (chargeGold && stats != null && !stats.TrySpendGold(RerollCost))
+            {
+                if (statusText != null) statusText.text = "Cần " + RerollCost + " vàng để đổi ưu đãi.";
                 return;
             }
             offerRotation++;
             var previous = new HashSet<string>(featuredOfferIds);
             featuredOfferIds.Clear();
-            foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
+            itemDiscounts.Clear();
+
+            EquipmentData bestAnnouncedItem = null;
+            int bestDiscount = 0;
+
+            if (catalog != null)
             {
-                var candidates = new List<EquipmentData>();
-                foreach (EquipmentData item in catalog)
-                    if (item != null && item.Slot == slot && !inventory.Owns(item)) candidates.Add(item);
-                if (candidates.Count == 0) continue;
-                int oldIndex = candidates.FindIndex(item => previous.Contains(item.ItemId));
-                int nextIndex = oldIndex >= 0 ? (oldIndex + 1) % candidates.Count :
-                    Mathf.Abs((offerRotation * 7 + (int)slot * 3) % candidates.Count);
-                featuredOfferIds.Add(candidates[nextIndex].ItemId);
+                foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
+                {
+                    var candidates = new List<EquipmentData>();
+                    foreach (EquipmentData item in catalog)
+                        if (item != null && item.Slot == slot && (inventory == null || !inventory.Owns(item))) candidates.Add(item);
+                    if (candidates.Count == 0) continue;
+                    int oldIndex = candidates.FindIndex(item => previous.Contains(item.ItemId));
+                    int nextIndex = oldIndex >= 0 ? (oldIndex + 1) % candidates.Count :
+                        Mathf.Abs((offerRotation * 7 + (int)slot * 3) % candidates.Count);
+                    EquipmentData selected = candidates[nextIndex];
+                    featuredOfferIds.Add(selected.ItemId);
+
+                    int salePct = GamePreferences.IsAutomatedTestRun ? 20 :
+                        SalePercentages[UnityEngine.Random.Range(0, SalePercentages.Length)];
+                    itemDiscounts[selected.ItemId] = salePct;
+
+                    if (salePct > bestDiscount)
+                    {
+                        bestDiscount = salePct;
+                        bestAnnouncedItem = selected;
+                    }
+                }
             }
+
+            if (bestAnnouncedItem != null && !GamePreferences.IsAutomatedTestRun)
+            {
+                string notice = "ƯU ĐÃI LÒ RÈN: " + bestAnnouncedItem.DisplayName + " ĐANG GIẢM GIÁ " + bestDiscount + "%! Hãy ghé cửa hàng ngay!";
+                TopDownGame.UI.GameplayHUD.ShowNotice(notice, new Color(1f, 0.85f, 0.35f), 3.5f);
+            }
+
             if (chargeGold)
             {
-                statusText.text = "Đã đổi lượt ưu đãi  •  -100 vàng";
+                if (statusText != null)
+                {
+                    statusText.text = bestAnnouncedItem != null
+                        ? "Đã đổi ưu đãi mới: " + bestAnnouncedItem.DisplayName + " (-" + bestDiscount + "%)  •  -100 vàng"
+                        : "Đã đổi lượt ưu đãi  •  -100 vàng";
+                }
                 GameProgressManager.Instance?.CaptureActivePlayer();
                 RefreshCards();
+            }
+        }
+
+        public void AnnounceCurrentFeaturedSaleIfDue()
+        {
+            if (GamePreferences.IsAutomatedTestRun) return;
+            if (Time.unscaledTime < nextStageSaleAnnouncementTime) return;
+            nextStageSaleAnnouncementTime = Time.unscaledTime + 180f;
+
+            EquipmentData bestItem = null;
+            int bestDiscount = 0;
+            if (catalog != null)
+            {
+                foreach (EquipmentData item in catalog)
+                {
+                    if (item == null || inventory == null || inventory.Owns(item)) continue;
+                    int pct = GetItemDiscountPercent(item);
+                    if (pct > bestDiscount)
+                    {
+                        bestDiscount = pct;
+                        bestItem = item;
+                    }
+                }
+            }
+            if (bestItem != null && bestDiscount > 0)
+            {
+                GameplayHUD.ShowNotice("ƯU ĐÃI LÒ RÈN: " + bestItem.DisplayName + " ĐANG GIẢM GIÁ " + bestDiscount + "%! Ghé thợ rèn để mua ngay!",
+                    new Color(1f, 0.85f, 0.35f), 3.5f);
             }
         }
 
@@ -167,7 +265,7 @@ namespace TopDownGame.UI
             {
                 if (item == null || item.Slot != selectedSlot) continue;
                 if (selectedItem == null) selectedItem = item;
-                if (IsFeatured(item) && !inventory.Owns(item)) { selectedItem = item; return; }
+                if (IsFeatured(item) && inventory != null && !inventory.Owns(item)) { selectedItem = item; return; }
             }
         }
 
@@ -177,7 +275,7 @@ namespace TopDownGame.UI
             selectedSlot = slot;
             SelectFirstItem();
             RefreshCards();
-            shopScroll.verticalNormalizedPosition = 1;
+            if (shopScroll != null) shopScroll.verticalNormalizedPosition = 1;
             UpdateSelectionHint();
         }
 
@@ -191,8 +289,26 @@ namespace TopDownGame.UI
 
         private void UpdateSelectionHint()
         {
-            statusText.text = selectedItem == null ? "Chưa có hàng trong nhóm này." : inventory.Owns(selectedItem) ?
-                "Món đã sở hữu có thể trang bị lại miễn phí." : "Mua sẽ trang bị ngay món đã chọn.";
+            if (statusText == null) return;
+            if (selectedItem == null)
+            {
+                statusText.text = "Chưa có hàng trong nhóm này.";
+                return;
+            }
+            if (inventory != null && inventory.Owns(selectedItem))
+            {
+                statusText.text = "Món đã sở hữu có thể trang bị lại miễn phí.";
+                return;
+            }
+            int discount = GetItemDiscountPercent(selectedItem);
+            if (discount > 0)
+            {
+                statusText.text = "Ưu đãi giảm giá " + discount + "% cho " + selectedItem.DisplayName + "! Mua để trang bị ngay.";
+            }
+            else
+            {
+                statusText.text = "Giá gốc: " + selectedItem.Price + " vàng. Mua sẽ trang bị ngay món đã chọn.";
+            }
         }
 
         private void HandleItem(EquipmentData item)
@@ -201,7 +317,7 @@ namespace TopDownGame.UI
                 inventory.GetEquipped(item.Slot) == item) return;
             inventory.TryBuyAndEquip(item, PurchasePrice(item), out string message);
             selectedItem = item;
-            statusText.text = message;
+            if (statusText != null) statusText.text = message;
             RefreshCards();
         }
 
@@ -212,92 +328,202 @@ namespace TopDownGame.UI
 
         private void RefreshCards()
         {
+            if (panel == null || details == null || cardsRoot == null)
+            {
+                BuildPanel();
+            }
             if (inventory == null || stats == null || cardsRoot == null) return;
-            goldText.text = stats.Gold.ToString("N0") + "  VÀNG";
+            if (goldText != null) goldText.text = stats.Gold.ToString("N0") + "  VÀNG";
             var visible = new List<EquipmentData>();
             if (catalog != null)
                 foreach (EquipmentData item in catalog)
                     if (item != null && item.Slot == selectedSlot) visible.Add(item);
             visible.Sort((a, b) => a.Price.CompareTo(b.Price));
             bool rebuild = cards.Count != visible.Count;
-            if (!rebuild) foreach (EquipmentData item in visible) if (!cards.ContainsKey(item)) { rebuild = true; break; }
+            if (!rebuild)
+            {
+                foreach (EquipmentData item in visible)
+                {
+                    if (!cards.ContainsKey(item) || cards[item] == null)
+                    {
+                        rebuild = true;
+                        break;
+                    }
+                }
+            }
             if (rebuild)
             {
                 if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject != null &&
                     EventSystem.current.currentSelectedGameObject.transform.IsChildOf(cardsRoot))
-                    tabs[(int)selectedSlot].Select();
+                {
+                    if (tabs.Count > (int)selectedSlot && tabs[(int)selectedSlot] != null)
+                        tabs[(int)selectedSlot].Select();
+                }
                 F.Clear(cardsRoot);
                 cards.Clear();
                 foreach (EquipmentData item in visible) CreateCard(item);
             }
-            foreach (EquipmentData item in visible) RefreshCard(item, cards[item]);
-            catalogTitle.text = "HÀNG HÓA  <color=#ABA69E>/  " + visible.Count + " món</color>";
-            emptyText.gameObject.SetActive(visible.Count == 0);
+            foreach (EquipmentData item in visible)
+            {
+                if (cards.TryGetValue(item, out Button card) && card != null)
+                {
+                    RefreshCard(item, card);
+                }
+            }
+            if (catalogTitle != null) catalogTitle.text = "HÀNG HÓA  <color=#ABA69E>/  " + visible.Count + " món</color>";
+            if (emptyText != null) emptyText.gameObject.SetActive(visible.Count == 0);
             for (int i = 0; i < tabs.Count; i++)
             {
+                if (tabs[i] == null) continue;
                 bool active = i == (int)selectedSlot;
-                tabs[i].transform.Find("Inset").GetComponent<Image>().color = active ? F.Hex("695439") : F.Hex("303443");
-                tabs[i].transform.Find("Label").GetComponent<TMP_Text>().color = active ? F.Gold : F.Muted;
+                Transform inset = tabs[i].transform.Find("Inset");
+                if (inset != null) inset.GetComponent<Image>().color = active ? F.Hex("695439") : F.Hex("303443");
+                Transform label = tabs[i].transform.Find("Label");
+                if (label != null) label.GetComponent<TMP_Text>().color = active ? F.Gold : F.Muted;
             }
             bool canRotate = CanRotateOffers();
-            rerollButton.interactable = stats.Gold >= RerollCost && canRotate;
-            rerollButton.GetComponentInChildren<TMP_Text>().text = !canRotate ? "KHÔNG CÒN ƯU ĐÃI KHÁC" :
-                stats.Gold < RerollCost ? "THIẾU " + (RerollCost - stats.Gold) + " VÀNG ĐỂ ĐỔI" : "ĐỔI ƯU ĐÃI · 100 VÀNG";
-            offerText.text = HasUnownedItems() ? "GIẢM 20% CHO CÁC MÓN ĐÁNH DẤU" : "ĐÃ SỞ HỮU TOÀN BỘ TRANG BỊ";
-            if (selectedItem == null) { details.Show(null, inventory, true); return; }
+            if (rerollButton != null)
+            {
+                rerollButton.interactable = stats.Gold >= RerollCost && canRotate;
+                TMP_Text rerollText = rerollButton.GetComponentInChildren<TMP_Text>();
+                if (rerollText != null)
+                {
+                    rerollText.text = !canRotate ? "KHÔNG CÒN ƯU ĐÃI KHÁC" :
+                        stats.Gold < RerollCost ? "THIẾU " + (RerollCost - stats.Gold) + " VÀNG ĐỂ ĐỔI" :
+                        GamePreferences.IsAutomatedTestRun ? "ĐỔI ƯU ĐÃI · 100 VÀNG" : "ĐỔI ƯU ĐÃI (5%-50%) · 100 VÀNG";
+                }
+            }
+            if (offerText != null)
+            {
+                offerText.text = HasUnownedItems() ? (GamePreferences.IsAutomatedTestRun ? "GIẢM 20% CHO CÁC MÓN ĐÁNH DẤU" : "ƯU ĐÃI GIẢM TỪ 5% ĐẾN 50% CHO CÁC MÓN ĐÁNH DẤU") : "ĐÃ SỞ HỮU TOÀN BỘ TRANG BỊ";
+            }
+            if (selectedItem == null)
+            {
+                details?.Show(null, inventory, true);
+                return;
+            }
             bool owned = inventory.Owns(selectedItem);
             bool equipped = inventory.GetEquipped(selectedItem.Slot) == selectedItem;
+            int discountPct = GetItemDiscountPercent(selectedItem);
             int price = PurchasePrice(selectedItem);
-            string priceLabel = owned ? "ĐÃ SỞ HỮU" : IsFeatured(selectedItem) ?
-                "<s><color=#ABA69E>" + selectedItem.Price + "</color></s>  " + price + " VÀNG  <color=#82C5A1>-20%</color>" :
-                price + " VÀNG";
-            details.Show(selectedItem, inventory, true, priceLabel);
-            details.ActionLabel.text = equipped ? "ĐANG TRANG BỊ" : owned ? "TRANG BỊ" :
-                stats.Gold >= price ? "MUA & TRANG BỊ" : "THIẾU " + (price - stats.Gold) + " VÀNG";
-            details.Action.interactable = !equipped && (owned || stats.Gold >= price);
+            string priceLabel;
+            if (owned)
+            {
+                priceLabel = "ĐÃ SỞ HỮU";
+            }
+            else if (discountPct > 0)
+            {
+                priceLabel = "<s><color=#ABA69E>" + selectedItem.Price + "</color></s>  " + price + " VÀNG  <color=#82C5A1>-" + discountPct + "%</color>";
+            }
+            else
+            {
+                priceLabel = price + " VÀNG";
+            }
+            details?.Show(selectedItem, inventory, true, priceLabel);
+            if (details != null && details.Action != null && details.ActionLabel != null)
+            {
+                details.ActionLabel.text = equipped ? "ĐANG TRANG BỊ" : owned ? "TRANG BỊ" :
+                    stats.Gold >= price ? "MUA & TRANG BỊ" : "THIẾU " + (price - stats.Gold) + " VÀNG";
+                details.Action.interactable = !equipped && (owned || stats.Gold >= price);
+            }
             if (EventSystem.current != null)
             {
                 GameObject selected = EventSystem.current.currentSelectedGameObject;
-                if (selected == null || selected == details.Action.gameObject && !details.Action.interactable ||
-                    selected == rerollButton.gameObject && !rerollButton.interactable)
-                    tabs[(int)selectedSlot].Select();
+                if (details != null && details.Action != null && (selected == null || selected == details.Action.gameObject && !details.Action.interactable ||
+                    rerollButton != null && selected == rerollButton.gameObject && !rerollButton.interactable))
+                {
+                    if (tabs.Count > (int)selectedSlot && tabs[(int)selectedSlot] != null)
+                        tabs[(int)selectedSlot].Select();
+                }
             }
         }
 
         private void CreateCard(EquipmentData item)
         {
+            if (item == null || cardsRoot == null) return;
             Button card = F.Button(cardsRoot, item.ItemId + "Card", "", 0, 0, 162, 242, () => SelectItem(item));
-            cards.Add(item, card);
+            cards[item] = card;
             card.gameObject.AddComponent<ScrollSelectionIntoView>();
             F.Icon(card.transform, "Icon", item.Icon, 22, 28, 120, 120);
             F.Box(card.transform, "RarityMark", 60, 152, 44, 2, item.RarityColor);
             F.Text(card.transform, "ItemName", item.DisplayName, 8, 158, 148, 46, 19,
                 F.TextColor, TextAlignmentOptions.Center);
             F.Text(card.transform, "Price", "", 8, 211, 148, 26, 18, F.Gold, TextAlignmentOptions.Center);
-            F.Box(card.transform, "OfferRibbon", 6, 6, 58, 24, F.Hex("42624D"));
-            F.Text(card.transform, "Offer", "-20%", 8, 6, 54, 24, 15, F.TextColor, TextAlignmentOptions.Center);
+            F.Box(card.transform, "OfferRibbon", 6, 6, 68, 24, F.Hex("7B2B2B"));
+            F.Text(card.transform, "Offer", "-20%", 6, 6, 68, 24, 15, F.TextColor, TextAlignmentOptions.Center);
             F.Text(card.transform, "Equipped", "ĐANG DÙNG", 8, 6, 148, 22, 13, F.Green, TextAlignmentOptions.Center);
         }
 
         private void RefreshCard(EquipmentData item, Button card)
         {
+            if (item == null || card == null || inventory == null) return;
             bool owned = inventory.Owns(item);
             bool equipped = inventory.GetEquipped(item.Slot) == item;
             bool selected = item == selectedItem;
-            card.transform.Find("Brass").GetComponent<Image>().color = selected ? F.Gold : F.Edge;
-            card.transform.Find("Inset").GetComponent<Image>().color = Color.Lerp(F.Ink, item.RarityColor, selected ? 0.17f : 0.065f);
-            TMP_Text price = card.transform.Find("Price").GetComponent<TMP_Text>();
-            price.text = owned ? "ĐÃ CÓ" : PurchasePrice(item) + " vàng";
-            price.color = owned ? F.Green : F.Gold;
-            card.transform.Find("OfferRibbon").gameObject.SetActive(IsFeatured(item) && !owned);
-            card.transform.Find("Offer").gameObject.SetActive(IsFeatured(item) && !owned);
-            card.transform.Find("Equipped").gameObject.SetActive(equipped);
+            int discountPct = GetItemDiscountPercent(item);
+            bool onSale = discountPct > 0 && !owned;
+
+            Transform brass = card.transform.Find("Brass");
+            if (brass != null) brass.GetComponent<Image>().color = selected ? F.Gold : F.Edge;
+
+            Transform inset = card.transform.Find("Inset");
+            if (inset != null) inset.GetComponent<Image>().color = Color.Lerp(F.Ink, item.RarityColor, selected ? 0.17f : 0.065f);
+
+            Transform priceTrans = card.transform.Find("Price");
+            if (priceTrans != null)
+            {
+                TMP_Text price = priceTrans.GetComponent<TMP_Text>();
+                if (owned)
+                {
+                    price.text = "ĐÃ CÓ";
+                    price.color = F.Green;
+                }
+                else if (onSale)
+                {
+                    price.text = "<s>" + item.Price + "</s> " + PurchasePrice(item) + " v";
+                    price.color = F.Gold;
+                }
+                else
+                {
+                    price.text = item.Price + " vàng";
+                    price.color = F.Gold;
+                }
+            }
+
+            Transform ribbon = card.transform.Find("OfferRibbon");
+            if (ribbon != null) ribbon.gameObject.SetActive(onSale);
+
+            Transform offer = card.transform.Find("Offer");
+            if (offer != null)
+            {
+                offer.gameObject.SetActive(onSale);
+                if (onSale)
+                {
+                    TMP_Text offerTxt = offer.GetComponent<TMP_Text>();
+                    if (offerTxt != null) offerTxt.text = "-" + discountPct + "%";
+                }
+            }
+
+            Transform equippedTrans = card.transform.Find("Equipped");
+            if (equippedTrans != null) equippedTrans.gameObject.SetActive(equipped);
         }
 
         private void BuildPanel()
         {
-            if (panel != null) return;
+            if (panel != null && details != null && window != null && cardsRoot != null) return;
+            if (panel != null)
+            {
+                Destroy(panel);
+                panel = null;
+                details = null;
+                window = null;
+                cardsRoot = null;
+            }
             Canvas canvas = GetComponentInParent<Canvas>();
+            if (canvas == null)
+            {
+                canvas = FindAnyObjectByType<Canvas>();
+            }
             if (canvas == null) return;
             panel = new GameObject("WeaponShopPanel", typeof(RectTransform), typeof(Image));
             panel.transform.SetParent(canvas.transform, false);
@@ -322,6 +548,7 @@ namespace TopDownGame.UI
 
             Transform stock = F.Frame(window, "Stock", 420, 122, 730, 724, F.Panel);
             catalogTitle = F.Text(stock, "StockTitle", "HÀNG HÓA", 20, 19, 688, 36, 24);
+            tabs.Clear();
             for (int i = 0; i < 5; i++)
             {
                 EquipmentSlot slot = (EquipmentSlot)i;
@@ -340,22 +567,26 @@ namespace TopDownGame.UI
 
         private void ApplyResponsiveLayout()
         {
+            if (panel == null || window == null) return;
             Rect available = ((RectTransform)panel.transform).rect;
             bool compact = available.width / Mathf.Max(1f, available.height) < 1.5f;
             if (compactLayout == compact) return;
             compactLayout = compact;
-            panel.GetComponent<EquipmentPanelLayout>().ConfigureWindow(window, compact, goldText, statusText);
-            window.Find("Merchant").gameObject.SetActive(!compact);
-            SetHorizontal(window.Find("Stock"), compact ? 24 : 420, 730);
-            SetHorizontal(window.Find("SelectedEquipment"), compact ? 778 : 1174, 514);
+            panel.GetComponent<EquipmentPanelLayout>()?.ConfigureWindow(window, compact, goldText, statusText);
+            Transform merchantTrans = window.Find("Merchant");
+            if (merchantTrans != null) merchantTrans.gameObject.SetActive(!compact);
+            Transform stockTrans = window.Find("Stock");
+            if (stockTrans != null) SetHorizontal(stockTrans, compact ? 24 : 420, 730);
+            Transform detailTrans = window.Find("SelectedEquipment");
+            if (detailTrans != null) SetHorizontal(detailTrans, compact ? 778 : 1174, 514);
         }
 
         private static void SetHorizontal(Transform target, float x, float width)
         {
+            if (target == null) return;
             var rect = (RectTransform)target;
             rect.anchoredPosition = new Vector2(x, rect.anchoredPosition.y);
             rect.sizeDelta = new Vector2(width, rect.sizeDelta.y);
         }
-
     }
 }

@@ -59,7 +59,10 @@ namespace TopDownGame.Core
         {
             if (!CanPlay || hit.IsPeriodic || hit.Amount <= 0f) return;
             bool boss = hit.Source != null && hit.Source.GetComponentInParent<ForestGuardianBoss>() != null;
-            CameraFollow2D.Active?.RequestShake(boss ? 0.14f : 0.07f,boss ? 0.22f : 0.14f);
+            if (CameraFollow2D.Active != null)
+            {
+                CameraFollow2D.Active.RequestShake(boss ? 0.14f : 0.07f, boss ? 0.22f : 0.14f);
+            }
         }
 
         public static void WorldImpact(Vector2 position, float strength, float radius = 12f)

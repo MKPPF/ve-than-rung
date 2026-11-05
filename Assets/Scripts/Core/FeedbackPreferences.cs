@@ -15,7 +15,7 @@ namespace TopDownGame.Core
         {
             CameraShakeEnabled = PlayerPrefs.GetInt(GamePreferences.Key(ShakeKey),1) != 0;
             HitstopEnabled = PlayerPrefs.GetInt(GamePreferences.Key(HitstopKey),1) != 0;
-            if (!CameraShakeEnabled) CameraFollow2D.Active?.ClearShake();
+            if (!CameraShakeEnabled && CameraFollow2D.Active != null) CameraFollow2D.Active.ClearShake();
             if (!HitstopEnabled) GameplayState.CancelHitstop();
         }
 
@@ -24,7 +24,7 @@ namespace TopDownGame.Core
             CameraShakeEnabled = value;
             PlayerPrefs.SetInt(GamePreferences.Key(ShakeKey),value ? 1 : 0);
             PlayerPrefs.Save();
-            if (!value) CameraFollow2D.Active?.ClearShake();
+            if (!value && CameraFollow2D.Active != null) CameraFollow2D.Active.ClearShake();
         }
 
         public static void SetHitstopEnabled(bool value)

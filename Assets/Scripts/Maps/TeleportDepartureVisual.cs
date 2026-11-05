@@ -73,11 +73,17 @@ namespace TopDownGame.Maps
                 root.SetActive(true);
                 Camera camera = Camera.main;
                 cameraFollow = camera != null ? camera.GetComponent<CameraFollow2D>() : null;
-                cameraFollow?.BeginCinematicFocus(this, transform.position + Vector3.up * 1.1f, zoomOutMultiplier);
+                if (cameraFollow != null)
+                {
+                    cameraFollow.BeginCinematicFocus(this, transform.position + Vector3.up * 1.1f, zoomOutMultiplier);
+                }
             }
             float t = portal.DepartureProgress;
             float clock = t * portal.DepartureDuration;
-            cameraFollow?.SetCinematicProgress(this, t / 0.42f);
+            if (cameraFollow != null)
+            {
+                cameraFollow.SetCinematicProgress(this, t / 0.42f);
+            }
             if (material != null)
             {
                 material.SetFloat("_Progress", t);
@@ -101,7 +107,10 @@ namespace TopDownGame.Maps
 
         public void ResetPresentation()
         {
-            cameraFollow?.EndCinematicFocus(this);
+            if (cameraFollow != null)
+            {
+                cameraFollow.EndCinematicFocus(this);
+            }
             cameraFollow = null;
             presenting = false;
             if (root != null) root.SetActive(false);

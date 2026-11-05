@@ -37,7 +37,7 @@ namespace TopDownGame.Core
 
         public bool BeginCinematicFocus(Object owner, Vector3 focus, float zoomMultiplier)
         {
-            if (owner == null || (cinematicOwner != null && cinematicOwner != owner)) return false;
+            if (this == null || owner == null || (cinematicOwner != null && cinematicOwner != owner)) return false;
             cinematicOwner = owner;
             ClearShake();
             cinematicFocus = focus;
@@ -48,12 +48,13 @@ namespace TopDownGame.Core
 
         public void SetCinematicProgress(Object owner, float progress)
         {
-            if (cinematicOwner != owner) return;
+            if (this == null || cinematicOwner != owner) return;
             cinematicBlend = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(progress));
         }
 
         public void EndCinematicFocus(Object owner)
         {
+            if (this == null) return;
             if (cinematicOwner != owner) return;
             cinematicOwner = null;
             cinematicBlend = 0f;
@@ -105,7 +106,18 @@ namespace TopDownGame.Core
         {
             shakeStartedAt = shakeEndsAt = shakeAmplitude = 0f;
             ShakeOffset = Vector2.zero;
-            transform.position = unshakenPosition;
+            if (this == null) return;
+            try
+            {
+                if (transform != null)
+                {
+                    transform.position = unshakenPosition;
+                }
+            }
+            catch (MissingReferenceException)
+            {
+                // Component or GameObject already torn down during scene unload
+            }
         }
 
         private Vector3 SampleShake()
@@ -187,7 +199,7 @@ namespace TopDownGame.Core
 
         private void SnapToTarget()
         {
-            if (target == null)
+            if (this == null || target == null)
             {
                 return;
             }
